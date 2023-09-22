@@ -1,73 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define TAM_REGISTRO 76
-#define TAM_REGISTRO_FIXO 21
-#define LIXO = '$'
-#define NAO_REMOVIDO = '0'
-#define REMOVIDO = '1'
-#define TAMANHO_MAXIMO 500
-
-typedef struct {
-    char status;
-    int proxRRn;
-    int nroTecnologias;
-    int nroParesTecnologias;
-} Cabecalho;
-
-typedef struct {
-    int tamanho;
-    char *string;
-} StringVariavel;
-
-typedef struct {
-    char removido;
-    int grupo;
-    int popularidade;
-    int peso;
-    StringVariavel tecnologiaOrigem;
-    StringVariavel tecnologiaDestino;
-} Registro;
-
-void escreverRegistro(FILE *arquivo, Registro *registro) {
-    fwrite(&registro->removido, sizeof(char), 1, arquivo);
-    fwrite(&registro->grupo, sizeof(int), 1, arquivo);
-    fwrite(&registro->popularidade, sizeof(int), 1, arquivo);
-    fwrite(&registro->peso, sizeof(int), 1, arquivo);
-    fwrite(registro->tecnologiaOrigem.string, sizeof(char), registro->tecnologiaOrigem.tamanho, arquivo);
-    fwrite(&registro->tecnologiaOrigem.tamanho, sizeof(int), 1, arquivo);
-    fwrite(registro->tecnologiaDestino.string, sizeof(char), registro->tecnologiaDestino.tamanho, arquivo);
-    fwrite(&registro->tecnologiaDestino.tamanho, sizeof(int), 1, arquivo);
-}
-
-void binarioNaTela(char *nomeArquivoBinario) { /* Você não precisa entender o código dessa função. */
-
-	/* Use essa função para comparação no run.codes. Lembre-se de ter fechado (fclose) o arquivo anteriormente.
-	*  Ela vai abrir de novo para leitura e depois fechar (você não vai perder pontos por isso se usar ela). */
-
-	unsigned long i, cs;
-	unsigned char *mb;
-	size_t fl;
-	FILE *fs;
-	if(nomeArquivoBinario == NULL || !(fs = fopen(nomeArquivoBinario, "rb"))) {
-		fprintf(stderr, "ERRO AO ESCREVER O BINARIO NA TELA (função binarioNaTela): não foi possível abrir o arquivo que me passou para leitura. Ele existe e você tá passando o nome certo? Você lembrou de fechar ele com fclose depois de usar?\n");
-		return;
-	}
-	fseek(fs, 0, SEEK_END);
-	fl = ftell(fs);
-	fseek(fs, 0, SEEK_SET);
-	mb = (unsigned char *) malloc(fl);
-	fread(mb, 1, fl, fs);
-
-	cs = 0;
-	for(i = 0; i < fl; i++) {
-		cs += (unsigned long) mb[i];
-	}
-	printf("%lf\n", (cs / (double) 100));
-	free(mb);
-	fclose(fs);
-}
+#include "arquivos.h"
 
 int main() {
     FILE *file;
@@ -76,6 +10,7 @@ int main() {
     int cont = 0;
     char line[100]; // suppose each line of the file has a maximum of 100 characters
 
+    // open csv
     FILE *file_in = fopen("tecnologia.csv", "r");
     FILE *file_out = fopen("tecnologia.bin", "wb");
 
@@ -84,6 +19,7 @@ int main() {
         return 1;
     }
 
+    // parse csv
     while (fgets(line, sizeof(line), file_in)) {
 
         // allocates space for the new struct

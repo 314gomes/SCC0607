@@ -1,5 +1,8 @@
 all:
-	gcc *.c -ggdb -o main.o
+	gcc src/*.c -I include -ggdb -o main.o
 
 run:
 	./main.o
+
+debug:
+	gdb main.o
