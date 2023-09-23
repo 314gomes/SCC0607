@@ -1,8 +1,8 @@
 #define TAM_REGISTRO 76
 #define TAM_REGISTRO_FIXO 21
-#define LIXO = '$'
-#define NAO_REMOVIDO = '0'
-#define REMOVIDO = '1'
+#define LIXO '$'
+#define NAO_REMOVIDO '0'
+#define REMOVIDO '1'
 #define TAMANHO_MAXIMO 500
 
 typedef struct {
@@ -26,8 +26,24 @@ typedef struct {
     StringVariavel tecnologiaDestino;
 } Registro;
 
+// @brief Calculates size of a register
+// @param r pointer to register
+// @return size of register data on file
+int calcularTamanhoRegistro(Registro *r);
+
+// @brief Writes trash values to complete fixed register size.
+// @param arquivo file to write `registro`
+// @param r register to be written
+void escreverLixoRegistro(FILE *arquivo, Registro *r);
+
+// @brief Writes `r` data to `arquivo` according to specifications
+// @param arquivo file to write `registro`
+// @param r register to be written
+void escreverDadosRegistro(FILE *arquivo, Registro *r);
+
 // @brief Writes `registro` to `arquivo`
 // @param arquivo file to write `registro`
-// @param registro register to be written
-void escreverRegistro(FILE *arquivo, Registro *registro);
+// @param r register to be written
+void escreverRegistro(FILE *arquivo, Registro *r);
+
 void binarioNaTela(char *nomeArquivoBinario);
