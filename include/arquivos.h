@@ -1,9 +1,9 @@
 #define TAM_REGISTRO 76
 #define TAM_REGISTRO_FIXO 21
+#define TAM_MAXIMO_STRING (TAM_REGISTRO - TAM_REGISTRO_FIXO)
 #define LIXO '$'
 #define NAO_REMOVIDO '0'
 #define REMOVIDO '1'
-#define TAMANHO_MAXIMO 500
 
 typedef struct {
     char status;
@@ -47,3 +47,9 @@ void escreverDadosRegistro(FILE *arquivo, Registro *r);
 void escreverRegistro(FILE *arquivo, Registro *r);
 
 void binarioNaTela(char *nomeArquivoBinario);
+
+/// @brief Parses  `caminhoCSV`
+/// substituting or creating new binary file `caminhoBin`
+/// @param caminhoCSV path to CSV file
+/// @param caminhoBin path to new binary file according to specification
+void csvParaBinario(char* caminhoCSV, char* caminhoBin);

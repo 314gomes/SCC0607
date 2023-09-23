@@ -35,3 +35,39 @@ void escreverRegistro(FILE *arquivo, Registro *r) {
     escreverLixoRegistro(arquivo, r);
 }
 
+void csvParaBinario(char* caminhoCSV, char* caminhoBin){
+    char CSV_line_buffer[100];
+    char tec_origem_buffer[TAM_MAXIMO_STRING];
+    char tec_destino_buffer[TAM_MAXIMO_STRING];
+    Registro r_buffer;
+
+    r_buffer.tecnologiaOrigem.string = tec_origem_buffer;
+    r_buffer.tecnologiaDestino.string = tec_destino_buffer;
+    
+    FILE *CSV_in = fopen(caminhoCSV, "r");
+    FILE *BIN_out = fopen(caminhoBin, "wb");
+
+    // Cannot open file
+    if (CSV_in == NULL) {
+        return;
+    }
+
+    while (fgets(CSV_line_buffer, sizeof(CSV_line_buffer), CSV_in)) {
+        sscanf(CSV_line_buffer, "%49[^,],%d,%d,%49[^,],%d",
+               r_buffer.tecnologiaOrigem.string,
+               &r_buffer.grupo,
+               &r_buffer.popularidade,
+               r_buffer.tecnologiaDestino.string,
+               &r_buffer.peso);
+
+        r_buffer.removido = '0';
+
+        r_buffer.tecnologiaOrigem.tamanho = strlen(r_buffer.tecnologiaOrigem.string);
+        r_buffer.tecnologiaDestino.tamanho = strlen(r_buffer.tecnologiaDestino.string);
+
+        escreverRegistro(BIN_out, &r_buffer);
+    }
+
+    fclose(CSV_in);
+    fclose(BIN_out);
+}
