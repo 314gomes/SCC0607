@@ -52,22 +52,72 @@ void csvParaBinario(char* caminhoCSV, char* caminhoBin){
         return;
     }
 
+    char *token = NULL;
+    int field = 0;
+    char *saveptr = CSV_line_buffer;
+
     while (fgets(CSV_line_buffer, sizeof(CSV_line_buffer), CSV_in)) {
-        sscanf(CSV_line_buffer, "%49[^,],%d,%d,%49[^,],%d",
-               r_buffer.tecnologiaOrigem.string,
-               &r_buffer.grupo,
-               &r_buffer.popularidade,
-               r_buffer.tecnologiaDestino.string,
-               &r_buffer.peso);
-
+        switch (field) {
+                case 0:
+                    if (strcmp(token, "") != 0) {
+                        r_buffer.tecnologiaOrigem.string = strdup(token);
+                        r_buffer.tecnologiaOrigem.tamanho = strlen(token);
+                    } else {
+                        r_buffer.tecnologiaOrigem.string = NULL;
+                    }
+                    break;
+                case 1:
+                    if (strcmp(token, "") != 0) {
+                        r_buffer.grupo = atoi(token);
+                    } else {
+                        r_buffer.grupo = -1;
+                    }
+                    break;
+                case 2:
+                    if (strcmp(token, "") != 0) {
+                        r_buffer.popularidade = atoi(token);
+                    } else {
+                        r_buffer.popularidade = -1;
+                    }
+                    break;
+                case 3:
+                    if (strcmp(token, "") != 0) {
+                        r_buffer.tecnologiaDestino.string = strdup(token);
+                        r_buffer.tecnologiaDestino.tamanho = strlen(token);
+                    } else {
+                        r_buffer.tecnologiaDestino.string = NULL;
+                    }
+                    break;
+                case 4:
+                    if (strcmp(token, ",") != 0) {
+                    // Check if token is not an empty string or consists only of whitespace
+                        int i;
+                        int onlyWhitespace = 1;  // Assume that token consists only of whitespace
+                        for (i = 0; token[i] != '\0'; i++) {
+                            // Check if the current character is not a whitespace character
+                            if (token[i] != ' ' && token[i] != '\t' && token[i] != '\n' && token[i] != '\r') {
+                                onlyWhitespace = 0;  // Found a non-whitespace character
+                                break;
+                            }
+                        }
+                        // If token is not empty or doesn't consist only of whitespace
+                        if (!onlyWhitespace) {
+                            r_buffer.peso = atoi(token);  // Convert token to integer and assign to peso
+                        }
+                    }
+                    if (strlen(token) == 0) {
+                        r_buffer.peso = -1;  // If token is an empty string, assign -1 to peso
+                    }
+                break;
+                default:
+                    break;
+            }
+            field++;
+        }
         r_buffer.removido = '0';
-
-        r_buffer.tecnologiaOrigem.tamanho = strlen(r_buffer.tecnologiaOrigem.string);
-        r_buffer.tecnologiaDestino.tamanho = strlen(r_buffer.tecnologiaDestino.string);
 
         escreverRegistro(BIN_out, &r_buffer);
     }
-
     fclose(CSV_in);
     fclose(BIN_out);
 }
