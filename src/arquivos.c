@@ -37,34 +37,43 @@ void escreverRegistro(FILE *arquivo, Registro *r) {
 
 void csvParaBinario(char* caminhoCSV, char* caminhoBin){
     char CSV_line_buffer[100];
-    char tec_origem_buffer[TAM_MAXIMO_STRING];
-    char tec_destino_buffer[TAM_MAXIMO_STRING];
     Registro r_buffer;
-
-    r_buffer.tecnologiaOrigem.string = tec_origem_buffer;
-    r_buffer.tecnologiaDestino.string = tec_destino_buffer;
     
     FILE *CSV_in = fopen(caminhoCSV, "r");
     FILE *BIN_out = fopen(caminhoBin, "wb");
-
+    
     // Cannot open file
     if (CSV_in == NULL) {
+        printf("Error opening the file_in.\n");
         return;
     }
 
-    char *token = NULL;
-    int field = 0;
-    char *saveptr = CSV_line_buffer;
+    while (fgets(CSV_line_buffer, sizeof(CSV_line_buffer), CSV_in)) {        
+        r_buffer.tecnologiaOrigem.string = NULL;
+        r_buffer.tecnologiaOrigem.tamanho = 0;
+        r_buffer.tecnologiaDestino.string = NULL;
+        r_buffer.tecnologiaDestino.tamanho = 0;
+        r_buffer.grupo = -1;
+        r_buffer.popularidade = -1;
+        r_buffer.peso = -1;
 
-    while (fgets(CSV_line_buffer, sizeof(CSV_line_buffer), CSV_in)) {
-        switch (field) {
-                case 0:
+        r_buffer.tecnologiaOrigem.string = (char *)malloc(TAM_MAXIMO_STRING);
+        r_buffer.tecnologiaDestino.string =(char *)malloc(TAM_MAXIMO_STRING);
+
+        char *token = NULL;
+        int field = 0;
+        char *saveptr = CSV_line_buffer;
+
+        while ((token = strsep(&saveptr, ",")) != NULL) {
+            switch (field) {
+                case 0:               
                     if (strcmp(token, "") != 0) {
                         r_buffer.tecnologiaOrigem.string = strdup(token);
                         r_buffer.tecnologiaOrigem.tamanho = strlen(token);
                     } else {
                         r_buffer.tecnologiaOrigem.string = NULL;
                     }
+                    
                     break;
                 case 1:
                     if (strcmp(token, "") != 0) {
@@ -75,10 +84,11 @@ void csvParaBinario(char* caminhoCSV, char* caminhoBin){
                     break;
                 case 2:
                     if (strcmp(token, "") != 0) {
-                        r_buffer.popularidade = atoi(token);
+                        r_buffer.popularidade = atoi(token);                    
                     } else {
                         r_buffer.popularidade = -1;
                     }
+                    
                     break;
                 case 3:
                     if (strcmp(token, "") != 0) {
@@ -115,9 +125,16 @@ void csvParaBinario(char* caminhoCSV, char* caminhoBin){
             field++;
         }
         r_buffer.removido = '0';
-
+        //printf("origem: %s,\n", r_buffer.tecnologiaOrigem.string);
+        //printf("grupo: %d,\n", r_buffer.grupo);
+        //printf("popularidade: %d,\n", r_buffer.popularidade);
+        //printf("destino: %s,\n", r_buffer.tecnologiaDestino.string);
+        //printf("peso: %d", r_buffer.peso);
+        //printf("\n--------------------------------------\n");
         escreverRegistro(BIN_out, &r_buffer);
+        
     }
     fclose(CSV_in);
     fclose(BIN_out);
-}
+}       
+
