@@ -9,7 +9,7 @@
 
 typedef struct {
     char status;
-    int proxRRn;
+    int proxRRN;
     int nroTecnologias;
     int nroParesTecnologias;
 } Cabecalho;
