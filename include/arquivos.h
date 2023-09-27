@@ -55,3 +55,5 @@ void binarioNaTela(char *nomeArquivoBinario);
 /// @param caminhoCSV path to CSV file
 /// @param caminhoBin path to new binary file according to specification
 void csvParaBinario(char* caminhoCSV, char* caminhoBin);
+
+void leitura_e_imprime(char* caminhoBin);
