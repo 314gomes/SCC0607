@@ -8,7 +8,7 @@
 #define REMOVIDO '1'
 
 typedef struct {
-    char status;
+    char status[2];
     int proxRRN;
     int nroTecnologias;
     int nroParesTecnologias;
@@ -20,7 +20,7 @@ typedef struct {
 } StringVariavel;
 
 typedef struct {
-    char removido;
+    char removido[1];
     int grupo;
     int popularidade;
     int peso;
