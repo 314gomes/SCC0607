@@ -13,7 +13,6 @@ void tratar_comando_entrada(){
 			scanf("%s", args[0]);
 			scanf("%s", args[1]);
 			csvParaBinario(args[0], args[1]);
-			leitura_e_imprime(args[1]);
 			break;
 		case SELECT_FROM:
 			scanf("%s", args[0]);
