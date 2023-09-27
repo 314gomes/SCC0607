@@ -41,15 +41,25 @@ int calcularTamanhoRegistro(Registro *r){
     return tamanhoRegistro;
 }
 
+void escreverCampoChar(FILE *a, char c){
+    fwrite(&c, sizeof(c), 1, a);
+}
+void escreverCampoInt(FILE *a, int c){
+    fwrite(&c, sizeof(c), 1, a);
+}
+void escreverCampoStringVariavel(FILE *a, StringVariavel c){
+    escreverCampoInt(a, c.tamanho);
+    fwrite(c.string, sizeof(char), c.tamanho, a);
+}
+
 void escreverDadosRegistro(FILE *arquivo, Registro *r){
-    fwrite(&(r->removido), sizeof(char), 1, arquivo);
-    fwrite(&(r->grupo), sizeof(int), 1, arquivo);
-    fwrite(&(r->popularidade), sizeof(int), 1, arquivo);
-    fwrite(&(r->peso), sizeof(int), 1, arquivo);
-    fwrite(&(r->tecnologiaOrigem.tamanho), sizeof(int), 1, arquivo);
-    fwrite(r->tecnologiaOrigem.string, sizeof(char), r->tecnologiaOrigem.tamanho, arquivo);
-    fwrite(&(r->tecnologiaDestino.tamanho), sizeof(int), 1, arquivo);
-    fwrite(r->tecnologiaDestino.string, sizeof(char), r->tecnologiaDestino.tamanho, arquivo);
+    escreverCampoChar(arquivo, r->removido);
+    escreverCampoInt(arquivo, r->grupo);
+    escreverCampoInt(arquivo, r->popularidade);
+    escreverCampoInt(arquivo, r->peso);
+    escreverCampoStringVariavel(arquivo, r->tecnologiaOrigem);
+    escreverCampoStringVariavel(arquivo, r->tecnologiaDestino);
+
 }
 
 void escreverLixoRegistro(FILE *arquivo, Registro *r){
