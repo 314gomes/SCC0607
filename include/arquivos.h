@@ -48,8 +48,6 @@ void escreverDadosRegistro(FILE *arquivo, Registro *r);
 /// @param r register to be written
 void escreverRegistro(FILE *arquivo, Registro *r);
 
-void binarioNaTela(char *nomeArquivoBinario);
-
 /// @brief Parses  `caminhoCSV`
 /// substituting or creating new binary file `caminhoBin`
 /// @param caminhoCSV path to CSV file
