@@ -9,13 +9,17 @@ void tratar_comando_entrada(){
 	cmd_in = buffer;
 
 	switch (cmd_in){
-	case CREATE_TABLE:
-		scanf("%s", args[0]);
-		scanf("%s", args[1]);
-		csvParaBinario(args[0], args[1]);
-		break;
-
-	default:
-		break;
+		case CREATE_TABLE:
+			scanf("%s", args[0]);
+			scanf("%s", args[1]);
+			csvParaBinario(args[0], args[1]);
+			leitura_e_imprime(args[1]);
+			break;
+		case SELECT_FROM:
+			scanf("%s", args[0]);
+			leitura_e_imprime(args[0]);
+			break;
+		default:
+			break;
 	}
 }
