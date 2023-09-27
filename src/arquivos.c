@@ -9,7 +9,7 @@ Registro *novo_registro() {
     Registro* r_buffer;
     r_buffer = (Registro*)malloc(sizeof(Registro));
 
-    strcpy(r_buffer->removido ,"0");
+    r_buffer->removido = '0';
     r_buffer->tecnologiaOrigem.string = NULL;
     r_buffer->tecnologiaOrigem.tamanho = 0;
     r_buffer->tecnologiaDestino.string = NULL;
@@ -27,7 +27,7 @@ Cabecalho *novo_cabecalho() {
     Cabecalho* cabecalho;
     cabecalho = (Cabecalho*)malloc(sizeof(Cabecalho));
 
-    strcpy(cabecalho->status ,"0");
+    cabecalho->status = '0';
     cabecalho->proxRRN = 0;
     cabecalho->nroTecnologias = 0;
     cabecalho->nroParesTecnologias = 0;
@@ -42,13 +42,13 @@ int calcularTamanhoRegistro(Registro *r){
 }
 
 void escreverDadosRegistro(FILE *arquivo, Registro *r){
-    fwrite(&r->removido, sizeof(char), 1, arquivo);
-    fwrite(&r->grupo, sizeof(int), 1, arquivo);
-    fwrite(&r->popularidade, sizeof(int), 1, arquivo);
-    fwrite(&r->peso, sizeof(int), 1, arquivo);
-    fwrite(&r->tecnologiaOrigem.tamanho, sizeof(int), 1, arquivo);
+    fwrite(&(r->removido), sizeof(char), 1, arquivo);
+    fwrite(&(r->grupo), sizeof(int), 1, arquivo);
+    fwrite(&(r->popularidade), sizeof(int), 1, arquivo);
+    fwrite(&(r->peso), sizeof(int), 1, arquivo);
+    fwrite(&(r->tecnologiaOrigem.tamanho), sizeof(int), 1, arquivo);
     fwrite(r->tecnologiaOrigem.string, sizeof(char), r->tecnologiaOrigem.tamanho, arquivo);
-    fwrite(&r->tecnologiaDestino.tamanho, sizeof(int), 1, arquivo);
+    fwrite(&(r->tecnologiaDestino.tamanho), sizeof(int), 1, arquivo);
     fwrite(r->tecnologiaDestino.string, sizeof(char), r->tecnologiaDestino.tamanho, arquivo);
 }
 
@@ -150,7 +150,6 @@ void csvParaBinario(char* caminhoCSV, char* caminhoBin){
             }
             field++;
         }
-        strcpy(r_buffer->removido ,"0");
         
         /*
         printf("origem: %s,\n", r_buffer->tecnologiaOrigem.string);
@@ -179,41 +178,46 @@ void csvParaBinario(char* caminhoCSV, char* caminhoBin){
     // fecha os arquivos
     fclose(CSV_in);
     fclose(BIN_out);
-    strcpy(cabecalho->status ,"1");
+    //cabecalho->status = '1';
 }       
 
 void leitura_e_imprime(char* caminhoBin) {
 
     Registro *r_buffer = novo_registro();
     int size;
+    int lixo = 0;
 
     FILE *BIN_out = fopen(caminhoBin, "rb");
     if(BIN_out == NULL) return;
-
-    while(fread(r_buffer->removido, sizeof(char)*2, 1, BIN_out) != 0) {
+    fseek(BIN_out, 0, SEEK_SET);
+    while(fread(&(r_buffer->removido), sizeof(char), 1, BIN_out) != 0) {
         size++;
-        fread(&(r_buffer->tecnologiaOrigem.tamanho), sizeof(int), 1, BIN_out);
-        printf("(%d), \n", r_buffer->tecnologiaOrigem.tamanho);
-        /*
-        fread(&(r_buffer->tecnologiaOrigem.tamanho), sizeof(int), 1, BIN_out);
-        printf("SIZE = %d\n", r_buffer->tecnologiaOrigem.tamanho);
-        fread(r_buffer->tecnologiaOrigem.string, sizeof(char)*(r_buffer->tecnologiaOrigem.tamanho), 1, BIN_out);
-        printf("(%s), ", r_buffer->tecnologiaOrigem.string);
-
         fread(&(r_buffer->grupo), sizeof(int), 1, BIN_out);
-        printf("(%d), ", r_buffer->grupo);
-
-        fread(&(r_buffer->popularidade), sizeof(int), 1, BIN_out);
-        printf("(%d), ", r_buffer->popularidade);
-
-        fread(r_buffer->tecnologiaDestino.string, sizeof(char)*TAM_MAXIMO_STRING, 1, BIN_out);
-        printf("(%s), ", r_buffer->tecnologiaDestino.string);
+        printf("%d, ", r_buffer->grupo);
 
         fread(&(r_buffer->peso), sizeof(int), 1, BIN_out);
-        printf("(%d), \n", r_buffer->peso);
-        */
-        printf("--------------------------------------\n");
+        printf("%d, ", r_buffer->peso);
 
+        fread(&(r_buffer->popularidade), sizeof(int), 1, BIN_out);
+        printf("%d, ", r_buffer->popularidade);
+
+        fread(&(r_buffer->tecnologiaOrigem.tamanho), sizeof(int), 1, BIN_out);
+        printf("%d, ", r_buffer->tecnologiaOrigem.tamanho);
+
+        fread(r_buffer->tecnologiaOrigem.string, sizeof(char), (r_buffer->tecnologiaOrigem.tamanho), BIN_out);
+        r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaOrigem.tamanho] = '\0';
+        printf("%s, ", r_buffer->tecnologiaOrigem.string);
+
+        fread(&(r_buffer->tecnologiaDestino.tamanho), sizeof(int), 1, BIN_out);
+        printf("%d, ", r_buffer->tecnologiaDestino.tamanho);
+
+        fread(r_buffer->tecnologiaDestino.string, sizeof(char), (r_buffer->tecnologiaDestino.tamanho), BIN_out);
+        r_buffer->tecnologiaDestino.string[r_buffer->tecnologiaDestino.tamanho] = '\0';
+        printf("%s\n", r_buffer->tecnologiaDestino.string);
+
+
+        lixo = 76 - (21 + (r_buffer->tecnologiaDestino.tamanho) + (r_buffer->tecnologiaOrigem.tamanho));
+        fseek(BIN_out, lixo, SEEK_CUR);
     }
     free(r_buffer->tecnologiaOrigem.string);
     free(r_buffer->tecnologiaDestino.string);
