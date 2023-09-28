@@ -64,6 +64,11 @@ void escreverDadosRegistro(FILE *arquivo, Registro *r);
 /// @param r register to be written
 void escreverRegistro(FILE *arquivo, Registro *r);
 
+/// @brief Writes `cabecalho` to `arquivo`
+/// @param arquivo file to write `registro`
+/// @param h register to be written
+void escreverCabecalho(FILE *arquivo, Cabecalho *h);
+
 /// @brief Parses  `caminhoCSV`
 /// substituting or creating new binary file `caminhoBin`
 /// @param caminhoCSV path to CSV file

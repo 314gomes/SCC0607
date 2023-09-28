@@ -76,6 +76,13 @@ void escreverRegistro(FILE *arquivo, Registro *r) {
     escreverLixoRegistro(arquivo, r);
 }
 
+void escreverCabecalho(FILE *arquivo, Cabecalho *h){
+    escreverCampoChar(arquivo, h->status);
+    escreverCampoInt(arquivo, h->proxRRN);
+    escreverCampoInt(arquivo, h->nroTecnologias);
+    escreverCampoInt(arquivo, h->nroParesTecnologias);
+}
+
 void csvParaBinario(char* caminhoCSV, char* caminhoBin){
 
     // inicializa novo registro e novo cabecalho
