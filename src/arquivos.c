@@ -166,7 +166,6 @@ void csvParaBinario(char* caminhoCSV, char* caminhoBin){
     }
     
     cabecalho->proxRRN = cont_registros; // numero de registros
-    fseek(BIN_out, 0, SEEK_SET); // volta ao inicio do arquivo
     binarioNaTela(caminhoBin);
 
     // libera a memoria
