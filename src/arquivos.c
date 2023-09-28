@@ -181,7 +181,11 @@ void csvParaBinario(char* caminhoCSV, char* caminhoBin){
     // le o arquivo csv e escreve no arquivo binario
     parseCSV(CSV_in, BIN_out, c_buffer);
     
+<<<<<<< HEAD
+    cabecalho->proxRRN = cont_registros; // numero de registros
+=======
     fseek(BIN_out, 0, SEEK_SET); // volta ao inicio do arquivo
+>>>>>>> 11432a8d753bc0ba4c5fb6afd6b0adc824c9d8fb
     binarioNaTela(caminhoBin);
 
     // libera a memoria
