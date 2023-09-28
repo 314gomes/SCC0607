@@ -83,26 +83,13 @@ void escreverCabecalho(FILE *arquivo, Cabecalho *h){
     escreverCampoInt(arquivo, h->nroParesTecnologias);
 }
 
-void csvParaBinario(char* caminhoCSV, char* caminhoBin){
-
-    // inicializa novo registro e novo cabecalho
-    Registro *r_buffer = novo_registro();
-    Cabecalho *cabecalho = novo_cabecalho();
-    
-    // abre arquivos de leitura e escrita em binario
-    FILE *CSV_in = fopen(caminhoCSV, "r");
-    FILE *BIN_out = fopen(caminhoBin, "wb");
-    
-    // verifica se foram abertos corretamente
-    if (CSV_in == NULL) return;
-    if (BIN_out == NULL) return;
-
+void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer, Registro *r_buffer){
     char CSV_line_buffer[100];
-    int cont_registros = 0;
-
-    // le o arquivo csv e escreve no arquivo binario
-    while (fgets(CSV_line_buffer, sizeof(CSV_line_buffer), CSV_in)) {        
-        cont_registros++;
+    
+    // le primeira linha mas nao escreve
+    fgets(CSV_line_buffer, sizeof(CSV_line_buffer), CSV_in);
+    while (fgets(CSV_line_buffer, sizeof(CSV_line_buffer), CSV_in)) {
+        c_buffer->proxRRN++;
         
         int field = 0;
         char *token = NULL;
@@ -176,13 +163,31 @@ void csvParaBinario(char* caminhoCSV, char* caminhoBin){
         printf("peso: %d", r_buffer->peso);
         printf("\n--------------------------------------\n");
         */
-
-        // pula a primeira linha
-        if(cont_registros > 1) escreverRegistro(BIN_out, r_buffer);
-        
+        escreverRegistro(BIN_out, r_buffer);
     }
+}
+
+void csvParaBinario(char* caminhoCSV, char* caminhoBin){
+
+    // inicializa novo registro e novo c_buffer
+    Registro *r_buffer = novo_registro();
+    Cabecalho *c_buffer = novo_cabecalho();
     
-    cabecalho->proxRRN = cont_registros; // numero de registros
+    // abre arquivos de leitura e escrita em binario
+    FILE *CSV_in = fopen(caminhoCSV, "r");
+    FILE *BIN_out = fopen(caminhoBin, "wb");
+    
+    // verifica se foram abertos corretamente
+    if (CSV_in == NULL) return;
+    if (BIN_out == NULL) return;
+
+    escreverCabecalho(BIN_out, c_buffer);
+
+
+
+    // le o arquivo csv e escreve no arquivo binario
+    parseCSV(CSV_in, BIN_out, c_buffer, r_buffer);
+    
     fseek(BIN_out, 0, SEEK_SET); // volta ao inicio do arquivo
     binarioNaTela(caminhoBin);
 
@@ -190,12 +195,12 @@ void csvParaBinario(char* caminhoCSV, char* caminhoBin){
     free(r_buffer->tecnologiaOrigem.string);
     free(r_buffer->tecnologiaDestino.string);
     free(r_buffer);
-    free(cabecalho);
+    free(c_buffer);
 
     // fecha os arquivos
     fclose(CSV_in);
     fclose(BIN_out);
-    //cabecalho->status = '1';
+    //c_buffer->status = '1';
 }       
 
 void leitura_e_imprime(char* caminhoBin) {
