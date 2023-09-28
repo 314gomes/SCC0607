@@ -82,95 +82,94 @@ void escreverCabecalho(FILE *arquivo, Cabecalho *h){
     escreverCampoInt(arquivo, h->nroTecnologias);
     escreverCampoInt(arquivo, h->nroParesTecnologias);
 }
+void parseLinhaCSV(char *CSV_line, Registro *r_buffer){
+    int field = 0;
+    char *token = NULL;
 
-void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer, Registro *r_buffer){
+    while ((token = strsep(&CSV_line, ",")) != NULL) {
+        switch (field) {
+            case 0:               
+                if (strcmp(token, "") != 0) {
+                    r_buffer->tecnologiaOrigem.string = strdup(token);
+                    r_buffer->tecnologiaOrigem.tamanho = strlen(token);
+                } else {
+                    r_buffer->tecnologiaOrigem.string = NULL;
+                }
+                break;
+            case 1:
+                if (strcmp(token, "") != 0) {
+                    r_buffer->grupo = atoi(token);
+                } else {
+                    r_buffer->grupo = -1;
+                }
+                break;
+            case 2:
+                if (strcmp(token, "") != 0) {
+                    r_buffer->popularidade = atoi(token);                    
+                } else {
+                    r_buffer->popularidade = -1;
+                }
+                
+                break;
+            case 3:
+                if (strcmp(token, "") != 0) {
+                    r_buffer->tecnologiaDestino.string = strdup(token);
+                    r_buffer->tecnologiaDestino.tamanho = strlen(token);
+                } else {
+                    r_buffer->tecnologiaDestino.string = NULL;
+                }
+                break;
+            case 4:
+                if (strcmp(token, ",") != 0) {
+                // Check if token is not an empty string or consists only of whitespace
+                    int i;
+                    int onlyWhitespace = 1;  // Assume that token consists only of whitespace
+                    for (i = 0; token[i] != '\0'; i++) {
+                        // Check if the current character is not a whitespace character
+                        if (token[i] != ' ' && token[i] != '\t' && token[i] != '\n' && token[i] != '\r') {
+                            onlyWhitespace = 0;  // Found a non-whitespace character
+                            break;
+                        }
+                    }
+                    // If token is not empty or doesn't consist only of whitespace
+                    if (!onlyWhitespace) {
+                        r_buffer->peso = atoi(token);  // Convert token to integer and assign to peso
+                    }
+                }
+                if (strlen(token) == 0) {
+                    r_buffer->peso = -1;  // If token is an empty string, assign -1 to peso
+                }
+            break;
+            default:
+                break;
+        }
+        field++;
+    }
+}
+
+void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer){
+    Registro *r_buffer = novo_registro();
     char CSV_line_buffer[100];
     
     // le primeira linha mas nao escreve
     fgets(CSV_line_buffer, sizeof(CSV_line_buffer), CSV_in);
+
     while (fgets(CSV_line_buffer, sizeof(CSV_line_buffer), CSV_in)) {
         c_buffer->proxRRN++;
-        
-        int field = 0;
-        char *token = NULL;
-        char *saveptr = CSV_line_buffer;
 
-        while ((token = strsep(&saveptr, ",")) != NULL) {
-            switch (field) {
-                case 0:               
-                    if (strcmp(token, "") != 0) {
-                        r_buffer->tecnologiaOrigem.string = strdup(token);
-                        r_buffer->tecnologiaOrigem.tamanho = strlen(token);
-                    } else {
-                        r_buffer->tecnologiaOrigem.string = NULL;
-                    }
-                    break;
-                case 1:
-                    if (strcmp(token, "") != 0) {
-                        r_buffer->grupo = atoi(token);
-                    } else {
-                        r_buffer->grupo = -1;
-                    }
-                    break;
-                case 2:
-                    if (strcmp(token, "") != 0) {
-                        r_buffer->popularidade = atoi(token);                    
-                    } else {
-                        r_buffer->popularidade = -1;
-                    }
-                    
-                    break;
-                case 3:
-                    if (strcmp(token, "") != 0) {
-                        r_buffer->tecnologiaDestino.string = strdup(token);
-                        r_buffer->tecnologiaDestino.tamanho = strlen(token);
-                    } else {
-                        r_buffer->tecnologiaDestino.string = NULL;
-                    }
-                    break;
-                case 4:
-                    if (strcmp(token, ",") != 0) {
-                    // Check if token is not an empty string or consists only of whitespace
-                        int i;
-                        int onlyWhitespace = 1;  // Assume that token consists only of whitespace
-                        for (i = 0; token[i] != '\0'; i++) {
-                            // Check if the current character is not a whitespace character
-                            if (token[i] != ' ' && token[i] != '\t' && token[i] != '\n' && token[i] != '\r') {
-                                onlyWhitespace = 0;  // Found a non-whitespace character
-                                break;
-                            }
-                        }
-                        // If token is not empty or doesn't consist only of whitespace
-                        if (!onlyWhitespace) {
-                            r_buffer->peso = atoi(token);  // Convert token to integer and assign to peso
-                        }
-                    }
-                    if (strlen(token) == 0) {
-                        r_buffer->peso = -1;  // If token is an empty string, assign -1 to peso
-                    }
-                break;
-                default:
-                    break;
-            }
-            field++;
-        }
-        
-        /*
-        printf("origem: %s,\n", r_buffer->tecnologiaOrigem.string);
-        printf("grupo: %d,\n", r_buffer->grupo);
-        printf("popularidade: %d,\n", r_buffer->popularidade);
-        printf("destino: %s,\n", r_buffer->tecnologiaDestino.string);
-        printf("peso: %d", r_buffer->peso);
-        printf("\n--------------------------------------\n");
-        */
+        parseLinhaCSV(CSV_line_buffer, r_buffer);
+
         escreverRegistro(BIN_out, r_buffer);
     }
+
+    free(r_buffer->tecnologiaOrigem.string);
+    free(r_buffer->tecnologiaDestino.string);
+    free(r_buffer);
 }
 
 void csvParaBinario(char* caminhoCSV, char* caminhoBin){
 
-    // inicializa novo registro e novo c_buffer
-    Registro *r_buffer = novo_registro();
+    // inicializa novo c_buffer
     Cabecalho *c_buffer = novo_cabecalho();
     
     // abre arquivos de leitura e escrita em binario
@@ -183,18 +182,13 @@ void csvParaBinario(char* caminhoCSV, char* caminhoBin){
 
     escreverCabecalho(BIN_out, c_buffer);
 
-
-
     // le o arquivo csv e escreve no arquivo binario
-    parseCSV(CSV_in, BIN_out, c_buffer, r_buffer);
+    parseCSV(CSV_in, BIN_out, c_buffer);
     
     fseek(BIN_out, 0, SEEK_SET); // volta ao inicio do arquivo
     binarioNaTela(caminhoBin);
 
     // libera a memoria
-    free(r_buffer->tecnologiaOrigem.string);
-    free(r_buffer->tecnologiaDestino.string);
-    free(r_buffer);
     free(c_buffer);
 
     // fecha os arquivos
