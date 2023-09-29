@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "arquivos.h"
 #include "funcoesFornecidas.h"
 
@@ -83,64 +84,58 @@ void escreverCabecalho(FILE *arquivo, Cabecalho *h){
     escreverCampoInt(arquivo, h->nroParesTecnologias);
 }
 
+int isempty(const char *s)
+{
+	if ((*s) == '\0') return 1;
+
+	while (*s) {
+	
+	if (!isspace(*s))
+		return 0;
+	s++;
+	}
+	return 1;
+}
+
+void parseTokenInt(char* tkn, int *n){
+    if (isempty(tkn)){
+        *n = -1;
+    } else {
+        *n = atoi(tkn);
+    }
+}
+
+void parseTokenStringVariavel(char* tkn, StringVariavel *str){
+    if (isempty(tkn)){
+        *(str->string) = '\0';
+        str->tamanho = 0;
+    } else {
+        strcpy(str->string, tkn);
+        str->tamanho = strlen(tkn);
+    }
+}
+
 void parseLinhaCSV(char *CSV_line, Registro *r_buffer){
     int field = 0;
-    char *token = NULL;
+    char *tkn = NULL;
 
-    while ((token = strsep(&CSV_line, ",")) != NULL) {
+    while ((tkn = strsep(&CSV_line, ",")) != NULL) {
         switch (field) {
             case 0:               
-                if (strcmp(token, "") != 0) {
-                    r_buffer->tecnologiaOrigem.string = strdup(token);
-                    r_buffer->tecnologiaOrigem.tamanho = strlen(token);
-                } else {
-                    r_buffer->tecnologiaOrigem.string = NULL;
-                }
+                parseTokenStringVariavel(tkn, &(r_buffer->tecnologiaOrigem));
                 break;
             case 1:
-                if (strcmp(token, "") != 0) {
-                    r_buffer->grupo = atoi(token);
-                } else {
-                    r_buffer->grupo = -1;
-                }
+                parseTokenInt(tkn, &(r_buffer->grupo));
                 break;
             case 2:
-                if (strcmp(token, "") != 0) {
-                    r_buffer->popularidade = atoi(token);                    
-                } else {
-                    r_buffer->popularidade = -1;
-                }
-                
+                parseTokenInt(tkn, &(r_buffer->popularidade));
                 break;
             case 3:
-                if (strcmp(token, "") != 0) {
-                    r_buffer->tecnologiaDestino.string = strdup(token);
-                    r_buffer->tecnologiaDestino.tamanho = strlen(token);
-                } else {
-                    r_buffer->tecnologiaDestino.string = NULL;
-                }
+                parseTokenStringVariavel(tkn, &(r_buffer->tecnologiaDestino));
                 break;
             case 4:
-                if (strcmp(token, ",") != 0) {
-                // Check if token is not an empty string or consists only of whitespace
-                    int i;
-                    int onlyWhitespace = 1;  // Assume that token consists only of whitespace
-                    for (i = 0; token[i] != '\0'; i++) {
-                        // Check if the current character is not a whitespace character
-                        if (token[i] != ' ' && token[i] != '\t' && token[i] != '\n' && token[i] != '\r') {
-                            onlyWhitespace = 0;  // Found a non-whitespace character
-                            break;
-                        }
-                    }
-                    // If token is not empty or doesn't consist only of whitespace
-                    if (!onlyWhitespace) {
-                        r_buffer->peso = atoi(token);  // Convert token to integer and assign to peso
-                    }
-                }
-                if (strlen(token) == 0) {
-                    r_buffer->peso = -1;  // If token is an empty string, assign -1 to peso
-                }
-            break;
+                parseTokenInt(tkn, &(r_buffer->peso));
+                break;
             default:
                 break;
         }
@@ -185,8 +180,8 @@ void csvParaBinario(char* caminhoCSV, char* caminhoBin){
 
     // le o arquivo csv e escreve no arquivo binario
     parseCSV(CSV_in, BIN_out, c_buffer);
-    
-    //c_buffer->proxRRN = cont_registros; // numero de registros
+
+    fseek(BIN_out, 0, SEEK_SET); // volta ao inicio do arquivo
     binarioNaTela(caminhoBin);
 
     // libera a memoria
