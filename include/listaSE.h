@@ -1,4 +1,4 @@
-#include "arquivos.h"
+#include "defines.h"
 
 typedef struct no{
 	char str[TAM_MAXIMO_STRING];
