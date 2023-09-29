@@ -82,6 +82,7 @@ void escreverCabecalho(FILE *arquivo, Cabecalho *h){
     escreverCampoInt(arquivo, h->nroTecnologias);
     escreverCampoInt(arquivo, h->nroParesTecnologias);
 }
+
 void parseLinhaCSV(char *CSV_line, Registro *r_buffer){
     int field = 0;
     char *token = NULL;
@@ -185,7 +186,7 @@ void csvParaBinario(char* caminhoCSV, char* caminhoBin){
     // le o arquivo csv e escreve no arquivo binario
     parseCSV(CSV_in, BIN_out, c_buffer);
     
-    cabecalho->proxRRN = cont_registros; // numero de registros
+    //c_buffer->proxRRN = cont_registros; // numero de registros
     binarioNaTela(caminhoBin);
 
     // libera a memoria
@@ -197,6 +198,17 @@ void csvParaBinario(char* caminhoCSV, char* caminhoBin){
     //c_buffer->status = '1';
 }       
 
+int imprime_int (int parametro){
+    if (parametro == -1) {
+        printf("NULO, ");
+        return 0;
+    }
+    else {
+        printf("%d, ", parametro);
+        if (parametro != 0) return 1;
+        else return 0;
+    }
+}
 void leitura_e_imprime(char* caminhoBin) {
 
     Registro *r_buffer = novo_registro();
@@ -206,31 +218,37 @@ void leitura_e_imprime(char* caminhoBin) {
     FILE *BIN_out = fopen(caminhoBin, "rb");
     if(BIN_out == NULL) return;
     fseek(BIN_out, 0, SEEK_SET);
+    fseek(BIN_out, 13, SEEK_CUR);
     while(fread(&(r_buffer->removido), sizeof(char), 1, BIN_out) != 0) {
         size++;
         fread(&(r_buffer->grupo), sizeof(int), 1, BIN_out);
-        printf("%d, ", r_buffer->grupo);
+        imprime_int (r_buffer->grupo);
 
         fread(&(r_buffer->peso), sizeof(int), 1, BIN_out);
-        printf("%d, ", r_buffer->peso);
+        imprime_int (r_buffer->peso);
 
         fread(&(r_buffer->popularidade), sizeof(int), 1, BIN_out);
-        printf("%d, ", r_buffer->popularidade);
+        imprime_int (r_buffer->popularidade);
 
         fread(&(r_buffer->tecnologiaOrigem.tamanho), sizeof(int), 1, BIN_out);
-        printf("%d, ", r_buffer->tecnologiaOrigem.tamanho);
-
-        fread(r_buffer->tecnologiaOrigem.string, sizeof(char), (r_buffer->tecnologiaOrigem.tamanho), BIN_out);
-        r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaOrigem.tamanho] = '\0';
-        printf("%s, ", r_buffer->tecnologiaOrigem.string);
+        if(imprime_int (r_buffer->tecnologiaOrigem.tamanho)){
+            fread(r_buffer->tecnologiaOrigem.string, sizeof(char), (r_buffer->tecnologiaOrigem.tamanho), BIN_out);
+            r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaOrigem.tamanho] = '\0';
+            printf("%s, ", r_buffer->tecnologiaOrigem.string);
+        }
+        else {
+            printf("NULO, ");
+        }
 
         fread(&(r_buffer->tecnologiaDestino.tamanho), sizeof(int), 1, BIN_out);
-        printf("%d, ", r_buffer->tecnologiaDestino.tamanho);
-
-        fread(r_buffer->tecnologiaDestino.string, sizeof(char), (r_buffer->tecnologiaDestino.tamanho), BIN_out);
-        r_buffer->tecnologiaDestino.string[r_buffer->tecnologiaDestino.tamanho] = '\0';
-        printf("%s\n", r_buffer->tecnologiaDestino.string);
-
+        if(imprime_int (r_buffer->tecnologiaDestino.tamanho)){
+            fread(r_buffer->tecnologiaDestino.string, sizeof(char), (r_buffer->tecnologiaDestino.tamanho), BIN_out);
+            r_buffer->tecnologiaDestino.string[r_buffer->tecnologiaDestino.tamanho] = '\0';
+            printf("%s\n", r_buffer->tecnologiaDestino.string);
+        }
+        else {
+            printf("NULO\n");
+        }
 
         lixo = 76 - (21 + (r_buffer->tecnologiaDestino.tamanho) + (r_buffer->tecnologiaOrigem.tamanho));
         fseek(BIN_out, lixo, SEEK_CUR);
