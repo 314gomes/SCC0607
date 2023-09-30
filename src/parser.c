@@ -3,7 +3,7 @@
 void tratar_comando_entrada(){
 	Comandos cmd_in = 0;
 	char args[CONTAGEM_ARGUMENTOS][TAMANHO_VALOR_ARGUMENTO];
-
+	int num_busca;
 	int buffer;
 	scanf("%d", &buffer);
 	cmd_in = buffer;
@@ -18,6 +18,10 @@ void tratar_comando_entrada(){
 			scanf("%s", args[0]);
 			leitura_e_imprime(args[0]);
 			break;
+		case SELECT_WHERE:
+			scanf("%s", args[0]);
+			scanf("%d", &num_busca);
+			busca_campo(args[0], num_busca);
 		default:
 			break;
 	}

@@ -71,3 +71,4 @@ void escreverCabecalho(FILE *arquivo, Cabecalho *h);
 void csvParaBinario(char* caminhoCSV, char* caminhoBin);
 
 void leitura_e_imprime(char* caminhoBin);
+void busca_campo (char* caminhoBin, int n);
