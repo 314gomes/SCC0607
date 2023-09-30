@@ -147,7 +147,6 @@ void parseLinhaCSV(char *CSV_line, Registro *r_buffer){
 void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer){
     Registro *r_buffer = novo_registro();
     char CSV_line_buffer[100];
-    int linhas_acc = 0;
     listaSE tec = novaLista();
 
     // le primeira linha mas nao escreve
@@ -158,14 +157,14 @@ void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer){
 
         parseLinhaCSV(CSV_line_buffer, r_buffer);
 
-        linhas_acc++;
         insereOrdenadoSemRepeticao(r_buffer->tecnologiaOrigem.string, &tec);
         insereOrdenadoSemRepeticao(r_buffer->tecnologiaDestino.string, &tec);
 
         escreverRegistro(BIN_out, r_buffer);
     }
 
-    printf("tecnologias: {%d}, pares: {%d}\n", tec.tam, linhas_acc);
+    c_buffer->nroParesTecnologias = c_buffer->proxRRN;
+    c_buffer->nroTecnologias = tec.tam;
 
     free(r_buffer->tecnologiaOrigem.string);
     free(r_buffer->tecnologiaDestino.string);
@@ -190,16 +189,19 @@ void csvParaBinario(char* caminhoCSV, char* caminhoBin){
     // le o arquivo csv e escreve no arquivo binario
     parseCSV(CSV_in, BIN_out, c_buffer);
 
-    fseek(BIN_out, 0, SEEK_SET); // volta ao inicio do arquivo
+    // Writes updated binary file header
+    c_buffer->status = '1';
+    fseek(BIN_out, 0, 0);
+    escreverCabecalho(BIN_out, c_buffer);
+
+    // Closes files
+    fclose(CSV_in);
+    fclose(BIN_out);
+
     binarioNaTela(caminhoBin);
 
     // libera a memoria
     free(c_buffer);
-
-    // fecha os arquivos
-    fclose(CSV_in);
-    fclose(BIN_out);
-    //c_buffer->status = '1';
 }       
 
 int imprime_int (int parametro){
