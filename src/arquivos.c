@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include "arquivos.h"
 #include "funcoesFornecidas.h"
+#include "listaSE.h"
 
 Registro *novo_registro() {
 
@@ -146,7 +147,9 @@ void parseLinhaCSV(char *CSV_line, Registro *r_buffer){
 void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer){
     Registro *r_buffer = novo_registro();
     char CSV_line_buffer[100];
-    
+    int linhas_acc = 0;
+    listaSE tec = novaLista();
+
     // le primeira linha mas nao escreve
     fgets(CSV_line_buffer, sizeof(CSV_line_buffer), CSV_in);
 
@@ -155,8 +158,14 @@ void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer){
 
         parseLinhaCSV(CSV_line_buffer, r_buffer);
 
+        linhas_acc++;
+        insereOrdenadoSemRepeticao(r_buffer->tecnologiaOrigem.string, &tec);
+        insereOrdenadoSemRepeticao(r_buffer->tecnologiaDestino.string, &tec);
+
         escreverRegistro(BIN_out, r_buffer);
     }
+
+    printf("tecnologias: {%d}, pares: {%d}\n", tec.tam, linhas_acc);
 
     free(r_buffer->tecnologiaOrigem.string);
     free(r_buffer->tecnologiaDestino.string);

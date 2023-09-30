@@ -19,12 +19,14 @@ listaSE novaLista();
 /// @return 
 No *novoNo(char *str);
 
-/// @brief Crates new node with string `str` before `n` on list `l`,
-/// automatically updating l->incio and l->tam
+/// @brief Crates new node with string `str` between `p` and `n` on list `l`,
+/// automatically updating l->incio and l->tam. If p == NULL then the insertion
+/// takes place at list start
 /// @param l list to write
-/// @param p node to be inserted before next
+/// @param str new node's string
+/// @param p previous node already on list
 /// @param n next node already on list
-void insereNoPosicao(listaSE *l, char *str, No *n);
+void insereNoPosicao(listaSE *l, char *str, No *p, No *n);
 
 /// @brief Inserts node with `str` content in `l` in reverse alphabetical order
 /// (assumes `l` is already in reverse alphabetical order)
