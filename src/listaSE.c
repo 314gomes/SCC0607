@@ -15,12 +15,15 @@ No *novoNo(char *str){
 	strcpy(n->str, str);
 }
 
-void insereNoPosicao(listaSE *l, char *str, No *n){
-	No *p = novoNo(str);
-	p->prox = n;
+void insereNoPosicao(listaSE *l, char *str, No *p, No *n){
+	No *new = novoNo(str);
+	new->prox = n;
 	
-	if(n == l->inicio){
-		l->inicio = p;
+	if(p == NULL){
+		l->inicio = new;
+	}
+	else{
+		p->prox = new;
 	}
 
 	l->tam++;
@@ -28,6 +31,7 @@ void insereNoPosicao(listaSE *l, char *str, No *n){
 
 void insereOrdenadoSemRepeticao(char *str, listaSE *l){
 	No *atual = l->inicio;
+	No *prev = NULL;
 
 	while(atual != NULL){
 		int cmp = strcmp (str, atual->str);
@@ -41,15 +45,17 @@ void insereOrdenadoSemRepeticao(char *str, listaSE *l){
 		else if(cmp > 0){
 			// insert in reverse alphabetical order
 			
-			insereNoPosicao(l, str, atual);
+			insereNoPosicao(l, str, prev, atual);
 			return;
 		}
 
+		prev = atual;
 		atual = atual->prox;
 	}
 
 	// Could not find previous matches: place at end
-	insereNoPosicao(l, str, atual);
+	insereNoPosicao(l, str, prev, atual);
+	
 }
 
 void destroiNo(No *n){
