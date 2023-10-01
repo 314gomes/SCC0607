@@ -346,11 +346,56 @@ void busca_int (char* caminhoBin, int campo, int buscado) {
     fclose(BIN_out);
 }
 
+void busca_string (char* caminhoBin, char* buscado, int tamanho) {
+    Registro *r_buffer = novo_registro();
+    FILE *BIN_out = fopen(caminhoBin, "rb");
+    if(BIN_out == NULL) return;
+
+    int campo = 12;
+    int linha = 0;
+    int aux_tamanho, lixo = 0;
+    char aux_char, aux_string[TAM_MAXIMO_STRING];
+    
+
+
+    fseek(BIN_out, 0, SEEK_SET);
+    fseek(BIN_out, 13, SEEK_CUR);
+    while(fread(&(aux_char), sizeof(char), 1, BIN_out) != 0) {
+        
+        fseek(BIN_out, campo, SEEK_CUR);
+        fread(&(aux_tamanho), sizeof(int), 1, BIN_out);
+
+        if (aux_tamanho == tamanho) {
+            fread(&(aux_string), sizeof(char), aux_tamanho, BIN_out);
+            lixo = 76 - (17+tamanho);
+
+            aux_string[tamanho] = '\0';
+            buscado[tamanho] = '\0';
+
+            if (strcmp(aux_string, buscado) == 0) {
+                func3_aux(caminhoBin, (linha*76)+13);
+            }
+        }
+        else {
+            lixo = 76 -(17);
+        }
+
+        linha++;
+        fseek(BIN_out, lixo, SEEK_CUR);
+    }
+
+    free(r_buffer);
+    fclose(BIN_out);
+}
+
+
 void funcionalidade3 (char* caminhoBin, int n) {
 
     char busca[n][TAM_MAXIMO_STRING];
     int busca_i[n];
+    char busca_c[n][TAM_MAXIMO_STRING];
     int campo[n];
+    int tamanho[n];
 
     for (int i = 0; i < n; i++) {
         scanf("%s", busca[i]);
@@ -366,12 +411,21 @@ void funcionalidade3 (char* caminhoBin, int n) {
         else if (strcmp(busca[i], "peso") == 0) {
             scanf("%d", &busca_i[i]);
             campo[i] = 8;
-        }      
+        } 
+        else if (strcmp(busca[i], "nomeTecnologiaOrigem") == 0) {
+			scan_quote_string(busca_c[i]);
+            tamanho[i] = strlen(busca_c[i]);
+        } 
+        else if (strcmp(busca[i], "nomeTecnologiaDestino") == 0) {
+            scan_quote_string(busca_c[i]);
+            tamanho[i] = strlen(busca_c[i]);
+        }     
     }
 
 // arrumar colocar uns if para quando for de string
     for (int i = 0; i < n; i++) {
-        printf("BUSCADO  %d\nCAMPO = %d\n\n", busca_i[i], campo[i]);
-        busca_int(caminhoBin, campo[i], busca_i[i]);
+        //printf("BUSCADO  %d\nCAMPO = %d\n\n", busca_i[i], campo[i]);
+        //busca_int(caminhoBin, campo[i], busca_i[i]);
+        busca_string(caminhoBin, busca_c[i], tamanho[i]);
     }
 }
