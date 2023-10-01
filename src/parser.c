@@ -21,7 +21,7 @@ void tratar_comando_entrada(){
 		case SELECT_WHERE:
 			scanf("%s", args[0]);
 			scanf("%d", &num_busca);
-			busca_campo(args[0], num_busca);
+			funcionalidade3(args[0], num_busca);
 		default:
 			break;
 	}
