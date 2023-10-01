@@ -275,19 +275,20 @@ void func3_aux (char* caminhoBin, int posicao) {
 
     fread(&(r_buffer->removido), sizeof(char), 1, BIN_out);
     fread(&(r_buffer->grupo), sizeof(int), 1, BIN_out);
-    fread(&(r_buffer->peso), sizeof(int), 1, BIN_out);
     fread(&(r_buffer->popularidade), sizeof(int), 1, BIN_out);
+    fread(&(r_buffer->peso), sizeof(int), 1, BIN_out);
+    
 
     fread(&(r_buffer->tecnologiaOrigem.tamanho), sizeof(int), 1, BIN_out);
     if((r_buffer->tecnologiaOrigem.tamanho) != 0){
         fread(r_buffer->tecnologiaOrigem.string, sizeof(char), (r_buffer->tecnologiaOrigem.tamanho), BIN_out);
-         r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaOrigem.tamanho] = '\0';
+        r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaOrigem.tamanho] = '\0';
     }
 
     fread(&(r_buffer->tecnologiaDestino.tamanho), sizeof(int), 1, BIN_out);
     if((r_buffer->tecnologiaDestino.tamanho) != 0){
         fread(r_buffer->tecnologiaDestino.string, sizeof(char), (r_buffer->tecnologiaDestino.tamanho), BIN_out);
-         r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaDestino.tamanho] = '\0';
+        r_buffer->tecnologiaDestino.string[r_buffer->tecnologiaDestino.tamanho] = '\0';
     }
 
     // print
@@ -324,7 +325,6 @@ void busca_int (char* caminhoBin, int campo, int buscado) {
     int linha = 0;
     int aux_int;
     char aux_char;
-    //scanf("%d", &buscado);
 
     fseek(BIN_out, 0, SEEK_SET);
     fseek(BIN_out, 13, SEEK_CUR);
@@ -338,7 +338,7 @@ void busca_int (char* caminhoBin, int campo, int buscado) {
             func3_aux(caminhoBin, (linha*76)+13);
         }
         linha++;
-        lixo = 76 - 5;
+        lixo = 76 - (1 + (campo+1)*4);
         fseek(BIN_out, lixo, SEEK_CUR);
     }
 
@@ -356,20 +356,22 @@ void funcionalidade3 (char* caminhoBin, int n) {
         scanf("%s", busca[i]);
 
         if (strcmp(busca[i], "grupo") == 0) {
-            //printf("-grupo:\n");
             scanf("%d", &busca_i[i]);
             campo[i] = 0;           
         }
         else if (strcmp(busca[i], "popularidade") == 0) {
-            //printf("-popularidade\n");
+            scanf("%d", &busca_i[i]);
+            campo[i] = 4;
         }
         else if (strcmp(busca[i], "peso") == 0) {
-            //printf("-peso\n");
+            scanf("%d", &busca_i[i]);
+            campo[i] = 8;
         }      
     }
 
 // arrumar colocar uns if para quando for de string
     for (int i = 0; i < n; i++) {
+        printf("BUSCADO  %d\nCAMPO = %d\n\n", busca_i[i], campo[i]);
         busca_int(caminhoBin, campo[i], busca_i[i]);
     }
 }
