@@ -157,13 +157,25 @@ void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer){
 
         parseLinhaCSV(CSV_line_buffer, r_buffer);
 
-        insereOrdenadoSemRepeticao(r_buffer->tecnologiaOrigem.string, &tec);
-        insereOrdenadoSemRepeticao(r_buffer->tecnologiaDestino.string, &tec);
+        char *strOrigem = r_buffer->tecnologiaOrigem.string;
+        char *strDestino = r_buffer->tecnologiaDestino.string;
+
+        int origemIsNull = isempty(strOrigem);
+        int destinoIsNull = isempty(strDestino);
+
+        int parExists = !(origemIsNull) && !(destinoIsNull);
+
+        if(!origemIsNull)
+            insereOrdenadoSemRepeticao(strOrigem, &tec);
+        if(!destinoIsNull)
+            insereOrdenadoSemRepeticao(strDestino, &tec);
+
+        if(parExists)
+            c_buffer->nroParesTecnologias++;
 
         escreverRegistro(BIN_out, r_buffer);
     }
 
-    c_buffer->nroParesTecnologias = c_buffer->proxRRN;
     c_buffer->nroTecnologias = tec.tam;
 
     free(r_buffer->tecnologiaOrigem.string);
