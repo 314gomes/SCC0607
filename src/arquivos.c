@@ -218,29 +218,79 @@ void csvParaBinario(char* caminhoCSV, char* caminhoBin){
 
 int imprime_int (int parametro){
     if (parametro == -1) {
-        printf("NULO");
+        printf(", NULO");
         return 0;
     }
     else {
-        printf("%d", parametro);
+        printf(", %d", parametro);
         if (parametro != 0) return 1;
         else return 0;
     }
 }
 
-void virgula () {
-    printf(", ");
+void func3_aux (char* caminhoBin, int posicao) {
+    Registro *r_buffer = novo_registro();
+    FILE *BIN_out = fopen(caminhoBin, "rb");
+    if(BIN_out == NULL) return;
+
+    fseek(BIN_out, 0, SEEK_SET);
+    fseek(BIN_out, posicao, SEEK_CUR);
+
+    fread(&(r_buffer->removido), sizeof(char), 1, BIN_out);
+    fread(&(r_buffer->grupo), sizeof(int), 1, BIN_out);
+    fread(&(r_buffer->popularidade), sizeof(int), 1, BIN_out);
+    fread(&(r_buffer->peso), sizeof(int), 1, BIN_out);
+    
+
+    fread(&(r_buffer->tecnologiaOrigem.tamanho), sizeof(int), 1, BIN_out);
+    if((r_buffer->tecnologiaOrigem.tamanho) != 0){
+        fread(r_buffer->tecnologiaOrigem.string, sizeof(char), (r_buffer->tecnologiaOrigem.tamanho), BIN_out);
+        r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaOrigem.tamanho] = '\0';
+    }
+
+    fread(&(r_buffer->tecnologiaDestino.tamanho), sizeof(int), 1, BIN_out);
+    if((r_buffer->tecnologiaDestino.tamanho) != 0){
+        fread(r_buffer->tecnologiaDestino.string, sizeof(char), (r_buffer->tecnologiaDestino.tamanho), BIN_out);
+        r_buffer->tecnologiaDestino.string[r_buffer->tecnologiaDestino.tamanho] = '\0';
+    }
+
+    // print
+    if((r_buffer->tecnologiaOrigem.tamanho) != 0){
+        r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaOrigem.tamanho] = '\0';
+        printf("%s", r_buffer->tecnologiaOrigem.string);
+    }
+    else {
+        printf("NULO");
+    }
+    imprime_int (r_buffer->grupo);
+    imprime_int (r_buffer->popularidade);
+    if((r_buffer->tecnologiaOrigem.tamanho) != 0){
+        r_buffer->tecnologiaDestino.string[r_buffer->tecnologiaDestino.tamanho] = '\0';
+        printf(", %s", r_buffer->tecnologiaDestino.string);
+    }
+    else {
+        printf(", NULO");
+    }
+    imprime_int (r_buffer->peso);
+    printf("\n");
+
+    free(r_buffer);
+    fclose(BIN_out);
+
 }
+
 void leitura_e_imprime(char* caminhoBin) {
 
     Registro *r_buffer = novo_registro();
     int size;
     int lixo = 0;
+    int posicao = 13;
 
     FILE *BIN_out = fopen(caminhoBin, "rb");
     if(BIN_out == NULL) return;
     fseek(BIN_out, 0, SEEK_SET);
     fseek(BIN_out, 13, SEEK_CUR);
+    /*
     while(fread(&(r_buffer->removido), sizeof(char), 1, BIN_out) != 0) {
         size++;
         fread(&(r_buffer->grupo), sizeof(int), 1, BIN_out);
@@ -278,64 +328,23 @@ void leitura_e_imprime(char* caminhoBin) {
         lixo = 76 - (21 + (r_buffer->tecnologiaDestino.tamanho) + (r_buffer->tecnologiaOrigem.tamanho));
         fseek(BIN_out, lixo, SEEK_CUR);
     }
+    */
+
+    while(fread(&(r_buffer->removido), sizeof(char), 1, BIN_out) != 0) {
+        func3_aux(caminhoBin, posicao);
+
+        posicao += 76;
+        fseek(BIN_out, 75, SEEK_CUR);
+    }
+    
+
+    
     free(r_buffer->tecnologiaOrigem.string);
     free(r_buffer->tecnologiaDestino.string);
     free(r_buffer);
     fclose(BIN_out);
 }
 
-void func3_aux (char* caminhoBin, int posicao) {
-    Registro *r_buffer = novo_registro();
-    FILE *BIN_out = fopen(caminhoBin, "rb");
-    if(BIN_out == NULL) return;
-
-    fseek(BIN_out, 0, SEEK_SET);
-    fseek(BIN_out, posicao, SEEK_CUR);
-
-    fread(&(r_buffer->removido), sizeof(char), 1, BIN_out);
-    fread(&(r_buffer->grupo), sizeof(int), 1, BIN_out);
-    fread(&(r_buffer->popularidade), sizeof(int), 1, BIN_out);
-    fread(&(r_buffer->peso), sizeof(int), 1, BIN_out);
-    
-
-    fread(&(r_buffer->tecnologiaOrigem.tamanho), sizeof(int), 1, BIN_out);
-    if((r_buffer->tecnologiaOrigem.tamanho) != 0){
-        fread(r_buffer->tecnologiaOrigem.string, sizeof(char), (r_buffer->tecnologiaOrigem.tamanho), BIN_out);
-        r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaOrigem.tamanho] = '\0';
-    }
-
-    fread(&(r_buffer->tecnologiaDestino.tamanho), sizeof(int), 1, BIN_out);
-    if((r_buffer->tecnologiaDestino.tamanho) != 0){
-        fread(r_buffer->tecnologiaDestino.string, sizeof(char), (r_buffer->tecnologiaDestino.tamanho), BIN_out);
-        r_buffer->tecnologiaDestino.string[r_buffer->tecnologiaDestino.tamanho] = '\0';
-    }
-
-    // print
-    if((r_buffer->tecnologiaOrigem.tamanho) != 0){
-        r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaOrigem.tamanho] = '\0';
-        printf("%s, ", r_buffer->tecnologiaOrigem.string);
-    }
-    else {
-        printf("NULO, ");
-    }
-    imprime_int (r_buffer->grupo);
-    virgula();
-    imprime_int (r_buffer->popularidade);
-    virgula();
-    if((r_buffer->tecnologiaOrigem.tamanho) != 0){
-        r_buffer->tecnologiaDestino.string[r_buffer->tecnologiaDestino.tamanho] = '\0';
-        printf("%s, ", r_buffer->tecnologiaDestino.string);
-    }
-    else {
-        printf("NULO, ");
-    }
-    imprime_int (r_buffer->peso);
-    printf("\n");
-
-    free(r_buffer);
-    fclose(BIN_out);
-
-}
 
 void busca_int (char* caminhoBin, int campo, int buscado) {
     Registro *r_buffer = novo_registro();
@@ -474,12 +483,10 @@ void funcionalidade3 (char* caminhoBin, int n) {
         
 
         if(campo[i] > -1) {
-            puts("flag int");
             busca_int(caminhoBin, campo[i], busca_i[i]);
         }
 
         if (campo[i] = -1) {
-            //puts("flag char");
             busca_string(caminhoBin, busca_c[i], tamanho[i], flag[i]);
         }
 
