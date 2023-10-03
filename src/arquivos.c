@@ -157,13 +157,25 @@ void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer){
 
         parseLinhaCSV(CSV_line_buffer, r_buffer);
 
-        insereOrdenadoSemRepeticao(r_buffer->tecnologiaOrigem.string, &tec);
-        insereOrdenadoSemRepeticao(r_buffer->tecnologiaDestino.string, &tec);
+        char *strOrigem = r_buffer->tecnologiaOrigem.string;
+        char *strDestino = r_buffer->tecnologiaDestino.string;
+
+        int origemIsNull = isempty(strOrigem);
+        int destinoIsNull = isempty(strDestino);
+
+        int parExists = !(origemIsNull) && !(destinoIsNull);
+
+        if(!origemIsNull)
+            insereOrdenadoSemRepeticao(strOrigem, &tec);
+        if(!destinoIsNull)
+            insereOrdenadoSemRepeticao(strDestino, &tec);
+
+        if(parExists)
+            c_buffer->nroParesTecnologias++;
 
         escreverRegistro(BIN_out, r_buffer);
     }
 
-    c_buffer->nroParesTecnologias = c_buffer->proxRRN;
     c_buffer->nroTecnologias = tec.tam;
 
     free(r_buffer->tecnologiaOrigem.string);
@@ -282,20 +294,19 @@ void func3_aux (char* caminhoBin, int posicao) {
 
     fread(&(r_buffer->removido), sizeof(char), 1, BIN_out);
     fread(&(r_buffer->grupo), sizeof(int), 1, BIN_out);
-    fread(&(r_buffer->popularidade), sizeof(int), 1, BIN_out);
     fread(&(r_buffer->peso), sizeof(int), 1, BIN_out);
-    
+    fread(&(r_buffer->popularidade), sizeof(int), 1, BIN_out);
 
     fread(&(r_buffer->tecnologiaOrigem.tamanho), sizeof(int), 1, BIN_out);
     if((r_buffer->tecnologiaOrigem.tamanho) != 0){
         fread(r_buffer->tecnologiaOrigem.string, sizeof(char), (r_buffer->tecnologiaOrigem.tamanho), BIN_out);
-        r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaOrigem.tamanho] = '\0';
+         r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaOrigem.tamanho] = '\0';
     }
 
     fread(&(r_buffer->tecnologiaDestino.tamanho), sizeof(int), 1, BIN_out);
     if((r_buffer->tecnologiaDestino.tamanho) != 0){
         fread(r_buffer->tecnologiaDestino.string, sizeof(char), (r_buffer->tecnologiaDestino.tamanho), BIN_out);
-        r_buffer->tecnologiaDestino.string[r_buffer->tecnologiaDestino.tamanho] = '\0';
+         r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaDestino.tamanho] = '\0';
     }
 
     // print
@@ -334,6 +345,7 @@ void busca_int (char* caminhoBin, int campo, int buscado) {
     int linha = 0;
     int aux_int;
     char aux_char;
+    //scanf("%d", &buscado);
 
     fseek(BIN_out, 0, SEEK_SET);
     fseek(BIN_out, 13, SEEK_CUR);
@@ -423,7 +435,6 @@ void funcionalidade3 (char* caminhoBin, int n) {
 
     char busca[n][TAM_MAXIMO_STRING];
     int busca_i[n];
-    char busca_c[n][TAM_MAXIMO_STRING];
     int campo[n];
     int tamanho[n];
     int flag[n];
@@ -432,12 +443,12 @@ void funcionalidade3 (char* caminhoBin, int n) {
         scanf("%s", busca[i]);
 
         if (strcmp(busca[i], "grupo") == 0) {
+            //printf("-grupo:\n");
             scanf("%d", &busca_i[i]);
             campo[i] = 0;           
         }
         else if (strcmp(busca[i], "popularidade") == 0) {
-            scanf("%d", &busca_i[i]);
-            campo[i] = 4;
+            //printf("-popularidade\n");
         }
         else if (strcmp(busca[i], "peso") == 0) {
             scanf("%d", &busca_i[i]);
