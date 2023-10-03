@@ -157,13 +157,25 @@ void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer){
 
         parseLinhaCSV(CSV_line_buffer, r_buffer);
 
-        insereOrdenadoSemRepeticao(r_buffer->tecnologiaOrigem.string, &tec);
-        insereOrdenadoSemRepeticao(r_buffer->tecnologiaDestino.string, &tec);
+        char *strOrigem = r_buffer->tecnologiaOrigem.string;
+        char *strDestino = r_buffer->tecnologiaDestino.string;
+
+        int origemIsNull = isempty(strOrigem);
+        int destinoIsNull = isempty(strDestino);
+
+        int parExists = !(origemIsNull) && !(destinoIsNull);
+
+        if(!origemIsNull)
+            insereOrdenadoSemRepeticao(strOrigem, &tec);
+        if(!destinoIsNull)
+            insereOrdenadoSemRepeticao(strDestino, &tec);
+
+        if(parExists)
+            c_buffer->nroParesTecnologias++;
 
         escreverRegistro(BIN_out, r_buffer);
     }
 
-    c_buffer->nroParesTecnologias = c_buffer->proxRRN;
     c_buffer->nroTecnologias = tec.tam;
 
     free(r_buffer->tecnologiaOrigem.string);
@@ -275,20 +287,19 @@ void func3_aux (char* caminhoBin, int posicao) {
 
     fread(&(r_buffer->removido), sizeof(char), 1, BIN_out);
     fread(&(r_buffer->grupo), sizeof(int), 1, BIN_out);
-    fread(&(r_buffer->popularidade), sizeof(int), 1, BIN_out);
     fread(&(r_buffer->peso), sizeof(int), 1, BIN_out);
-    
+    fread(&(r_buffer->popularidade), sizeof(int), 1, BIN_out);
 
     fread(&(r_buffer->tecnologiaOrigem.tamanho), sizeof(int), 1, BIN_out);
     if((r_buffer->tecnologiaOrigem.tamanho) != 0){
         fread(r_buffer->tecnologiaOrigem.string, sizeof(char), (r_buffer->tecnologiaOrigem.tamanho), BIN_out);
-        r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaOrigem.tamanho] = '\0';
+         r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaOrigem.tamanho] = '\0';
     }
 
     fread(&(r_buffer->tecnologiaDestino.tamanho), sizeof(int), 1, BIN_out);
     if((r_buffer->tecnologiaDestino.tamanho) != 0){
         fread(r_buffer->tecnologiaDestino.string, sizeof(char), (r_buffer->tecnologiaDestino.tamanho), BIN_out);
-        r_buffer->tecnologiaDestino.string[r_buffer->tecnologiaDestino.tamanho] = '\0';
+         r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaDestino.tamanho] = '\0';
     }
 
     // print
@@ -325,6 +336,7 @@ void busca_int (char* caminhoBin, int campo, int buscado) {
     int linha = 0;
     int aux_int;
     char aux_char;
+    //scanf("%d", &buscado);
 
     fseek(BIN_out, 0, SEEK_SET);
     fseek(BIN_out, 13, SEEK_CUR);
@@ -338,94 +350,38 @@ void busca_int (char* caminhoBin, int campo, int buscado) {
             func3_aux(caminhoBin, (linha*76)+13);
         }
         linha++;
-        lixo = 76 - (1 + (campo+1)*4);
+        lixo = 76 - 5;
         fseek(BIN_out, lixo, SEEK_CUR);
     }
 
     free(r_buffer);
     fclose(BIN_out);
 }
-
-void busca_string (char* caminhoBin, char* buscado, int tamanho) {
-    Registro *r_buffer = novo_registro();
-    FILE *BIN_out = fopen(caminhoBin, "rb");
-    if(BIN_out == NULL) return;
-
-    int campo = 12;
-    int linha = 0;
-    int aux_tamanho, lixo = 0;
-    char aux_char, aux_string[TAM_MAXIMO_STRING];
-    
-
-
-    fseek(BIN_out, 0, SEEK_SET);
-    fseek(BIN_out, 13, SEEK_CUR);
-    while(fread(&(aux_char), sizeof(char), 1, BIN_out) != 0) {
-        
-        fseek(BIN_out, campo, SEEK_CUR);
-        fread(&(aux_tamanho), sizeof(int), 1, BIN_out);
-
-        if (aux_tamanho == tamanho) {
-            fread(&(aux_string), sizeof(char), aux_tamanho, BIN_out);
-            lixo = 76 - (17+tamanho);
-
-            aux_string[tamanho] = '\0';
-            buscado[tamanho] = '\0';
-
-            if (strcmp(aux_string, buscado) == 0) {
-                func3_aux(caminhoBin, (linha*76)+13);
-            }
-        }
-        else {
-            lixo = 76 -(17);
-        }
-
-        linha++;
-        fseek(BIN_out, lixo, SEEK_CUR);
-    }
-
-    free(r_buffer);
-    fclose(BIN_out);
-}
-
 
 void funcionalidade3 (char* caminhoBin, int n) {
 
     char busca[n][TAM_MAXIMO_STRING];
     int busca_i[n];
-    char busca_c[n][TAM_MAXIMO_STRING];
     int campo[n];
-    int tamanho[n];
 
     for (int i = 0; i < n; i++) {
         scanf("%s", busca[i]);
 
         if (strcmp(busca[i], "grupo") == 0) {
+            //printf("-grupo:\n");
             scanf("%d", &busca_i[i]);
             campo[i] = 0;           
         }
         else if (strcmp(busca[i], "popularidade") == 0) {
-            scanf("%d", &busca_i[i]);
-            campo[i] = 4;
+            //printf("-popularidade\n");
         }
         else if (strcmp(busca[i], "peso") == 0) {
-            scanf("%d", &busca_i[i]);
-            campo[i] = 8;
-        } 
-        else if (strcmp(busca[i], "nomeTecnologiaOrigem") == 0) {
-			scan_quote_string(busca_c[i]);
-            tamanho[i] = strlen(busca_c[i]);
-        } 
-        else if (strcmp(busca[i], "nomeTecnologiaDestino") == 0) {
-            scan_quote_string(busca_c[i]);
-            tamanho[i] = strlen(busca_c[i]);
-        }     
+            //printf("-peso\n");
+        }      
     }
 
 // arrumar colocar uns if para quando for de string
     for (int i = 0; i < n; i++) {
-        //printf("BUSCADO  %d\nCAMPO = %d\n\n", busca_i[i], campo[i]);
-        //busca_int(caminhoBin, campo[i], busca_i[i]);
-        busca_string(caminhoBin, busca_c[i], tamanho[i]);
+        busca_int(caminhoBin, campo[i], busca_i[i]);
     }
 }
