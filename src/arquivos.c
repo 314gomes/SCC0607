@@ -253,6 +253,10 @@ FILE *abreBinario(char *caminhoBin){
     return bin;
 }
 
+long byteoffset_RRN(int RRN){
+    return TAM_CABECALHO + TAM_REGISTRO*RRN;
+}
+
 void func3_aux (char* caminhoBin, int posicao) {
     Registro *r_buffer = novo_registro();
     FILE *BIN_out = fopen(caminhoBin, "rb");

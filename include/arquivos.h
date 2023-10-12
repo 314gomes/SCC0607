@@ -125,5 +125,10 @@ StatusDeRetorno csvParaBinario(char* caminhoCSV, char* caminhoBin);
 /// to binary file if sucessfull.
 FILE *abreBinario(char *caminhobin);
 
+/// @brief Calculates byteoffset of a given RRN according to specification.
+/// @param RRN Relative registry number.
+/// @return It's byte offset.
+long byteoffset_RRN(int RRN);
+
 void leitura_e_imprime(char* caminhoBin);
 void funcionalidade3 (char* caminhoBin, int n);
