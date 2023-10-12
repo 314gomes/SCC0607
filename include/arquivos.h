@@ -23,6 +23,17 @@ typedef struct {
     StringVariavel tecnologiaDestino;
 } Registro;
 
+
+/// @brief Enum for return features' return types
+typedef enum{
+    /// @brief Sucess!
+    sucesso = 0,
+    /// @brief Falha no processamento do arquivo.
+    falha_processamento = 1,
+    /// @brief Registro inexistente.
+    registro_inexistente = 2,
+} StatusDeRetorno;
+
 /// @brief Allocates memory and assings default values for new Registro struct.
 /// @return pointer to new Registro.
 Registro *novo_registro();
@@ -105,7 +116,7 @@ void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer);
 /// substituting or creating new binary file `caminhoBin`
 /// @param caminhoCSV path to CSV file
 /// @param caminhoBin path to new binary file according to specification
-void csvParaBinario(char* caminhoCSV, char* caminhoBin);
+StatusDeRetorno csvParaBinario(char* caminhoCSV, char* caminhoBin);
 
 void leitura_e_imprime(char* caminhoBin);
 void funcionalidade3 (char* caminhoBin, int n);

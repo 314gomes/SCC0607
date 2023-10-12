@@ -193,8 +193,8 @@ void csvParaBinario(char* caminhoCSV, char* caminhoBin){
     FILE *BIN_out = fopen(caminhoBin, "wb");
     
     // verifica se foram abertos corretamente
-    if (CSV_in == NULL) return;
-    if (BIN_out == NULL) return;
+    if (CSV_in == NULL) return falha_processamento;
+    if (BIN_out == NULL) return falha_processamento;
 
     escreverCabecalho(BIN_out, c_buffer);
 
