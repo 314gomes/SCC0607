@@ -183,18 +183,18 @@ void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer){
     free(r_buffer);
 }
 
-void csvParaBinario(char* caminhoCSV, char* caminhoBin){
+StatusDeRetorno csvParaBinario(char* caminhoCSV, char* caminhoBin){
 
     // inicializa novo c_buffer
     Cabecalho *c_buffer = novo_cabecalho();
     
     // abre arquivos de leitura e escrita em binario
+    // verificando se foram abertos corretamente
     FILE *CSV_in = fopen(caminhoCSV, "r");
-    FILE *BIN_out = fopen(caminhoBin, "wb");
-    
-    // verifica se foram abertos corretamente
     if (CSV_in == NULL) return falha_processamento;
+    FILE *BIN_out = fopen(caminhoBin, "wb");
     if (BIN_out == NULL) return falha_processamento;
+    
 
     escreverCabecalho(BIN_out, c_buffer);
 
