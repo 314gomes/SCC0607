@@ -13,6 +13,8 @@ No *novoNo(char *str){
 	No *n = NULL;
 	n = malloc(sizeof(No));
 	strcpy(n->str, str);
+	
+	return n;
 }
 
 void insereNoPosicao(listaSE *l, char *str, No *p, No *n){

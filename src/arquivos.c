@@ -22,6 +22,8 @@ Registro *novo_registro() {
 
     r_buffer->tecnologiaOrigem.string = (char *)malloc(TAM_MAXIMO_STRING);
     r_buffer->tecnologiaDestino.string =(char *)malloc(TAM_MAXIMO_STRING);
+
+    return r_buffer;
 }
 
 Cabecalho *novo_cabecalho() {
@@ -33,6 +35,8 @@ Cabecalho *novo_cabecalho() {
     cabecalho->proxRRN = 0;
     cabecalho->nroTecnologias = 0;
     cabecalho->nroParesTecnologias = 0;
+
+    return cabecalho;
 }
 
 
@@ -79,6 +83,7 @@ void escreverRegistro(FILE *arquivo, Registro *r) {
 }
 
 void escreverCabecalho(FILE *arquivo, Cabecalho *h){
+    fseek(arquivo, 0, 0);
     escreverCampoChar(arquivo, h->status);
     escreverCampoInt(arquivo, h->proxRRN);
     escreverCampoInt(arquivo, h->nroTecnologias);
@@ -203,7 +208,6 @@ StatusDeRetorno csvParaBinario(char* caminhoCSV, char* caminhoBin){
 
     // Writes updated binary file header
     c_buffer->status = '1';
-    fseek(BIN_out, 0, 0);
     escreverCabecalho(BIN_out, c_buffer);
 
     // Closes files
@@ -214,6 +218,8 @@ StatusDeRetorno csvParaBinario(char* caminhoCSV, char* caminhoBin){
 
     // libera a memoria
     free(c_buffer);
+
+    return sucesso;
 }       
 
 int imprime_int (int parametro){
@@ -282,8 +288,6 @@ void func3_aux (char* caminhoBin, int posicao) {
 void leitura_e_imprime(char* caminhoBin) {
 
     Registro *r_buffer = novo_registro();
-    int size;
-    int lixo = 0;
     int posicao = 13;
 
     FILE *BIN_out = fopen(caminhoBin, "rb");
@@ -486,7 +490,7 @@ void funcionalidade3 (char* caminhoBin, int n) {
             busca_int(caminhoBin, campo[i], busca_i[i]);
         }
 
-        if (campo[i] = -1) {
+        if (campo[i] == -1) {
             busca_string(caminhoBin, busca_c[i], tamanho[i], flag[i]);
         }
 
