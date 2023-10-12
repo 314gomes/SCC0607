@@ -4,3 +4,5 @@
 #define LIXO '$'
 #define NAO_REMOVIDO '0'
 #define REMOVIDO '1'
+#define CONSISTENTE '1'
+#define INCONSISTENTE '0'

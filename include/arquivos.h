@@ -119,5 +119,11 @@ void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer);
 /// @return `sucesso` if no errors encountered, `falha_processamento` otherwise
 StatusDeRetorno csvParaBinario(char* caminhoCSV, char* caminhoBin);
 
+/// @brief Opens binary file and detects its status.
+/// @param caminhobin path to binary file.
+/// @return NULL if status is `INCONSISTENTE` or if file does not exist, FILE*
+/// to binary file if sucessfull.
+FILE *abreBinario(char *caminhobin);
+
 void leitura_e_imprime(char* caminhoBin);
 void funcionalidade3 (char* caminhoBin, int n);

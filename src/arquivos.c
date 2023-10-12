@@ -31,7 +31,7 @@ Cabecalho *novo_cabecalho() {
     Cabecalho* cabecalho;
     cabecalho = (Cabecalho*)malloc(sizeof(Cabecalho));
 
-    cabecalho->status = '0';
+    cabecalho->status = INCONSISTENTE;
     cabecalho->proxRRN = 0;
     cabecalho->nroTecnologias = 0;
     cabecalho->nroParesTecnologias = 0;
@@ -207,7 +207,7 @@ StatusDeRetorno csvParaBinario(char* caminhoCSV, char* caminhoBin){
     parseCSV(CSV_in, BIN_out, c_buffer);
 
     // Writes updated binary file header
-    c_buffer->status = '1';
+    c_buffer->status = CONSISTENTE;
     escreverCabecalho(BIN_out, c_buffer);
 
     // Closes files
@@ -232,6 +232,25 @@ int imprime_int (int parametro){
         if (parametro != 0) return 1;
         else return 0;
     }
+}
+
+FILE *abreBinario(char *caminhoBin){
+    char status;
+    
+    FILE *bin = fopen(caminhoBin, "rb");
+    if(bin == NULL){
+        return NULL;
+    }
+
+    fseek(bin, 0, SEEK_SET);
+    fread(&status, 1, 1, bin);
+    
+    if(status == INCONSISTENTE){
+        fclose(bin);
+        return NULL;
+    }
+    
+    return bin;
 }
 
 void func3_aux (char* caminhoBin, int posicao) {
