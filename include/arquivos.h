@@ -116,6 +116,7 @@ void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer);
 /// substituting or creating new binary file `caminhoBin`
 /// @param caminhoCSV path to CSV file
 /// @param caminhoBin path to new binary file according to specification
+/// @return `sucesso` if no errors encountered, `falha_processamento` otherwise
 StatusDeRetorno csvParaBinario(char* caminhoCSV, char* caminhoBin);
 
 void leitura_e_imprime(char* caminhoBin);
