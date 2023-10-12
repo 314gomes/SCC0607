@@ -3,6 +3,7 @@
 void tratar_comando_entrada(){
 	Comandos cmd_in = 0;
 	char args[CONTAGEM_ARGUMENTOS][TAMANHO_VALOR_ARGUMENTO];
+	StatusDeRetorno status;
 	int num_busca;
 	int buffer;
 	scanf("%d", &buffer);
@@ -12,7 +13,7 @@ void tratar_comando_entrada(){
 		case CREATE_TABLE:
 			scanf("%s", args[0]);
 			scanf("%s", args[1]);
-			csvParaBinario(args[0], args[1]);
+			status = csvParaBinario(args[0], args[1]);
 			break;
 		case SELECT_FROM:
 			scanf("%s", args[0]);
@@ -25,4 +26,23 @@ void tratar_comando_entrada(){
 		default:
 			break;
 	}
+
+	switch (status)
+	{
+	case sucesso:
+		break;
+	
+	case falha_processamento:
+		printf("Falha no processamento do arquivo.");
+		break;
+
+	case registro_inexistente:
+		printf("Registro inexistente.");
+		break;
+
+	default:
+		printf("Erro desconhecido!");
+		break;
+	}
+
 }
