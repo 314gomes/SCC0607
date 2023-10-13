@@ -42,6 +42,10 @@ Registro *novo_registro();
 /// @return pointer to new Cabecalho.
 Cabecalho *novo_cabecalho();
 
+/// @brief Frees memory for Registro*
+/// @param r registry pointer to have its memory freed
+void free_registro(Registro *r);
+
 /// @brief Calculates size of a register
 /// @param r pointer to register
 /// @return size of register data on file

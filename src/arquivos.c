@@ -26,6 +26,12 @@ Registro *novo_registro() {
     return r_buffer;
 }
 
+void free_registro(Registro *r){
+    free(r->tecnologiaOrigem.string);
+    free(r->tecnologiaDestino.string);
+    free(r);
+}
+
 Cabecalho *novo_cabecalho() {
 
     Cabecalho* cabecalho;
@@ -200,9 +206,7 @@ void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer){
     // number of different technologies is then just the size of our list
     c_buffer->nroTecnologias = tec.tam;
 
-    free(r_buffer->tecnologiaOrigem.string);
-    free(r_buffer->tecnologiaDestino.string);
-    free(r_buffer);
+    free_registro(r_buffer);
 }
 
 StatusDeRetorno csvParaBinario(char* caminhoCSV, char* caminhoBin){
@@ -647,5 +651,6 @@ StatusDeRetorno funcionalidade4(char* caminhoBin, int RRN){
     if(s != sucesso) return s;
 
     imprime_registro(*r_buffer);
+    free_registro(r_buffer);
     return sucesso;
 }
