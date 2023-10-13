@@ -6,6 +6,7 @@
 #include "funcoesFornecidas.h"
 #include "listaSE.h"
 
+/***************** INICIALIZACOES **********************/
 Registro *novo_registro() {
 
     Registro* r_buffer;
@@ -25,7 +26,6 @@ Registro *novo_registro() {
 
     return r_buffer;
 }
-
 Cabecalho *novo_cabecalho() {
 
     Cabecalho* cabecalho;
@@ -39,7 +39,6 @@ Cabecalho *novo_cabecalho() {
     return cabecalho;
 }
 
-
 int calcularTamanhoRegistro(Registro *r){
     int tamanhoRegistro = TAM_REGISTRO_FIXO;
     tamanhoRegistro += r->tecnologiaOrigem.tamanho;
@@ -47,12 +46,35 @@ int calcularTamanhoRegistro(Registro *r){
     return tamanhoRegistro;
 }
 
+FILE *abreBinario(char *caminhoBin){
+    char status;
+    
+    FILE *bin = abreBinario(caminhoBin);
+    if(bin == NULL){
+        return NULL;
+    }
+
+    fseek(bin, 0, SEEK_SET);
+    fread(&status, 1, 1, bin);
+    
+    if(status == INCONSISTENTE){
+        fclose(bin);
+        return NULL;
+    }
+    
+    return bin;
+}
+
+
+/***************** ESCRITA **********************/
 void escreverCampoChar(FILE *a, char c){
     fwrite(&c, sizeof(c), 1, a);
 }
+
 void escreverCampoInt(FILE *a, int c){
     fwrite(&c, sizeof(c), 1, a);
 }
+
 void escreverCampoStringVariavel(FILE *a, StringVariavel c){
     escreverCampoInt(a, c.tamanho);
     fwrite(c.string, sizeof(char), c.tamanho, a);
@@ -90,6 +112,8 @@ void escreverCabecalho(FILE *arquivo, Cabecalho *h){
     escreverCampoInt(arquivo, h->nroParesTecnologias);
 }
 
+
+/***************** PARSE **********************/
 int isempty(const char *s)
 {
 	if ((*s) == '\0') return 1;
@@ -187,42 +211,10 @@ void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer){
     free(r_buffer->tecnologiaDestino.string);
     free(r_buffer);
 }
+       
 
-StatusDeRetorno csvParaBinario(char* caminhoCSV, char* caminhoBin){
-
-    // inicializa novo c_buffer
-    Cabecalho *c_buffer = novo_cabecalho();
-    
-    // abre arquivos de leitura e escrita em binario
-    // verificando se foram abertos corretamente
-    FILE *CSV_in = fopen(caminhoCSV, "r");
-    if (CSV_in == NULL) return falha_processamento;
-    FILE *BIN_out = fopen(caminhoBin, "wb");
-    if (BIN_out == NULL) return falha_processamento;
-    
-
-    escreverCabecalho(BIN_out, c_buffer);
-
-    // le o arquivo csv e escreve no arquivo binario
-    parseCSV(CSV_in, BIN_out, c_buffer);
-
-    // Writes updated binary file header
-    c_buffer->status = CONSISTENTE;
-    escreverCabecalho(BIN_out, c_buffer);
-
-    // Closes files
-    fclose(CSV_in);
-    fclose(BIN_out);
-
-    binarioNaTela(caminhoBin);
-
-    // libera a memoria
-    free(c_buffer);
-
-    return sucesso;
-}       
-
-void imprime_int (int n){
+/***************** IMPRESSAO **********************/
+void imprimeCampoInt (int n){
     if (n == -1) {
         printf("NULO");
     }
@@ -231,7 +223,7 @@ void imprime_int (int n){
     }
 }
 
-void imprime_StringVariavel(StringVariavel str){
+void imprimeCampoStringVariavel(StringVariavel str){
     if(str.tamanho == 0){
         printf("NULO");
     }
@@ -240,47 +232,30 @@ void imprime_StringVariavel(StringVariavel str){
     }
 }
 
-void imprime_separador(){
+void imprimeSeparador(){
     printf(", ");
 }
 
-void imprime_registro(Registro r){
+void imprimeRegistro(Registro r){
     // nomeTecnologiaOrigem, grupo, popularidade, nomeTecnologiaDestino, peso,
-    imprime_StringVariavel(r.tecnologiaOrigem);
-    imprime_separador();
+    imprimeCampoStringVariavel(r.tecnologiaOrigem);
+    imprimeSeparador();
     
-    imprime_int(r.grupo);
-    imprime_separador();
+    imprimeCampoInt(r.grupo);
+    imprimeSeparador();
     
-    imprime_int(r.popularidade);
-    imprime_separador();
+    imprimeCampoInt(r.popularidade);
+    imprimeSeparador();
     
-    imprime_StringVariavel(r.tecnologiaDestino);
-    imprime_separador();
+    imprimeCampoStringVariavel(r.tecnologiaDestino);
+    imprimeSeparador();
 
-    imprime_int(r.popularidade);
+    imprimeCampoInt(r.peso);
     printf("\n");
 }
 
-FILE *abreBinario(char *caminhoBin){
-    char status;
-    
-    FILE *bin = fopen(caminhoBin, "rb");
-    if(bin == NULL){
-        return NULL;
-    }
 
-    fseek(bin, 0, SEEK_SET);
-    fread(&status, 1, 1, bin);
-    
-    if(status == INCONSISTENTE){
-        fclose(bin);
-        return NULL;
-    }
-    
-    return bin;
-}
-
+/***************** LEITURA **********************/
 long byteoffset_RRN(int RRN){
     return TAM_CABECALHO + TAM_REGISTRO*RRN;
 }
@@ -332,156 +307,70 @@ StatusDeRetorno le_RRN(FILE *bin, int RRN, Registro *r){
     return sucesso;
 }
 
-void func3_aux (char* caminhoBin, int posicao) {
-    Registro *r_buffer = novo_registro();
-    FILE *BIN_out = fopen(caminhoBin, "rb");
+
+/***************** BUSCA **********************/
+void auxiliarFuncionalidade3 (char* caminhoBin, int posicao) {
+    Registro *r = novo_registro();
+    FILE *BIN_out = abreBinario(caminhoBin);
     if(BIN_out == NULL) return;
 
+    
     fseek(BIN_out, 0, SEEK_SET);
     fseek(BIN_out, posicao, SEEK_CUR);
 
-    fread(&(r_buffer->removido), sizeof(char), 1, BIN_out);
-    fread(&(r_buffer->grupo), sizeof(int), 1, BIN_out);
-    fread(&(r_buffer->popularidade), sizeof(int), 1, BIN_out);
-    fread(&(r_buffer->peso), sizeof(int), 1, BIN_out);
-    
 
-    fread(&(r_buffer->tecnologiaOrigem.tamanho), sizeof(int), 1, BIN_out);
-    if((r_buffer->tecnologiaOrigem.tamanho) != 0){
-        fread(r_buffer->tecnologiaOrigem.string, sizeof(char), (r_buffer->tecnologiaOrigem.tamanho), BIN_out);
-        r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaOrigem.tamanho] = '\0';
-    }
+    leStatusRegistro(BIN_out, r); 
+    leConteudoRegistro(BIN_out, r); 
+    imprimeRegistro(*r);
 
-    fread(&(r_buffer->tecnologiaDestino.tamanho), sizeof(int), 1, BIN_out);
-    if((r_buffer->tecnologiaDestino.tamanho) != 0){
-        fread(r_buffer->tecnologiaDestino.string, sizeof(char), (r_buffer->tecnologiaDestino.tamanho), BIN_out);
-        r_buffer->tecnologiaDestino.string[r_buffer->tecnologiaDestino.tamanho] = '\0';
-    }
-
-    // print
-    if((r_buffer->tecnologiaOrigem.tamanho) != 0){
-        r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaOrigem.tamanho] = '\0';
-        printf("%s", r_buffer->tecnologiaOrigem.string);
-    }
-    else {
-        printf("NULO");
-    }
-    imprime_int (r_buffer->grupo);
-    imprime_int (r_buffer->popularidade);
-    if((r_buffer->tecnologiaOrigem.tamanho) != 0){
-        r_buffer->tecnologiaDestino.string[r_buffer->tecnologiaDestino.tamanho] = '\0';
-        printf(", %s", r_buffer->tecnologiaDestino.string);
-    }
-    else {
-        printf(", NULO");
-    }
-    imprime_int (r_buffer->peso);
-    printf("\n");
-
-    free(r_buffer);
+    free(r);
     fclose(BIN_out);
 
 }
 
-void leitura_e_imprime(char* caminhoBin) {
+StatusDeRetorno buscaCampoInt (char* caminhoBin, int campo, int buscado) {
+    Registro *r = novo_registro();
+    FILE *BIN_out = abreBinario(caminhoBin);
 
-    Registro *r_buffer = novo_registro();
-    int posicao = 13;
-
-    FILE *BIN_out = fopen(caminhoBin, "rb");
-    if(BIN_out == NULL) return;
-    fseek(BIN_out, 0, SEEK_SET);
-    fseek(BIN_out, 13, SEEK_CUR);
-    /*
-    while(fread(&(r_buffer->removido), sizeof(char), 1, BIN_out) != 0) {
-        size++;
-        fread(&(r_buffer->grupo), sizeof(int), 1, BIN_out);
-        imprime_int (r_buffer->grupo);
-        virgula();
-
-        fread(&(r_buffer->peso), sizeof(int), 1, BIN_out);
-        imprime_int (r_buffer->peso);
-        virgula();
-
-        fread(&(r_buffer->popularidade), sizeof(int), 1, BIN_out);
-        imprime_int (r_buffer->popularidade);
-        virgula();
-
-        fread(&(r_buffer->tecnologiaOrigem.tamanho), sizeof(int), 1, BIN_out);
-        if(imprime_int (r_buffer->tecnologiaOrigem.tamanho)){
-            fread(r_buffer->tecnologiaOrigem.string, sizeof(char), (r_buffer->tecnologiaOrigem.tamanho), BIN_out);
-            r_buffer->tecnologiaOrigem.string[r_buffer->tecnologiaOrigem.tamanho] = '\0';
-            printf(", %s, ", r_buffer->tecnologiaOrigem.string);
-        }
-        else {
-            printf("NULO, ");
-        }
-
-        fread(&(r_buffer->tecnologiaDestino.tamanho), sizeof(int), 1, BIN_out);
-        if(imprime_int (r_buffer->tecnologiaDestino.tamanho)){
-            fread(r_buffer->tecnologiaDestino.string, sizeof(char), (r_buffer->tecnologiaDestino.tamanho), BIN_out);
-            r_buffer->tecnologiaDestino.string[r_buffer->tecnologiaDestino.tamanho] = '\0';
-            printf(", %s\n", r_buffer->tecnologiaDestino.string);
-        }
-        else {
-            printf(", NULO\n");
-        }
-
-        lixo = 76 - (21 + (r_buffer->tecnologiaDestino.tamanho) + (r_buffer->tecnologiaOrigem.tamanho));
-        fseek(BIN_out, lixo, SEEK_CUR);
-    }
-    */
-
-    while(fread(&(r_buffer->removido), sizeof(char), 1, BIN_out) != 0) {
-        func3_aux(caminhoBin, posicao);
-
-        posicao += 76;
-        fseek(BIN_out, 75, SEEK_CUR);
-    }
+    StatusDeRetorno status = registro_inexistente;
+    if(BIN_out == NULL) return falha_processamento;
     
-
-    
-    free(r_buffer->tecnologiaOrigem.string);
-    free(r_buffer->tecnologiaDestino.string);
-    free(r_buffer);
-    fclose(BIN_out);
-}
-
-
-void busca_int (char* caminhoBin, int campo, int buscado) {
-    Registro *r_buffer = novo_registro();
-    FILE *BIN_out = fopen(caminhoBin, "rb");
-    if(BIN_out == NULL) return;
-    
-    int lixo = 0;
-    int linha = 0;
-    int aux_int;
+    int lixo = 0, linha = 0, aux_int;
     char aux_char;
 
     fseek(BIN_out, 0, SEEK_SET);
-    fseek(BIN_out, 13, SEEK_CUR);
+    fseek(BIN_out, TAM_CABECALHO, SEEK_CUR);
+
     while(fread(&(aux_char), sizeof(char), 1, BIN_out) != 0) {
-        
+        if (aux_char == REMOVIDO) lixo = TAM_REGISTRO - 1;
+
+        else {   
+        status = sucesso;
         fseek(BIN_out, campo, SEEK_CUR);
         fread(&(aux_int), sizeof(int), 1, BIN_out);
         
         
         if (aux_int == buscado) {
-            func3_aux(caminhoBin, (linha*76)+13);
+            auxiliarFuncionalidade3(caminhoBin, (linha*TAM_REGISTRO)+TAM_CABECALHO);
+        }    
+        lixo = TAM_REGISTRO - (1 + (campo+4));
         }
+
         linha++;
-        lixo = 76 - (1 + (campo+1)*4);
         fseek(BIN_out, lixo, SEEK_CUR);
     }
 
-    free(r_buffer);
+    free(r);
     fclose(BIN_out);
+
+    return status;
 }
 
-void busca_string (char* caminhoBin, char* buscado, int tamanho, int flag) {
-    Registro *r_buffer = novo_registro();
-    FILE *BIN_out = fopen(caminhoBin, "rb");
-    if(BIN_out == NULL) return;
+StatusDeRetorno buscaCampoStringVariavel (char* caminhoBin, char* buscado, int tamanho, int flag) {
+    Registro *r = novo_registro();
+    FILE *BIN_out = abreBinario(caminhoBin);
+    StatusDeRetorno status = registro_inexistente;
+    if(BIN_out == NULL) return falha_processamento;
 
     int campo = 12;
     int linha = 0;
@@ -491,58 +380,128 @@ void busca_string (char* caminhoBin, char* buscado, int tamanho, int flag) {
 
 
     fseek(BIN_out, 0, SEEK_SET);
-    fseek(BIN_out, 13, SEEK_CUR);
+    fseek(BIN_out, TAM_CABECALHO, SEEK_CUR);
     while(fread(&(aux_char), sizeof(char), 1, BIN_out) != 0) {
-        
-        fseek(BIN_out, campo, SEEK_CUR);
-        fread(&(aux_tamanho[0]), sizeof(int), 1, BIN_out);
+        if (aux_char == REMOVIDO) lixo = TAM_REGISTRO - 1;
 
-        switch(flag) {
-            case 0:
-                if (aux_tamanho[0] == tamanho) {
-                    fread(&(aux_string), sizeof(char), aux_tamanho[0], BIN_out);
-                    lixo = 76 - (17+tamanho);
+        else {
+            status = sucesso;
+            fseek(BIN_out, campo, SEEK_CUR);
+            fread(&(aux_tamanho[0]), sizeof(int), 1, BIN_out);
 
-                    aux_string[tamanho] = '\0';
-                    buscado[tamanho] = '\0';
+            switch(flag) {
+                case 0:
+                    if (aux_tamanho[0] == tamanho) {
+                        fread(&(aux_string), sizeof(char), aux_tamanho[0], BIN_out);
+                        lixo = TAM_REGISTRO - (17+tamanho);
 
-                    if (strcmp(aux_string, buscado) == 0) {
-                        func3_aux(caminhoBin, (linha*76)+13);
+                        aux_string[tamanho] = '\0';
+                        buscado[tamanho] = '\0';
+
+                        if (strcmp(aux_string, buscado) == 0) {
+                            auxiliarFuncionalidade3(caminhoBin, (linha*TAM_REGISTRO)+TAM_CABECALHO);
+                        }
                     }
-                }
-                else {
-                    lixo = 76 -(17);
-                }
-            break;
-            case 1:
-                fseek(BIN_out, aux_tamanho[0], SEEK_CUR);
-                fread(&(aux_tamanho[1]), sizeof(int), 1, BIN_out);
-                
-                if (aux_tamanho[1] == tamanho) {
-                    fread(&(aux_string), sizeof(char), aux_tamanho[1], BIN_out);
-                    lixo = 76 - (1+20+aux_tamanho[0]+tamanho);
-
-                    aux_string[tamanho] = '\0';
-                    buscado[tamanho] = '\0';
-
-                    if (strcmp(aux_string, buscado) == 0) {
-                        func3_aux(caminhoBin, (linha*76)+13);
+                    else {
+                        lixo = TAM_REGISTRO -(17);
                     }
-                }
-                else {
-                    lixo = 76 -(1+20+aux_tamanho[0]);
-                }
-            break;
+                break;
+                case 1:
+                    fseek(BIN_out, aux_tamanho[0], SEEK_CUR);
+                    fread(&(aux_tamanho[1]), sizeof(int), 1, BIN_out);
+                    
+                    if (aux_tamanho[1] == tamanho) {
+                        fread(&(aux_string), sizeof(char), aux_tamanho[1], BIN_out);
+                        lixo = TAM_REGISTRO - (1+20+aux_tamanho[0]+tamanho);
+
+                        aux_string[tamanho] = '\0';
+                        buscado[tamanho] = '\0';
+
+                        if (strcmp(aux_string, buscado) == 0) {
+                            auxiliarFuncionalidade3(caminhoBin, (linha*TAM_REGISTRO)+TAM_CABECALHO);
+                        }
+                    }
+                    else {
+                        lixo = TAM_REGISTRO -(1+20+aux_tamanho[0]);
+                    }
+                break;
+            }
         }
         linha++;
         fseek(BIN_out, lixo, SEEK_CUR);
     }
 
-    free(r_buffer);
+    return status;
+
+    free(r);
     fclose(BIN_out);
 }
 
-void funcionalidade3 (char* caminhoBin, int n) {
+
+/***************** FUNCIONALIDADES **********************/
+StatusDeRetorno funcionalidade1 (char* caminhoCSV, char* caminhoBin){
+
+    // inicializa novo c_buffer
+    Cabecalho *c_buffer = novo_cabecalho();
+    
+    // abre arquivos de leitura e escrita em binario
+    // verificando se foram abertos corretamente
+    FILE *CSV_in = fopen(caminhoCSV, "r");
+    if (CSV_in == NULL) return falha_processamento;
+    FILE *BIN_out = fopen(caminhoBin, "wb");
+    if (BIN_out == NULL) return falha_processamento;
+    
+
+    escreverCabecalho(BIN_out, c_buffer);
+
+    // le o arquivo csv e escreve no arquivo binario
+    parseCSV(CSV_in, BIN_out, c_buffer);
+
+    // Writes updated binary file header
+    c_buffer->status = CONSISTENTE;
+    escreverCabecalho(BIN_out, c_buffer);
+
+    // Closes files
+    fclose(CSV_in);
+    fclose(BIN_out);
+
+    binarioNaTela(caminhoBin);
+
+    // libera a memoria
+    free(c_buffer);
+
+    return sucesso;
+}
+
+StatusDeRetorno funcionalidade2 (char* caminhoBin) {
+
+    Registro *r = novo_registro();
+    StatusDeRetorno status = registro_inexistente;
+
+    FILE *BIN_out = abreBinario(caminhoBin);
+    if(BIN_out == NULL) return falha_processamento;
+
+    fseek(BIN_out, 0, SEEK_SET);
+    fseek(BIN_out, TAM_CABECALHO, SEEK_CUR);
+
+    while(fread(&(r->removido), sizeof(char), 1, BIN_out) != 0) {
+       
+       if (r->removido == NAO_REMOVIDO) {
+            status = sucesso;
+            leConteudoRegistro(BIN_out, r);
+            imprimeRegistro(*r);
+       }
+       
+    }
+   
+    free(r->tecnologiaOrigem.string);
+    free(r->tecnologiaDestino.string);
+    free(r);
+    fclose(BIN_out);
+    return status;
+}
+
+StatusDeRetorno funcionalidade3 (char* caminhoBin, int n) {
 
     char busca[n][TAM_MAXIMO_STRING];
     int busca_i[n];
@@ -580,33 +539,37 @@ void funcionalidade3 (char* caminhoBin, int n) {
         }     
     }
 
-// arrumar colocar uns if para quando for de string
+    //verificar se registros buscados existem
+    StatusDeRetorno status = sucesso;
+    int st = -1;
+
     for (int i = 0; i < n; i++) {
         
-
         if(campo[i] > -1) {
-            busca_int(caminhoBin, campo[i], busca_i[i]);
+            status = buscaCampoInt(caminhoBin, campo[i], busca_i[i]);
         }
 
         if (campo[i] == -1) {
-            busca_string(caminhoBin, busca_c[i], tamanho[i], flag[i]);
+            status = buscaCampoStringVariavel(caminhoBin, busca_c[i], tamanho[i], flag[i]);
         }
 
+        if (status == registro_inexistente) st++;
     }
+    
+    if (st == n) return registro_inexistente;
+    else return sucesso;
 }
 
-StatusDeRetorno funcionalidade4(char* caminhoBin, int RRN){
+StatusDeRetorno funcionalidade4 (char* caminhoBin, int RRN){
     FILE* bin = abreBinario(caminhoBin);
     
-    if(bin == NULL){
-        return falha_processamento;
-    }
+    if(bin == NULL) return falha_processamento;
 
     Registro *r_buffer = novo_registro();
     StatusDeRetorno s = le_RRN(bin, RRN, r_buffer);
 
     if(s != sucesso) return s;
 
-    imprime_registro(*r_buffer);
+    imprimeRegistro(*r_buffer);
     return sucesso;
 }

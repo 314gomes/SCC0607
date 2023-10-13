@@ -14,16 +14,16 @@ void tratar_comando_entrada(){
 		case CREATE_TABLE:
 			scanf("%s", args[0]);
 			scanf("%s", args[1]);
-			status = csvParaBinario(args[0], args[1]);
+			status = funcionalidade1(args[0], args[1]);
 			break;
 		case SELECT_FROM:
 			scanf("%s", args[0]);
-			leitura_e_imprime(args[0]);
+			status = funcionalidade2(args[0]);
 			break;
 		case SELECT_WHERE:
 			scanf("%s", args[0]);
 			scanf("%d", &num_busca);
-			funcionalidade3(args[0], num_busca);
+			status = funcionalidade3(args[0], num_busca);
 			break;
 		case SELECT_RRN:
 			scanf("%s", args[0]);

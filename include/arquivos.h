@@ -117,24 +117,24 @@ void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer);
 /// @param caminhoCSV path to CSV file
 /// @param caminhoBin path to new binary file according to specification
 /// @return `sucesso` if no errors encountered, `falha_processamento` otherwise
-StatusDeRetorno csvParaBinario(char* caminhoCSV, char* caminhoBin);
+StatusDeRetorno funcionalidade1(char* caminhoCSV, char* caminhoBin);
 
 /// @brief Prints an integer according to specification, handling NULL values
 /// @param n Integer to print
-void imprime_int (int n);
+void imprimeCampoInt (int n);
 
 /// @brief Prints StringVariavel according to specification, handling NULL
 /// values
 /// @param str StringVariavel to print 
-void imprime_StringVariavel(StringVariavel str);
+void imprimeCampoStringVariavel(StringVariavel str);
 
 /// @brief Prints values separator according to specification
-void imprime_separador();
+void imprimeSeparador();
 
 /// @brief Prints contents of registry according to specification, handling
 /// NULL values
 /// @param r registry to print
-void imprime_registro(Registro r);
+void imprimeRegistro(Registro r);
 
 /// @brief Opens binary file and detects its status.
 /// @param caminhobin path to binary file.
@@ -182,8 +182,22 @@ void leConteudoRegistro(FILE *bin, Registro *r);
 /// been marked as deleted or is not on file
 StatusDeRetorno le_RRN(FILE *bin, int RRN, Registro *r);
 
-void leitura_e_imprime(char* caminhoBin);
-void funcionalidade3 (char* caminhoBin, int n);
+/// @brief Function for feature 2. Opens binary file at 'caminhoBin'
+/// and print it
+/// @param caminhoBin Path to binary file to open
+/// @return `sucess` upon sucessful execution, `registro_inexistente` if
+/// all the registries are deleted
+/// `erro_processamento` if other errors have been found.
+StatusDeRetorno funcionalidade2(char* caminhoBin);
+
+/// @brief  Main function for feature 3. Opens binary file at 'caminhoBin',
+/// receives 'n' searches and prints all the registries with the searched field
+/// @param caminhoBin Path to binary file to open
+/// @param n Number of field to be searched
+/// @return `sucess` upon sucessful execution, `registro_inexistente` if
+/// no registry with the field especified is encoutered
+/// `erro_processamento` if other errors have been found.
+StatusDeRetorno funcionalidade3 (char* caminhoBin, int n);
 
 /// @brief Main function for feature 4. Opens binary file at `caminhoBin` and
 /// prints registry at relative registry number `RRN`
