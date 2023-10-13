@@ -5,6 +5,7 @@ void tratar_comando_entrada(){
 	char args[CONTAGEM_ARGUMENTOS][TAMANHO_VALOR_ARGUMENTO];
 	StatusDeRetorno status;
 	int num_busca;
+	int num_RRN;
 	int buffer;
 	scanf("%d", &buffer);
 	cmd_in = buffer;
@@ -23,6 +24,12 @@ void tratar_comando_entrada(){
 			scanf("%s", args[0]);
 			scanf("%d", &num_busca);
 			funcionalidade3(args[0], num_busca);
+			break;
+		case SELECT_RRN:
+			scanf("%s", args[0]);
+			scanf("%d", &num_RRN);
+			status = funcionalidade4(args[0], num_RRN);
+			break;
 		default:
 			break;
 	}

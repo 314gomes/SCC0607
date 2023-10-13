@@ -222,16 +222,44 @@ StatusDeRetorno csvParaBinario(char* caminhoCSV, char* caminhoBin){
     return sucesso;
 }       
 
-int imprime_int (int parametro){
-    if (parametro == -1) {
-        printf(", NULO");
-        return 0;
+void imprime_int (int n){
+    if (n == -1) {
+        printf("NULO");
     }
     else {
-        printf(", %d", parametro);
-        if (parametro != 0) return 1;
-        else return 0;
+        printf("%d", n);
     }
+}
+
+void imprime_StringVariavel(StringVariavel str){
+    if(str.tamanho == 0){
+        printf("NULO");
+    }
+    else {
+        printf("%s", str.string);
+    }
+}
+
+void imprime_separador(){
+    printf(", ");
+}
+
+void imprime_registro(Registro r){
+    // nomeTecnologiaOrigem, grupo, popularidade, nomeTecnologiaDestino, peso,
+    imprime_StringVariavel(r.tecnologiaOrigem);
+    imprime_separador();
+    
+    imprime_int(r.grupo);
+    imprime_separador();
+    
+    imprime_int(r.popularidade);
+    imprime_separador();
+    
+    imprime_StringVariavel(r.tecnologiaDestino);
+    imprime_separador();
+
+    imprime_int(r.popularidade);
+    printf("\n");
 }
 
 FILE *abreBinario(char *caminhoBin){
@@ -255,6 +283,53 @@ FILE *abreBinario(char *caminhoBin){
 
 long byteoffset_RRN(int RRN){
     return TAM_CABECALHO + TAM_REGISTRO*RRN;
+}
+
+void leCampoInt(FILE* bin, int *i){
+    fread(i, sizeof(int), 1, bin);
+}
+
+void leCampoChar(FILE* bin, char *c){
+    fread(c, sizeof(char), 1, bin);
+}
+
+void leCampoStringVariavel(FILE* bin, StringVariavel *s){
+    leCampoInt(bin, &s->tamanho);
+    if(s->tamanho > 0){
+        fread(s->string, sizeof(char), s->tamanho, bin);
+    }
+    // write string ending character to end of string
+    s->string[s->tamanho] = '\0';
+}
+
+void leStatusRegistro(FILE *bin, Registro *r){
+    leCampoChar(bin, &r->removido);
+}
+
+void leConteudoRegistro(FILE *bin, Registro *r){
+    leCampoInt(bin, &r->grupo);
+    leCampoInt(bin, &r->popularidade);
+    leCampoInt(bin, &r->peso);
+    leCampoStringVariavel(bin, &r->tecnologiaOrigem);
+    leCampoStringVariavel(bin, &r->tecnologiaDestino);
+}
+
+StatusDeRetorno le_RRN(FILE *bin, int RRN, Registro *r){
+    long byte_offset = byteoffset_RRN(RRN);
+    fseek(bin, byte_offset, SEEK_SET);
+    
+    leStatusRegistro(bin, r);
+    
+    if(feof(bin)){
+        return registro_inexistente;
+    }
+    if(r->removido == REMOVIDO){
+        return registro_inexistente;
+    }
+
+    leConteudoRegistro(bin, r);
+
+    return sucesso;
 }
 
 void func3_aux (char* caminhoBin, int posicao) {
@@ -518,4 +593,20 @@ void funcionalidade3 (char* caminhoBin, int n) {
         }
 
     }
+}
+
+StatusDeRetorno funcionalidade4(char* caminhoBin, int RRN){
+    FILE* bin = abreBinario(caminhoBin);
+    
+    if(bin == NULL){
+        return falha_processamento;
+    }
+
+    Registro *r_buffer = novo_registro();
+    StatusDeRetorno s = le_RRN(bin, RRN, r_buffer);
+
+    if(s != sucesso) return s;
+
+    imprime_registro(*r_buffer);
+    return sucesso;
 }

@@ -119,6 +119,23 @@ void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer);
 /// @return `sucesso` if no errors encountered, `falha_processamento` otherwise
 StatusDeRetorno csvParaBinario(char* caminhoCSV, char* caminhoBin);
 
+/// @brief Prints an integer according to specification, handling NULL values
+/// @param n Integer to print
+void imprime_int (int n);
+
+/// @brief Prints StringVariavel according to specification, handling NULL
+/// values
+/// @param str StringVariavel to print 
+void imprime_StringVariavel(StringVariavel str);
+
+/// @brief Prints values separator according to specification
+void imprime_separador();
+
+/// @brief Prints contents of registry according to specification, handling
+/// NULL values
+/// @param r registry to print
+void imprime_registro(Registro r);
+
 /// @brief Opens binary file and detects its status.
 /// @param caminhobin path to binary file.
 /// @return NULL if status is `INCONSISTENTE` or if file does not exist, FILE*
@@ -130,5 +147,49 @@ FILE *abreBinario(char *caminhobin);
 /// @return It's byte offset.
 long byteoffset_RRN(int RRN);
 
+/// @brief Reads an integer field and writes it to i
+/// @param bin Open binary FILE* to read from
+/// @param i int buffer to write to
+void leCampoInt(FILE* bin, int *i);
+
+/// @brief Reads a single char from binary file and writes it to c
+/// @param bin Open binary FILE* to read from
+/// @param c Char buffer to write to
+void leCampoChar(FILE* bin, char *c);
+
+/// @brief Reads a StringVariavel field from binary file and writes it to s
+/// @param bin Open binary FILE* to read from
+/// @param s StringVariavel buffer to write to
+void leCampoStringVariavel(FILE* bin, StringVariavel *s);
+
+/// @brief Reads status from registry and writes it to r
+/// @param bin Open binary FILE* to read from
+/// @param r Registry buffer to write to
+void leStatusRegistro(FILE *bin, Registro *r);
+
+/// @brief Reads content (not including status) from registry and writes it to
+/// r
+/// @param bin Binary FILE* to read from
+/// @param r registry buffer to write to
+void leConteudoRegistro(FILE *bin, Registro *r);
+
+/// @brief Reads registry at relative registry number RRN from binary FILE* bin
+/// according to specification, writing it to r
+/// @param bin Open binary FILE* to write to
+/// @param RRN Relative registry number to acess
+/// @param r Registry buffer to write to
+/// @return Returns `sucesso` on sucess or `registro_inexistente` if registry has
+/// been marked as deleted or is not on file
+StatusDeRetorno le_RRN(FILE *bin, int RRN, Registro *r);
+
 void leitura_e_imprime(char* caminhoBin);
 void funcionalidade3 (char* caminhoBin, int n);
+
+/// @brief Main function for feature 4. Opens binary file at `caminhoBin` and
+/// prints registry at relative registry number `RRN`
+/// @param caminhoBin Path to binary file to open
+/// @param RRN Relative registry number to read
+/// @return `sucess` upon sucessful execution, `registro_inexistente` if
+/// registry at RRN has been marked as deleted or is not present on file or
+/// `erro_processamento` if other errors have been found.
+StatusDeRetorno funcionalidade4(char* caminhoBin, int RRN);
