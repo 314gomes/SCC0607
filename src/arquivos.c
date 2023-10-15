@@ -638,7 +638,7 @@ StatusDeRetorno funcionalidade3 (char* caminhoBin, int n) {
     }
 
     // flag to check if no sought-after records exist
-    int st = -1;
+    int st = 0;
     StatusDeRetorno status = sucesso;
     
 
