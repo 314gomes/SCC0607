@@ -26,6 +26,13 @@ Registro *novo_registro() {
 
     return r_buffer;
 }
+
+void free_registro(Registro *r){
+    free(r->tecnologiaOrigem.string);
+    free(r->tecnologiaDestino.string);
+    free(r);
+}
+
 Cabecalho *novo_cabecalho() {
 
     Cabecalho* cabecalho;
@@ -115,18 +122,23 @@ void escreverCabecalho(FILE *arquivo, Cabecalho *h){
 /***************** PARSE **********************/
 int isempty(const char *s)
 {
+    // string only contains \0
 	if ((*s) == '\0') return 1;
 
+    // iterate over string
 	while (*s) {
-	
-	if (!isspace(*s))
-		return 0;
-	s++;
+        // if a single nonempty character was found, return false
+        if (!isspace(*s))
+            return 0;
+        s++;
 	}
+
+    // otherwiser return true
 	return 1;
 }
 
 void parseTokenInt(char* tkn, int *n){
+    // specification says empty integers must receive value -1
     if (isempty(tkn)){
         *n = -1;
     } else {
@@ -135,6 +147,7 @@ void parseTokenInt(char* tkn, int *n){
 }
 
 void parseTokenStringVariavel(char* tkn, StringVariavel *str){
+    // empty strings remain empty and have size 0
     if (isempty(tkn)){
         *(str->string) = '\0';
         str->tamanho = 0;
@@ -148,9 +161,10 @@ void parseLinhaCSV(char *CSV_line, Registro *r_buffer){
     int field = 0;
     char *tkn = NULL;
 
+    // iterate over each token from csv line, each separated by ','
     while ((tkn = strsep(&CSV_line, ",")) != NULL) {
         switch (field) {
-            case 0:               
+            case 0:
                 parseTokenStringVariavel(tkn, &(r_buffer->tecnologiaOrigem));
                 break;
             case 1:
@@ -173,42 +187,50 @@ void parseLinhaCSV(char *CSV_line, Registro *r_buffer){
 }
 
 void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer){
+    // initialize buffer variables and list of technologies
     Registro *r_buffer = novo_registro();
     char CSV_line_buffer[100];
     listaSE tec = novaLista();
 
-    // le primeira linha mas nao escreve
+    // skips first line
     fgets(CSV_line_buffer, sizeof(CSV_line_buffer), CSV_in);
 
+    // iterate over each line of the CSV file    
     while (fgets(CSV_line_buffer, sizeof(CSV_line_buffer), CSV_in)) {
         c_buffer->proxRRN++;
 
+        // parse line to buffer
         parseLinhaCSV(CSV_line_buffer, r_buffer);
 
+        // some temporary variables for readability
         char *strOrigem = r_buffer->tecnologiaOrigem.string;
         char *strDestino = r_buffer->tecnologiaDestino.string;
 
         int origemIsNull = isempty(strOrigem);
         int destinoIsNull = isempty(strDestino);
 
+        // pair exists if both tec origem and tec destino are not null
         int parExists = !(origemIsNull) && !(destinoIsNull);
 
+
+        // add non-null technologies to list of technologies without repetitions
         if(!origemIsNull)
             insereOrdenadoSemRepeticao(strOrigem, &tec);
         if(!destinoIsNull)
             insereOrdenadoSemRepeticao(strDestino, &tec);
 
+        // increase technology pairs accordingly
         if(parExists)
             c_buffer->nroParesTecnologias++;
 
+        // write buffer to file
         escreverRegistro(BIN_out, r_buffer);
     }
 
+    // number of different technologies is then just the size of our list
     c_buffer->nroTecnologias = tec.tam;
 
-    free(r_buffer->tecnologiaOrigem.string);
-    free(r_buffer->tecnologiaDestino.string);
-    free(r_buffer);
+    free_registro(r_buffer);
 }
        
 
@@ -223,6 +245,7 @@ void imprimeCampoInt (int n){
 }
 
 void imprimeCampoStringVariavel(StringVariavel str){
+    // specification says zero-lenght strings must be printed as "NULO"
     if(str.tamanho == 0){
         printf("NULO");
     }
@@ -232,11 +255,11 @@ void imprimeCampoStringVariavel(StringVariavel str){
 }
 
 void imprimeSeparador(){
-    printf(", ");
+    printf(", "); // token separator according to specification
 }
 
 void imprimeRegistro(Registro r){
-    // nomeTecnologiaOrigem, grupo, popularidade, nomeTecnologiaDestino, peso,
+    // nomeTecnologiaOrigem, grupo, popularidade, nomeTecnologiaDestino, peso
     imprimeCampoStringVariavel(r.tecnologiaOrigem);
     imprimeSeparador();
     
@@ -256,6 +279,7 @@ void imprimeRegistro(Registro r){
 
 /***************** LEITURA **********************/
 long byteoffset_RRN(int RRN){
+    // quite straightforward formula
     return TAM_CABECALHO + TAM_REGISTRO*RRN;
 }
 
@@ -268,11 +292,14 @@ void leCampoChar(FILE* bin, char *c){
 }
 
 void leCampoStringVariavel(FILE* bin, StringVariavel *s){
+    // specification says StringVariavel field starts with string size
     leCampoInt(bin, &s->tamanho);
+    // read s-> tamanho characters if string is not zero-lenght
     if(s->tamanho > 0){
         fread(s->string, sizeof(char), s->tamanho, bin);
     }
     // write string ending character to end of string
+    // in case of zero-lenght, '\0' will be the first character
     s->string[s->tamanho] = '\0';
 }
 
@@ -289,18 +316,27 @@ void leConteudoRegistro(FILE *bin, Registro *r){
 }
 
 StatusDeRetorno le_RRN(FILE *bin, int RRN, Registro *r){
+    // fseek field start's byte offset 
     long byte_offset = byteoffset_RRN(RRN);
     fseek(bin, byte_offset, SEEK_SET);
     
+    // reads status
     leStatusRegistro(bin, r);
     
+    // reading might set EOF indicator for stream, in which case it is desired
+    // to indicate that the registry does not exists, as we may have supassed
+    // end of file.
     if(feof(bin)){
         return registro_inexistente;
     }
+    // exit with `registro inexistente` code when attempting to read registry
+    // marked as removed. 
     if(r->removido == REMOVIDO){
         return registro_inexistente;
     }
 
+    // if no erros previously encountered, read remaining data and return
+    // sucess code
     leConteudoRegistro(bin, r);
 
     return sucesso;
@@ -571,5 +607,6 @@ StatusDeRetorno funcionalidade4 (char* caminhoBin, int RRN){
     if(s != sucesso) return s;
 
     imprimeRegistro(*r_buffer);
+    free_registro(r_buffer);
     return sucesso;
 }
