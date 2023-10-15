@@ -233,6 +233,9 @@ void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer){
     // number of different technologies is then just the size of our list
     c_buffer->nroTecnologias = tec.tam;
 
+    // free memory from linked list
+    destroiLista(&tec);
+
     free_registro(r_buffer);
 }
        
@@ -674,5 +677,6 @@ StatusDeRetorno funcionalidade4 (char* caminhoBin, int RRN){
 
     imprimeRegistro(*r_buffer);
     free_registro(r_buffer);
+    fclose(bin);
     return sucesso;
 }
