@@ -451,7 +451,7 @@ StatusDeRetorno buscaCampoStringVariavel (char* caminhoBin, char* buscado, int t
         if (aux_char == REMOVIDO) lixo = TAM_REGISTRO - 1;
 
         else {
-            status = sucesso;
+            
             fseek(BIN_out, campo, SEEK_CUR);
 
             // size of the first string stored
@@ -473,6 +473,7 @@ StatusDeRetorno buscaCampoStringVariavel (char* caminhoBin, char* buscado, int t
                         buscado[tamanho] = '\0';
 
                         if (strcmp(aux_string, buscado) == 0) {
+                            status = sucesso;
                             auxiliarFuncionalidade3(caminhoBin, (RRN*TAM_REGISTRO)+TAM_CABECALHO);
                         }
                     }
@@ -496,6 +497,7 @@ StatusDeRetorno buscaCampoStringVariavel (char* caminhoBin, char* buscado, int t
                         buscado[tamanho] = '\0';
 
                         if (strcmp(aux_string, buscado) == 0) {
+                            status = sucesso;
                             auxiliarFuncionalidade3(caminhoBin, (RRN*TAM_REGISTRO)+TAM_CABECALHO);
                         }
                     }
