@@ -368,7 +368,7 @@ void auxiliarFuncionalidade3 (char* caminhoBin, int posicao) {
     leConteudoRegistro(BIN_out, r); 
     imprimeRegistro(*r);
 
-    free(r);
+    free_registro(r);
     fclose(BIN_out);
 
 }
@@ -419,7 +419,7 @@ StatusDeRetorno buscaCampoInt (char* caminhoBin, int campo, int buscado) {
         fseek(BIN_out, lixo, SEEK_CUR);
     }
 
-    free(r);
+    free_registro(r);
     fclose(BIN_out);
 
     return status;
@@ -514,7 +514,7 @@ StatusDeRetorno buscaCampoStringVariavel (char* caminhoBin, char* buscado, int t
 
     return status;
 
-    free(r);
+    free_registro(r);
     fclose(BIN_out);
 }
 
@@ -580,9 +580,7 @@ StatusDeRetorno funcionalidade2 (char* caminhoBin) {
        
     }
    
-    free(r->tecnologiaOrigem.string);
-    free(r->tecnologiaDestino.string);
-    free(r);
+    free_registro(r);
     fclose(BIN_out);
     return status;
 }
