@@ -573,6 +573,9 @@ StatusDeRetorno funcionalidade2 (char* caminhoBin) {
             status = sucesso;
             leConteudoRegistro(BIN_out, r);
             imprimeRegistro(*r);
+
+            int tam_lixo = TAM_REGISTRO - calcularTamanhoRegistro(r);
+            fseek(BIN_out, tam_lixo, SEEK_CUR);
        }
        
     }
