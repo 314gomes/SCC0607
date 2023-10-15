@@ -1,3 +1,8 @@
+/**
+ * Grupo 8
+ * João Pedro Gomes - 13839069
+ * Luana Hartmann Franco da Cruz - 13676350
+*/
 #include "defines.h"
 
 typedef struct no{
