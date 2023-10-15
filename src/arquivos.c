@@ -49,7 +49,7 @@ int calcularTamanhoRegistro(Registro *r){
 FILE *abreBinario(char *caminhoBin){
     char status;
     
-    FILE *bin = abreBinario(caminhoBin);
+    FILE *bin = fopen(caminhoBin, "rb");
     if(bin == NULL){
         return NULL;
     }
@@ -64,7 +64,6 @@ FILE *abreBinario(char *caminhoBin){
     
     return bin;
 }
-
 
 /***************** ESCRITA **********************/
 void escreverCampoChar(FILE *a, char c){
@@ -474,7 +473,7 @@ StatusDeRetorno funcionalidade1 (char* caminhoCSV, char* caminhoBin){
 }
 
 StatusDeRetorno funcionalidade2 (char* caminhoBin) {
-
+    
     Registro *r = novo_registro();
     StatusDeRetorno status = registro_inexistente;
 
@@ -553,6 +552,7 @@ StatusDeRetorno funcionalidade3 (char* caminhoBin, int n) {
             status = buscaCampoStringVariavel(caminhoBin, busca_c[i], tamanho[i], flag[i]);
         }
 
+        if (status == falha_processamento) return falha_processamento;
         if (status == registro_inexistente) st++;
     }
     
