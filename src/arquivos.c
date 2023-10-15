@@ -6,7 +6,8 @@
 #include "funcoesFornecidas.h"
 #include "listaSE.h"
 
-/***************** INICIALIZACOES **********************/
+/***************** INITIALIZATIONS **********************/
+
 Registro *novo_registro() {
 
     Registro* r_buffer;
@@ -72,7 +73,8 @@ FILE *abreBinario(char *caminhoBin){
     return bin;
 }
 
-/***************** ESCRITA **********************/
+/***************** WRITING **********************/
+
 void escreverCampoChar(FILE *a, char c){
     fwrite(&c, sizeof(c), 1, a);
 }
@@ -120,6 +122,7 @@ void escreverCabecalho(FILE *arquivo, Cabecalho *h){
 
 
 /***************** PARSE **********************/
+
 int isempty(const char *s)
 {
     // string only contains \0
@@ -234,7 +237,8 @@ void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer){
 }
        
 
-/***************** IMPRESSAO **********************/
+/***************** PRINTING **********************/
+
 void imprimeCampoInt (int n){
     if (n == -1) {
         printf("NULO");
@@ -277,7 +281,8 @@ void imprimeRegistro(Registro r){
 }
 
 
-/***************** LEITURA **********************/
+/***************** READING **********************/
+
 long byteoffset_RRN(int RRN){
     // quite straightforward formula
     return TAM_CABECALHO + TAM_REGISTRO*RRN;
@@ -343,8 +348,13 @@ StatusDeRetorno le_RRN(FILE *bin, int RRN, Registro *r){
 }
 
 
-/***************** BUSCA **********************/
+/***************** SEARCH **********************/
+
 void auxiliarFuncionalidade3 (char* caminhoBin, int posicao) {
+
+    // Função criada com o intuito de evitar múltiplas chamadas 
+    // de fseek no arquivo
+
     Registro *r = novo_registro();
     FILE *BIN_out = abreBinario(caminhoBin);
     if(BIN_out == NULL) return;
@@ -364,34 +374,48 @@ void auxiliarFuncionalidade3 (char* caminhoBin, int posicao) {
 }
 
 StatusDeRetorno buscaCampoInt (char* caminhoBin, int campo, int buscado) {
+
     Registro *r = novo_registro();
     FILE *BIN_out = abreBinario(caminhoBin);
 
     StatusDeRetorno status = registro_inexistente;
     if(BIN_out == NULL) return falha_processamento;
     
-    int lixo = 0, linha = 0, aux_int;
+    // lixo calcula bytes para o proximo registro
+    // RRN encaminhado para a funcao auxiliar
+    // aux_int armazena temporariamente o valor do campo lido
+    int lixo = 0, RRN = 0, aux_int;
+
+    // aux_char armazena temporariamente o valor do campo removido
     char aux_char;
 
     fseek(BIN_out, 0, SEEK_SET);
     fseek(BIN_out, TAM_CABECALHO, SEEK_CUR);
 
     while(fread(&(aux_char), sizeof(char), 1, BIN_out) != 0) {
+
+        // TAM_REGISTRO - removido
         if (aux_char == REMOVIDO) lixo = TAM_REGISTRO - 1;
 
-        else {   
-        status = sucesso;
+        else {  
+  
         fseek(BIN_out, campo, SEEK_CUR);
         fread(&(aux_int), sizeof(int), 1, BIN_out);
         
         
         if (aux_int == buscado) {
-            auxiliarFuncionalidade3(caminhoBin, (linha*TAM_REGISTRO)+TAM_CABECALHO);
+            // nao retorna registro inexistente quando encontra o buscado
+            status = sucesso;
+
+            auxiliarFuncionalidade3(caminhoBin, (RRN*TAM_REGISTRO)+TAM_CABECALHO);
         }    
+
+        // TAM_REGISTRO - (removido + (campo + inteiro))
         lixo = TAM_REGISTRO - (1 + (campo+4));
+
         }
 
-        linha++;
+        RRN++;
         fseek(BIN_out, lixo, SEEK_CUR);
     }
 
@@ -407,62 +431,82 @@ StatusDeRetorno buscaCampoStringVariavel (char* caminhoBin, char* buscado, int t
     StatusDeRetorno status = registro_inexistente;
     if(BIN_out == NULL) return falha_processamento;
 
+    // constant field = 3*int
+    // grupo + popularidade + peso
     int campo = 12;
-    int linha = 0;
+    int RRN = 0;
+
+    // aux_size temporarily stores the size of the 
+    // two strings that will be compared.
     int aux_tamanho[2], lixo = 0;
+
+    // aux_char temporarily stores the value of the removed field
+    // aux_string temporarily stores the read field
     char aux_char, aux_string[TAM_MAXIMO_STRING];
     
-
-
     fseek(BIN_out, 0, SEEK_SET);
     fseek(BIN_out, TAM_CABECALHO, SEEK_CUR);
+
     while(fread(&(aux_char), sizeof(char), 1, BIN_out) != 0) {
         if (aux_char == REMOVIDO) lixo = TAM_REGISTRO - 1;
 
         else {
             status = sucesso;
             fseek(BIN_out, campo, SEEK_CUR);
+
+            // size of the first string stored
+            // case 0: string read
+            // case 1: fseek with the string's size
             fread(&(aux_tamanho[0]), sizeof(int), 1, BIN_out);
 
             switch(flag) {
+                // first variable-length string
                 case 0:
                     if (aux_tamanho[0] == tamanho) {
                         fread(&(aux_string), sizeof(char), aux_tamanho[0], BIN_out);
-                        lixo = TAM_REGISTRO - (17+tamanho);
 
+                        // (TAM_REGISTRO - 4): tamanhoDestino was not read
+                        lixo = TAM_REGISTRO - ((TAM_REGISTRO_FIXO - 4)+tamanho);
+
+                        // assigns \0 at the end of strings for comparison purposes
                         aux_string[tamanho] = '\0';
                         buscado[tamanho] = '\0';
 
                         if (strcmp(aux_string, buscado) == 0) {
-                            auxiliarFuncionalidade3(caminhoBin, (linha*TAM_REGISTRO)+TAM_CABECALHO);
+                            auxiliarFuncionalidade3(caminhoBin, (RRN*TAM_REGISTRO)+TAM_CABECALHO);
                         }
                     }
                     else {
-                        lixo = TAM_REGISTRO -(17);
+                        lixo = TAM_REGISTRO - (TAM_REGISTRO_FIXO - 4);
                     }
                 break;
+
+                // second variable-length string
                 case 1:
                     fseek(BIN_out, aux_tamanho[0], SEEK_CUR);
                     fread(&(aux_tamanho[1]), sizeof(int), 1, BIN_out);
                     
                     if (aux_tamanho[1] == tamanho) {
                         fread(&(aux_string), sizeof(char), aux_tamanho[1], BIN_out);
-                        lixo = TAM_REGISTRO - (1+20+aux_tamanho[0]+tamanho);
+
+                        // only the record's GARBAGE remains
+                        lixo = TAM_REGISTRO - (TAM_REGISTRO_FIXO + aux_tamanho[0] + tamanho);
 
                         aux_string[tamanho] = '\0';
                         buscado[tamanho] = '\0';
 
                         if (strcmp(aux_string, buscado) == 0) {
-                            auxiliarFuncionalidade3(caminhoBin, (linha*TAM_REGISTRO)+TAM_CABECALHO);
+                            auxiliarFuncionalidade3(caminhoBin, (RRN*TAM_REGISTRO)+TAM_CABECALHO);
                         }
                     }
                     else {
-                        lixo = TAM_REGISTRO -(1+20+aux_tamanho[0]);
+                        // remains the last string and the garbage of the record
+                        lixo = TAM_REGISTRO - (TAM_REGISTRO_FIXO + aux_tamanho[0]);
                     }
                 break;
             }
         }
-        linha++;
+        RRN++;
         fseek(BIN_out, lixo, SEEK_CUR);
     }
 
@@ -473,14 +517,15 @@ StatusDeRetorno buscaCampoStringVariavel (char* caminhoBin, char* buscado, int t
 }
 
 
-/***************** FUNCIONALIDADES **********************/
+/***************** FEATURES **********************/
+
 StatusDeRetorno funcionalidade1 (char* caminhoCSV, char* caminhoBin){
 
-    // inicializa novo c_buffer
+    // initializes a new c_buffer
     Cabecalho *c_buffer = novo_cabecalho();
     
-    // abre arquivos de leitura e escrita em binario
-    // verificando se foram abertos corretamente
+    // opens binary files for reading and writing
+    // checking if they were opened correctly
     FILE *CSV_in = fopen(caminhoCSV, "r");
     if (CSV_in == NULL) return falha_processamento;
     FILE *BIN_out = fopen(caminhoBin, "wb");
@@ -489,7 +534,7 @@ StatusDeRetorno funcionalidade1 (char* caminhoCSV, char* caminhoBin){
 
     escreverCabecalho(BIN_out, c_buffer);
 
-    // le o arquivo csv e escreve no arquivo binario
+    // reads the CSV file and writes to the binary file
     parseCSV(CSV_in, BIN_out, c_buffer);
 
     // Writes updated binary file header
@@ -502,7 +547,7 @@ StatusDeRetorno funcionalidade1 (char* caminhoCSV, char* caminhoBin){
 
     binarioNaTela(caminhoBin);
 
-    // libera a memoria
+    // frees memory
     free(c_buffer);
 
     return sucesso;
@@ -519,6 +564,7 @@ StatusDeRetorno funcionalidade2 (char* caminhoBin) {
     fseek(BIN_out, 0, SEEK_SET);
     fseek(BIN_out, TAM_CABECALHO, SEEK_CUR);
 
+    // reading and printing of the binary file
     while(fread(&(r->removido), sizeof(char), 1, BIN_out) != 0) {
        
        if (r->removido == NAO_REMOVIDO) {
@@ -538,60 +584,77 @@ StatusDeRetorno funcionalidade2 (char* caminhoBin) {
 
 StatusDeRetorno funcionalidade3 (char* caminhoBin, int n) {
 
-    char busca[n][TAM_MAXIMO_STRING];
-    int busca_i[n];
-    char busca_c[n][TAM_MAXIMO_STRING];
+    // stores the field that will be searched
+    char busca_campo[n][TAM_MAXIMO_STRING]; 
+
+    // stores the sought-after integer
+    int busca_int[n];
+    // stores the sought-after variable-length string
+    char busca_char[n][TAM_MAXIMO_STRING];
+
+    // sets the position of the field in the record for integers
+    // assigns the value -1 when dealing with variable-length strings
     int campo[n];
+
+    // stores the number of characters in the sought-after string
     int tamanho[n];
+
+    // 0 when dealing with the first variable string
+    // 1 when dealing with the second variable string
     int flag[n];
 
     for (int i = 0; i < n; i++) {
-        scanf("%s", busca[i]);
+        scanf("%s", busca_campo[i]);
 
-        if (strcmp(busca[i], "grupo") == 0) {
-            scanf("%d", &busca_i[i]);
+        if (strcmp(busca_campo[i], "grupo") == 0) {
+            scanf("%d", &busca_int[i]);
             campo[i] = 0;           
         }
-        else if (strcmp(busca[i], "popularidade") == 0) {
-            scanf("%d", &busca_i[i]);
+        else if (strcmp(busca_campo[i], "popularidade") == 0) {
+            scanf("%d", &busca_int[i]);
             campo[i] = 4;
         }
-        else if (strcmp(busca[i], "peso") == 0) {
-            scanf("%d", &busca_i[i]);
+        else if (strcmp(busca_campo[i], "peso") == 0) {
+            scanf("%d", &busca_int[i]);
             campo[i] = 8;
         } 
-        else if (strcmp(busca[i], "nomeTecnologiaOrigem") == 0) {
-			scan_quote_string(busca_c[i]);
-            tamanho[i] = strlen(busca_c[i]);
+        else if (strcmp(busca_campo[i], "nomeTecnologiaOrigem") == 0) {
+			scan_quote_string(busca_char[i]);
+            tamanho[i] = strlen(busca_char[i]);
             campo[i] = -1;
             flag[i] = 0;
         } 
-        else if (strcmp(busca[i], "nomeTecnologiaDestino") == 0) {
-            scan_quote_string(busca_c[i]);
-            tamanho[i] = strlen(busca_c[i]);
+        else if (strcmp(busca_campo[i], "nomeTecnologiaDestino") == 0) {
+            scan_quote_string(busca_char[i]);
+            tamanho[i] = strlen(busca_char[i]);
             campo[i] = -1;
             flag[i] = 1;
         }     
     }
 
-    //verificar se registros buscados existem
-    StatusDeRetorno status = sucesso;
+    // flag to check if no sought-after records exist
     int st = -1;
+    StatusDeRetorno status = sucesso;
+    
 
     for (int i = 0; i < n; i++) {
         
         if(campo[i] > -1) {
-            status = buscaCampoInt(caminhoBin, campo[i], busca_i[i]);
+            status = buscaCampoInt(caminhoBin, campo[i], busca_int[i]);
         }
 
         if (campo[i] == -1) {
-            status = buscaCampoStringVariavel(caminhoBin, busca_c[i], tamanho[i], flag[i]);
+            status = buscaCampoStringVariavel(caminhoBin, busca_char[i], tamanho[i], flag[i]);
         }
 
+        // in case the search functions return falha_processamento
         if (status == falha_processamento) return falha_processamento;
+
+        // in case the search functions do not find the desired field
         if (status == registro_inexistente) st++;
     }
-    
+
+    // if all return "registro_inexistente", st will be equal to the number of searches n
     if (st == n) return registro_inexistente;
     else return sucesso;
 }
