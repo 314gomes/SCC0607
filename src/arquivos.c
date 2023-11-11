@@ -585,6 +585,9 @@ StatusDeRetorno funcionalidade2 (char* caminhoBin) {
             int tam_lixo = TAM_REGISTRO - calcularTamanhoRegistro(r);
             fseek(BIN_out, tam_lixo, SEEK_CUR);
        }
+       else{
+            fseek(BIN_out, TAM_REGISTRO - 1, SEEK_CUR);
+       }
        
     }
    
