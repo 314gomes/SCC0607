@@ -403,19 +403,18 @@ StatusDeRetorno buscaCampoInt (char* caminhoBin, int campo, int buscado) {
     while(fread(&(aux_char), sizeof(char), 1, BIN_out) != 0) {
 
         // TAM_REGISTRO - removido
-        if (aux_char == REMOVIDO) lixo = TAM_REGISTRO - 1;
+        if (aux_char == REMOVIDO)
+            lixo = TAM_REGISTRO - 1;
 
         else {  
-  
-        fseek(BIN_out, campo, SEEK_CUR);
-        fread(&(aux_int), sizeof(int), 1, BIN_out);
-        
-        
-        if (aux_int == buscado) {
-            // nao retorna registro inexistente quando encontra o buscado
-            status = sucesso;
+            fseek(BIN_out, campo, SEEK_CUR);
+            fread(&(aux_int), sizeof(int), 1, BIN_out);        
 
-            auxiliarFuncionalidade3(caminhoBin, (RRN*TAM_REGISTRO)+TAM_CABECALHO);
+            if (aux_int == buscado) {
+                // nao retorna registro inexistente quando encontra o buscado
+                status = sucesso;
+
+                auxiliarFuncionalidade3(caminhoBin, (RRN*TAM_REGISTRO)+TAM_CABECALHO);
         }    
 
         // TAM_REGISTRO - (removido + (campo + inteiro))
