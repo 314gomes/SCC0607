@@ -5,7 +5,7 @@
 */
 #include <stdio.h>
 
-#include <defines.h>
+#include "arquivos/defines.h"
 
 typedef struct {
     char status;

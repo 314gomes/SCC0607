@@ -3,7 +3,7 @@
  * João Pedro Gomes - 13839069
  * Luana Hartmann Franco da Cruz - 13676350
 */
-#include "defines.h"
+#include "arquivos/defines.h"
 
 typedef struct no{
 	char str[TAM_MAXIMO_STRING];
