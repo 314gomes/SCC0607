@@ -3,7 +3,7 @@
  * João Pedro Gomes - 13839069
  * Luana Hartmann Franco da Cruz - 13676350
 */
-#include "arquivos.h"
+#include "funcionalidades.h"
 
 #define TAMANHO_VALOR_ARGUMENTO 100
 #define CONTAGEM_ARGUMENTOS 3
