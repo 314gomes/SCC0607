@@ -42,6 +42,12 @@ Cabecalho *novo_cabecalho() {
     return cabecalho;
 }
 
+int calcularTamanhoRegistro(Registro *r){
+    int tamanhoRegistro = TAM_REGISTRO_FIXO;
+    tamanhoRegistro += r->tecnologiaOrigem.tamanho;
+    tamanhoRegistro += r->tecnologiaDestino.tamanho;
+    return tamanhoRegistro;
+}
 
 FILE *abreBinario(char *caminhoBin){
     char status;

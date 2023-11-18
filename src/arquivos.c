@@ -11,13 +11,6 @@
 #include "funcoesFornecidas.h"
 #include "listaSE.h"
 
-int calcularTamanhoRegistro(Registro *r){
-    int tamanhoRegistro = TAM_REGISTRO_FIXO;
-    tamanhoRegistro += r->tecnologiaOrigem.tamanho;
-    tamanhoRegistro += r->tecnologiaDestino.tamanho;
-    return tamanhoRegistro;
-}
-
 /***************** WRITING **********************/
 
 void escreverCampoChar(FILE *a, char c){

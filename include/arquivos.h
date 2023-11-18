@@ -8,11 +8,6 @@
 #include "arquivos/defines.h"
 #include "arquivos/utils.h"
 
-/// @brief Calculates size of a register
-/// @param r pointer to register
-/// @return size of register data on file
-int calcularTamanhoRegistro(Registro *r);
-
 /// @brief Writes trash values to complete fixed register size.
 /// @param arquivo file to write `registro`
 /// @param r register to be written

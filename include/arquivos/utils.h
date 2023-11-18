@@ -12,6 +12,11 @@ void free_registro(Registro *r);
 /// @return pointer to new Cabecalho.
 Cabecalho *novo_cabecalho();
 
+/// @brief Calculates size of a register
+/// @param r pointer to register
+/// @return size of register data on file
+int calcularTamanhoRegistro(Registro *r);
+
 /// @brief Opens binary file and detects its status.
 /// @param caminhobin path to binary file.
 /// @return NULL if status is `INCONSISTENTE` or if file does not exist, FILE*
