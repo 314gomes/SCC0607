@@ -1,4 +1,6 @@
-typedef struct {
+#ifndef FILENAME_INCLUDED
+#define FILENAME_INCLUDED
+    typedef struct {
     char status;
     int proxRRN;
     int nroTecnologias;
@@ -29,3 +31,4 @@ typedef enum{
     /// @brief Registro inexistente.
     registro_inexistente = 2,
 } StatusDeRetorno;
+#endif

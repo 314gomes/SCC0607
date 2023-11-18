@@ -8,6 +8,7 @@
 #include "funcionalidades.h"
 #include "funcoesFornecidas.h"
 #include "arquivos/impressao.h"
+#include "arquivos/escrita.h"
 
 StatusDeRetorno funcionalidade1 (char* caminhoCSV, char* caminhoBin){
 
