@@ -1,0 +1,7 @@
+{
+	"files.associations": {
+		"funcoesfornecidas.h": "c",
+		"tipos.h": "c",
+		"stdio.h": "c"
+	}
+}

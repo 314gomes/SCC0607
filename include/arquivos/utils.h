@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "arquivos/tipos.h"
 
 /// @brief Allocates memory and assings default values for new Registro struct.
