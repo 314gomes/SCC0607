@@ -23,3 +23,8 @@ int calcularTamanhoRegistro(Registro *r);
 /// @return NULL if status is `INCONSISTENTE` or if file does not exist, FILE*
 /// to binary file if sucessfull.
 FILE *abreBinario(char *caminhobin);
+
+/// @brief Calculates byteoffset of a given RRN according to specification.
+/// @param RRN Relative registry number.
+/// @return It's byte offset.
+long byteoffset_RRN(int RRN);

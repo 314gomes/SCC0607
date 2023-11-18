@@ -1,6 +1,6 @@
-#ifndef FILENAME_INCLUDED
-#define FILENAME_INCLUDED
-    typedef struct {
+#ifndef ARQUIVOS_TIPOS_INCLUDED
+#define ARQUIVOS_TIPOS_INCLUDED
+typedef struct {
     char status;
     int proxRRN;
     int nroTecnologias;

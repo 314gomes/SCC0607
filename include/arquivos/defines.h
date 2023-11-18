@@ -3,9 +3,9 @@
  * João Pedro Gomes - 13839069
  * Luana Hartmann Franco da Cruz - 13676350
 */
-#ifndef DEFINES_INCLUDED
+#ifndef ARQUIVOS_DEFINES_INCLUDED
 
-#define DEFINES_INCLUDED
+#define ARQUIVOS_DEFINES_INCLUDED
 
 #define TAM_REGISTRO 76
 #define TAM_REGISTRO_FIXO 21

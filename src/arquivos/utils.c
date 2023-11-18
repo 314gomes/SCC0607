@@ -67,3 +67,8 @@ FILE *abreBinario(char *caminhoBin){
     
     return bin;
 }
+
+long byteoffset_RRN(int RRN){
+    // quite straightforward formula
+    return TAM_CABECALHO + TAM_REGISTRO*RRN;
+}
