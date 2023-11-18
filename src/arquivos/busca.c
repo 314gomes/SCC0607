@@ -3,16 +3,13 @@
  * João Pedro Gomes - 13839069
  * Luana Hartmann Franco da Cruz - 13676350
 */
-#include <stdio.h>
-#include <stdlib.h>
+
 #include <string.h>
-#include "arquivos.h"
-#include "funcoesFornecidas.h"
-#include "listaSE.h"
-#include "arquivos/impressao.h"
-#include "arquivos/escrita.h"
+#include "arquivos/busca.h"
 #include "arquivos/utils.h"
 #include "arquivos/leitura.h"
+#include "arquivos/defines.h"
+#include "arquivos/impressao.h"
 
 /***************** SEARCH **********************/
 

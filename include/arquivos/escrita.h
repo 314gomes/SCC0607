@@ -1,3 +1,5 @@
+#include "arquivos/tipos.h"
+
 /// @brief Writes trash values to complete fixed register size.
 /// @param arquivo file to write `registro`
 /// @param r register to be written
@@ -12,7 +14,6 @@ void escreverCampoChar(FILE *a, char c);
 /// @param a file to write to
 /// @param c field
 void escreverCampoInt(FILE *a, int c);
-
 
 /// @brief Write a field of StringVariavel type to file `a`
 /// @param a file to write to

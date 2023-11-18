@@ -3,7 +3,7 @@
  * João Pedro Gomes - 13839069
  * Luana Hartmann Franco da Cruz - 13676350
 */
-#include "arquivos.h"
+#include "arquivos/tipos.h"
 
 /// @brief Parses  `caminhoCSV`
 /// substituting or creating new binary file `caminhoBin`

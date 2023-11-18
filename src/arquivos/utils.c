@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "arquivos/utils.h"
 #include "arquivos/tipos.h"
 #include "arquivos/defines.h"
 

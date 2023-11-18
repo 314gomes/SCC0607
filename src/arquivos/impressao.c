@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "arquivos/impressao.h"
 #include "arquivos/tipos.h"
 
 void imprimeCampoInt (int n){

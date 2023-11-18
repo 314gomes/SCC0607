@@ -1,11 +1,3 @@
-/**
- * Grupo 8
- * João Pedro Gomes - 13839069
- * Luana Hartmann Franco da Cruz - 13676350
-*/
-#include <stdio.h>
-
-#include "arquivos/defines.h"
 #include "arquivos/tipos.h"
 
 /// @brief Funcao auxiliar utilizada na busca de campos fixos de inteiros

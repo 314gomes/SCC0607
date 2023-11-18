@@ -12,6 +12,9 @@
 #include "arquivos/escrita.h"
 #include "arquivos/parse.h"
 #include "arquivos/leitura.h"
+#include "arquivos/tipos.h"
+#include "arquivos/defines.h"
+#include "arquivos/busca.h"
 
 StatusDeRetorno funcionalidade1 (char* caminhoCSV, char* caminhoBin){
 

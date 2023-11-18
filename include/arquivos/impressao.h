@@ -1,3 +1,5 @@
+#include "arquivos/tipos.h"
+
 /// @brief Prints an integer according to specification, handling NULL values
 /// @param n Integer to print
 void imprimeCampoInt (int n);

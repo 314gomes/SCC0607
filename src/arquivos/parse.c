@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
+#include "arquivos/parse.h"
 #include "arquivos/tipos.h"
 #include "arquivos/utils.h"
 #include "arquivos/escrita.h"
