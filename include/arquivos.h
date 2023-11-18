@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 #include "arquivos/defines.h"
-#include "arquivos/inicializadores.h"
+#include "arquivos/utils.h"
 
 /// @brief Calculates size of a register
 /// @param r pointer to register
