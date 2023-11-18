@@ -73,23 +73,6 @@ void parseLinhaCSV(char *CSV_line, Registro *r_buffer);
 /// @param c_buffer Buffer for updated `Cabecalho`.
 void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer);
 
-/// @brief Prints an integer according to specification, handling NULL values
-/// @param n Integer to print
-void imprimeCampoInt (int n);
-
-/// @brief Prints StringVariavel according to specification, handling NULL
-/// values
-/// @param str StringVariavel to print 
-void imprimeCampoStringVariavel(StringVariavel str);
-
-/// @brief Prints values separator according to specification
-void imprimeSeparador();
-
-/// @brief Prints contents of registry according to specification, handling
-/// NULL values
-/// @param r registry to print
-void imprimeRegistro(Registro r);
-
 /// @brief Calculates byteoffset of a given RRN according to specification.
 /// @param RRN Relative registry number.
 /// @return It's byte offset.
