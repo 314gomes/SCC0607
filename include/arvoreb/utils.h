@@ -1,0 +1,1 @@
+FILE *arBAbre(char *caminhoBin);
