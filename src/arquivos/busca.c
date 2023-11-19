@@ -13,36 +13,15 @@
 
 /***************** SEARCH **********************/
 
-void auxiliarFuncionalidade3 (char* caminhoBin, int posicao) {
-
-    // Função criada com o intuito de evitar múltiplas chamadas 
-    // de fseek no arquivo
-
-    Registro *r = novo_registro();
-    FILE *BIN_out = abreBinario(caminhoBin);
-    if(BIN_out == NULL) return;
-
-    
-    fseek(BIN_out, 0, SEEK_SET);
-    fseek(BIN_out, posicao, SEEK_CUR);
-
-
-    leStatusRegistro(BIN_out, r); 
+void buscaAuxiliar (FILE* BIN_out, Registro* r) {
     leConteudoRegistro(BIN_out, r); 
     imprimeRegistro(*r);
-
-    free_registro(r);
-    fclose(BIN_out);
-
 }
 
-StatusDeRetorno buscaCampoInt (char* caminhoBin, int campo, int buscado) {
+StatusDeRetorno buscaCampoInt (FILE* BIN_out, int campo, int buscado) {
 
     Registro *r = novo_registro();
-    FILE *BIN_out = abreBinario(caminhoBin);
-
     StatusDeRetorno status = registro_inexistente;
-    if(BIN_out == NULL) return falha_processamento;
     
     // lixo calcula bytes para o proximo registro
     // RRN encaminhado para a funcao auxiliar
@@ -57,41 +36,39 @@ StatusDeRetorno buscaCampoInt (char* caminhoBin, int campo, int buscado) {
 
     while(fread(&(aux_char), sizeof(char), 1, BIN_out) != 0) {
 
-        // TAM_REGISTRO - removido
-        if (aux_char == REMOVIDO)
-            lixo = TAM_REGISTRO - 1;
+       if (aux_char == NAO_REMOVIDO) {
 
-        else {  
             fseek(BIN_out, campo, SEEK_CUR);
-            fread(&(aux_int), sizeof(int), 1, BIN_out);        
+            fread(&(aux_int), sizeof(int), 1, BIN_out); 
+            fseek(BIN_out, -(campo+sizeof(int)), SEEK_CUR);
 
             if (aux_int == buscado) {
                 // nao retorna registro inexistente quando encontra o buscado
                 status = sucesso;
 
-                auxiliarFuncionalidade3(caminhoBin, (RRN*TAM_REGISTRO)+TAM_CABECALHO);
-        }    
-
-        // TAM_REGISTRO - (removido + (campo + inteiro))
-        lixo = TAM_REGISTRO - (1 + (campo+4));
-
-        }
+                buscaAuxiliar (BIN_out, r);
+                lixo = TAM_REGISTRO - (TAM_REGISTRO_FIXO + r->tecnologiaOrigem.tamanho + r->tecnologiaDestino.tamanho);
+                
+            }
+            else 
+                lixo = TAM_REGISTRO - 1;
+       }
+       else 
+            lixo = TAM_REGISTRO - 1;
 
         RRN++;
         fseek(BIN_out, lixo, SEEK_CUR);
     }
 
     free_registro(r);
-    fclose(BIN_out);
 
     return status;
 }
 
-StatusDeRetorno buscaCampoStringVariavel (char* caminhoBin, char* buscado, int tamanho, int flag) {
+
+StatusDeRetorno buscaCampoStringVariavel (FILE *BIN_out, char* buscado, int tamanho, int flag) {
     Registro *r = novo_registro();
-    FILE *BIN_out = abreBinario(caminhoBin);
     StatusDeRetorno status = registro_inexistente;
-    if(BIN_out == NULL) return falha_processamento;
 
     // constant field = 3*int
     // grupo + popularidade + peso
@@ -110,9 +87,8 @@ StatusDeRetorno buscaCampoStringVariavel (char* caminhoBin, char* buscado, int t
     fseek(BIN_out, TAM_CABECALHO, SEEK_CUR);
 
     while(fread(&(aux_char), sizeof(char), 1, BIN_out) != 0) {
-        if (aux_char == REMOVIDO) lixo = TAM_REGISTRO - 1;
-
-        else {
+        
+        if (aux_char == NAO_REMOVIDO) {
             
             fseek(BIN_out, campo, SEEK_CUR);
 
@@ -126,21 +102,25 @@ StatusDeRetorno buscaCampoStringVariavel (char* caminhoBin, char* buscado, int t
                 case 0:
                     if (aux_tamanho[0] == tamanho) {
                         fread(&(aux_string), sizeof(char), aux_tamanho[0], BIN_out);
-
-                        // (TAM_REGISTRO - 4): tamanhoDestino was not read
-                        lixo = TAM_REGISTRO - ((TAM_REGISTRO_FIXO - 4)+tamanho);
+                        fseek(BIN_out, -(campo+sizeof(int)+aux_tamanho[0]), SEEK_CUR);
 
                         // assigns \0 at the end of strings for comparison purposes
                         aux_string[tamanho] = '\0';
                         buscado[tamanho] = '\0';
 
                         if (strcmp(aux_string, buscado) == 0) {
-                            status = sucesso;
-                            auxiliarFuncionalidade3(caminhoBin, (RRN*TAM_REGISTRO)+TAM_CABECALHO);
+                            status = sucesso; 
+
+                            buscaAuxiliar (BIN_out, r);
+                            lixo = TAM_REGISTRO - (TAM_REGISTRO_FIXO + r->tecnologiaOrigem.tamanho + r->tecnologiaDestino.tamanho);
+                        }
+                        else {
+                            lixo = TAM_REGISTRO-1;
                         }
                     }
                     else {
-                        lixo = TAM_REGISTRO - (TAM_REGISTRO_FIXO - 4);
+                        fseek(BIN_out, -(campo+sizeof(int)), SEEK_CUR);
+                        lixo = TAM_REGISTRO-1;
                     }
                 break;
 
@@ -151,25 +131,31 @@ StatusDeRetorno buscaCampoStringVariavel (char* caminhoBin, char* buscado, int t
                     
                     if (aux_tamanho[1] == tamanho) {
                         fread(&(aux_string), sizeof(char), aux_tamanho[1], BIN_out);
-
-                        // only the record's GARBAGE remains
-                        lixo = TAM_REGISTRO - (TAM_REGISTRO_FIXO + aux_tamanho[0] + tamanho);
+                        fseek(BIN_out, -(campo+(2*sizeof(int))+aux_tamanho[0]+aux_tamanho[1]), SEEK_CUR);
 
                         aux_string[tamanho] = '\0';
                         buscado[tamanho] = '\0';
 
                         if (strcmp(aux_string, buscado) == 0) {
-                            status = sucesso;
-                            auxiliarFuncionalidade3(caminhoBin, (RRN*TAM_REGISTRO)+TAM_CABECALHO);
+                            status = sucesso;   
+
+                            buscaAuxiliar (BIN_out, r);
+                            lixo = TAM_REGISTRO - (TAM_REGISTRO_FIXO + r->tecnologiaOrigem.tamanho + r->tecnologiaDestino.tamanho);
+                        }
+                        else {
+                            lixo = TAM_REGISTRO-1;
                         }
                     }
                     else {
-                        // remains the last string and the garbage of the record
-                        lixo = TAM_REGISTRO - (TAM_REGISTRO_FIXO + aux_tamanho[0]);
+                        fseek(BIN_out, -(campo+(2*sizeof(int))+aux_tamanho[0]), SEEK_CUR);
+                        lixo = TAM_REGISTRO-1;
                     }
                 break;
             }
         }
+        else
+            lixo = TAM_REGISTRO - 1;
+            
         RRN++;
         fseek(BIN_out, lixo, SEEK_CUR);
     }
@@ -177,5 +163,4 @@ StatusDeRetorno buscaCampoStringVariavel (char* caminhoBin, char* buscado, int t
     return status;
 
     free_registro(r);
-    fclose(BIN_out);
 }

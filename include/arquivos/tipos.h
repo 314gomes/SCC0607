@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #ifndef ARQUIVOS_TIPOS_INCLUDED
 #define ARQUIVOS_TIPOS_INCLUDED
 typedef struct {

@@ -85,6 +85,10 @@ StatusDeRetorno funcionalidade2 (char* caminhoBin) {
 
 StatusDeRetorno funcionalidade3 (char* caminhoBin, int n) {
 
+    FILE *BIN_out = abreBinario(caminhoBin);
+    if (BIN_out == NULL) 
+        return falha_processamento;
+
     // stores the field that will be searched
     char busca_campo[n][TAM_MAXIMO_STRING]; 
 
@@ -141,23 +145,29 @@ StatusDeRetorno funcionalidade3 (char* caminhoBin, int n) {
     for (int i = 0; i < n; i++) {
         
         if(campo[i] > -1) {
-            status = buscaCampoInt(caminhoBin, campo[i], busca_int[i]);
+            status = buscaCampoInt(BIN_out, campo[i], busca_int[i]);
         }
 
         if (campo[i] == -1) {
-            status = buscaCampoStringVariavel(caminhoBin, busca_char[i], tamanho[i], flag[i]);
+            status = buscaCampoStringVariavel(BIN_out, busca_char[i], tamanho[i], flag[i]);
         }
 
         // in case the search functions return falha_processamento
-        if (status == falha_processamento) return falha_processamento;
+        if (status == falha_processamento) 
+            return falha_processamento;
 
         // in case the search functions do not find the desired field
-        if (status == registro_inexistente) st++;
+        if (status == registro_inexistente) 
+            st++;
     }
 
+    fclose(BIN_out);
+
     // if all return "registro_inexistente", st will be equal to the number of searches n
-    if (st == n) return registro_inexistente;
-    else return sucesso;
+    if (st == n) 
+        return registro_inexistente;
+    else 
+        return sucesso;
 }
 
 StatusDeRetorno funcionalidade4 (char* caminhoBin, int RRN){

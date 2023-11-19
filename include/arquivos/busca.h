@@ -6,7 +6,7 @@
 /// @param buscado Valor inteiro a ser buscado
 /// @return Retorna `sucesso` quando a busca e bem sucedida, `registro_inexistente` se
 /// o registro esta marcado como deletado ou caso nao esteja no arquivo
-StatusDeRetorno buscaCampoInt (char* caminhoBin, int campo, int buscado);
+StatusDeRetorno buscaCampoInt (FILE* BIN_out, int campo, int buscado);
 
 /// @brief Funcao auxiliar utilizada na busca de campos variaveis de char
 /// @param caminhoBin Caminho para arquivo binario
@@ -16,4 +16,4 @@ StatusDeRetorno buscaCampoInt (char* caminhoBin, int campo, int buscado);
 /// string e `1` para a segunda
 /// @return Retorna `sucesso` quando a busca e bem sucedida, `registro_inexistente` se
 /// o registro esta marcado como deletado ou caso nao esteja no arquivo
-StatusDeRetorno buscaCampoStringVariavel (char* caminhoBin, char* buscado, int tamanho, int flag);
+StatusDeRetorno buscaCampoStringVariavel (FILE* BIN_out, char* buscado, int tamanho, int flag);

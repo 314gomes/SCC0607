@@ -42,7 +42,7 @@ void escreverRegistro(FILE *arquivo, Registro *r) {
 }
 
 void escreverCabecalho(FILE *arquivo, Cabecalho *h){
-    fseek(arquivo, 0, 0);
+    fseek(arquivo, 0, SEEK_SET);
     escreverCampoChar(arquivo, h->status);
     escreverCampoInt(arquivo, h->proxRRN);
     escreverCampoInt(arquivo, h->nroTecnologias);

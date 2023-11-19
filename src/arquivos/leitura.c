@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "arquivos/leitura.h"
 #include "arquivos/defines.h"
 #include "arquivos/tipos.h"
@@ -28,8 +29,8 @@ void leStatusRegistro(FILE *bin, Registro *r){
     leCampoChar(bin, &r->removido);
 }
 
-void leConteudoRegistro(FILE *bin, Registro *r){
-    leCampoInt(bin, &r->grupo);
+void leConteudoRegistro(FILE *bin, Registro *r){  
+    leCampoInt(bin, &r->grupo);  
     leCampoInt(bin, &r->popularidade);
     leCampoInt(bin, &r->peso);
     leCampoStringVariavel(bin, &r->tecnologiaOrigem);
