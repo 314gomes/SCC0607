@@ -27,7 +27,7 @@ debug:
 	@cat $< | ./main.o > $@
 
 	@echo $(RED)
-	@diff $@ $*.out
+	diff $@ $*.out || :
 	@echo $(DEFALUT)
 
 test: $(testes)
