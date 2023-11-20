@@ -25,15 +25,15 @@ void imprimeMensagemErro(StatusDeRetorno s){
 		break;
 	
 	case falha_processamento:
-		printf("Falha no processamento do arquivo.");
+		printf("Falha no processamento do arquivo.\n");
 		break;
 
 	case registro_inexistente:
-		printf("Registro inexistente.");
+		printf("Registro inexistente.\n");
 		break;
 
 	default:
-		printf("Erro desconhecido!");
+		printf("Erro desconhecido!\n");
 		break;
 	}
 }
@@ -105,87 +105,34 @@ StatusDeRetorno funcionalidade2 (char* caminhoBin) {
     return status;
 }
 
-StatusDeRetorno funcionalidade3 (char* caminhoBin, int n) {
-
-    FILE *BIN_out = abreBinario(caminhoBin);
-    if (BIN_out == NULL) 
+StatusDeRetorno funcionalidade3(char* bin_path, int n, char** campo, char** valor){
+    FILE *bin = abreBinario(bin_path);
+    if (bin == NULL) 
         return falha_processamento;
 
-    // stores the field that will be searched
-    char busca_campo[n][TAM_MAXIMO_STRING]; 
-
-    // stores the sought-after integer
-    int busca_int[n];
-    // stores the sought-after variable-length string
-    char busca_char[n][TAM_MAXIMO_STRING];
-
-    // sets the position of the field in the record for integers
-    // assigns the value -1 when dealing with variable-length strings
-    int campo[n];
-
-    // stores the number of characters in the sought-after string
-    int tamanho[n];
-
-    // 0 when dealing with the first variable string
-    // 1 when dealing with the second variable string
-    int flag[n];
-
+    StatusDeRetorno s;
     for (int i = 0; i < n; i++) {
-        scanf("%s", busca_campo[i]);
-
-        if (strcmp(busca_campo[i], "grupo") == 0) {
-            scanf("%d", &busca_int[i]);
-            campo[i] = 0;           
-        }
-        else if (strcmp(busca_campo[i], "popularidade") == 0) {
-            scanf("%d", &busca_int[i]);
-            campo[i] = 4;
-        }
-        else if (strcmp(busca_campo[i], "peso") == 0) {
-            scanf("%d", &busca_int[i]);
-            campo[i] = 8;
-        } 
-        else if (strcmp(busca_campo[i], "nomeTecnologiaOrigem") == 0) {
-			scan_quote_string(busca_char[i]);
-            tamanho[i] = strlen(busca_char[i]);
-            campo[i] = -1;
-            flag[i] = 0;
-        } 
-        else if (strcmp(busca_campo[i], "nomeTecnologiaDestino") == 0) {
-            scan_quote_string(busca_char[i]);
-            tamanho[i] = strlen(busca_char[i]);
-            campo[i] = -1;
-            flag[i] = 1;
-        }     
-    }
-
-    // flag to check if no sought-after records exist
-    int st = 0;
-    StatusDeRetorno status = sucesso;
-    
-
-    for (int i = 0; i < n; i++) {
+        s = buscaCampo(bin, campo[i], valor[i]);
         
-        if(campo[i] > -1) {
-            status = buscaCampoInt(BIN_out, campo[i], busca_int[i]);
+        // em casos de erro
+        switch (s)
+        {
+        case registro_inexistente:
+            imprimeMensagemErro(s);
+            break;
+        
+        case falha_processamento:
+            return s;
+            break;
+
+        default:
+            break;
         }
-
-        if (campo[i] == -1) {
-            status = buscaCampoStringVariavel(BIN_out, busca_char[i], tamanho[i], flag[i]);
-        }
-
-        // in case the search functions return falha_processamento
-        if (status == falha_processamento) 
-            return falha_processamento;
-
-        // in case the search functions do not find the desired field
-        if (status == registro_inexistente) 
-            st++;
     }
 
-    fclose(BIN_out);
+    fclose(bin);
 
-        return sucesso;
+    return sucesso;
 }
 
 StatusDeRetorno funcionalidade4 (char* caminhoBin, int RRN){

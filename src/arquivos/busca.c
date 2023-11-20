@@ -5,6 +5,7 @@
 */
 
 #include <string.h>
+#include <stdlib.h>
 #include "arquivos/busca.h"
 #include "arquivos/utils.h"
 #include "arquivos/leitura.h"
@@ -163,4 +164,37 @@ StatusDeRetorno buscaCampoStringVariavel (FILE *BIN_out, char* buscado, int tama
     return status;
 
     free_registro(r);
+}
+
+/// @brief Funcao auxiliar de busca de campo qualquer
+/// @param bin FILE* para o arquivo binario de busca
+/// @param campo nome do campo a ser buscado
+/// @param valor valor de busca
+/// @return `sucesso` se encontrado, `registro_inexistente` se nenhum registro
+/// atende à busca.
+StatusDeRetorno buscaCampo(FILE* bin, char* campo, char* valor){
+    int tamanhostring;
+    int buscado;
+    
+    if (strcmp(campo, "grupo") == 0) {
+        buscado = atoi(valor);
+        return buscaCampoInt (bin, 0, buscado);
+    }
+    else if (strcmp(campo, "popularidade") == 0) {
+        buscado = atoi(valor);
+        return buscaCampoInt (bin, 4, buscado);
+    }
+    else if (strcmp(campo, "peso") == 0) {
+        buscado = atoi(valor);
+        return buscaCampoInt (bin, 8, buscado);
+    } 
+    else if (strcmp(campo, "nomeTecnologiaOrigem") == 0) {
+        tamanhostring = strlen(valor);
+        return buscaCampoStringVariavel(bin, valor, tamanhostring, 0);
+    } 
+    else if (strcmp(campo, "nomeTecnologiaDestino") == 0) {
+        tamanhostring = strlen(valor);
+        return buscaCampoStringVariavel(bin, valor, tamanhostring, 1);
+    }
+    return -1;  
 }

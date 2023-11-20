@@ -17,3 +17,5 @@ StatusDeRetorno buscaCampoInt (FILE* BIN_out, int campo, int buscado);
 /// @return Retorna `sucesso` quando a busca e bem sucedida, `registro_inexistente` se
 /// o registro esta marcado como deletado ou caso nao esteja no arquivo
 StatusDeRetorno buscaCampoStringVariavel (FILE* BIN_out, char* buscado, int tamanho, int flag);
+
+StatusDeRetorno buscaCampo(FILE* bin, char* campo, char* valor);

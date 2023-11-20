@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "arquivos/utils.h"
 #include "arquivos/tipos.h"
 #include "arquivos/defines.h"
@@ -72,4 +73,23 @@ FILE *abreBinario(char *caminhoBin){
 long byteoffset_RRN(int RRN){
     // quite straightforward formula
     return TAM_CABECALHO + TAM_REGISTRO*RRN;
+}
+
+int campoDeBuscaEString(char* nomeCampo){
+    if (strcmp(nomeCampo, "grupo") == 0) {
+        return 0;
+    }
+    else if (strcmp(nomeCampo, "popularidade") == 0) {
+        return 0;
+    }
+    else if (strcmp(nomeCampo, "peso") == 0) {
+        return 0;
+    } 
+    else if (strcmp(nomeCampo, "nomeTecnologiaOrigem") == 0) {
+        return 1;
+    } 
+    else if (strcmp(nomeCampo, "nomeTecnologiaDestino") == 0) {
+        return 1;
+    }
+    return -1;
 }

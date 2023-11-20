@@ -4,8 +4,11 @@
  * Luana Hartmann Franco da Cruz - 13676350
 */
 #include <stdio.h>
+#include <stdlib.h>
 #include "funcionalidades.h"
 #include "arquivos/defines.h"
+#include "funcoesFornecidas.h"
+#include "arquivos/utils.h"
 
 typedef enum {
 	CREATE_TABLE = 1,
@@ -13,6 +16,40 @@ typedef enum {
 	SELECT_WHERE = 3,
 	SELECT_RRN = 4,
 } Comandos;
+
+void criar_termos_busca(int n, char ***campo, char ***valor){
+	*campo = calloc(n, sizeof(char*));
+	*valor = calloc(n, sizeof(char*));
+	for (int i = 0; i < n; i++)
+	{
+		(*campo)[i] = calloc(TAM_MAXIMO_STRING, sizeof(char));
+		(*valor)[i] = calloc(TAM_MAXIMO_STRING, sizeof(char));
+	}
+	
+}
+
+void ler_termos_busca(int n, char** campo, char** valor){
+	for (int i = 0; i < n; i++){
+		scanf("%s", campo[i]);
+		if(campoDeBuscaEString(campo[i])){
+			scan_quote_string(valor[i]);
+		}
+		else{
+			scanf("%s", valor[i]);
+		}
+		
+	}
+}
+
+void destruir_termos_busca(int n, char **campo, char **valor){
+	for (int i = 0; i < n; i++)
+	{
+		free(campo[i]);
+		free(valor[i]);
+	}
+	free(campo);
+	free(valor);
+}
 
 void tratar_comando_entrada(){
 	Comandos cmd_in = 0;
@@ -36,11 +73,19 @@ void tratar_comando_entrada(){
 			break;
 		case SELECT_WHERE:
 			int num_busca;
-			
+			char** campo;
+			char** valor;
+
 			scanf("%s", bin_path);
 			scanf("%d", &num_busca);
-			
-			status = funcionalidade3(bin_path, num_busca);
+
+			criar_termos_busca(num_busca, &campo, &valor);
+
+			ler_termos_busca(num_busca, campo, valor);
+
+			status = funcionalidade3(bin_path, num_busca, campo, valor);
+
+			destruir_termos_busca(num_busca, campo, valor);
 			break;
 		case SELECT_RRN:
 			int num_RRN;

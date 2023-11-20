@@ -4,6 +4,7 @@
  * Luana Hartmann Franco da Cruz - 13676350
 */
 #include "arquivos/tipos.h"
+#include "arquivos/defines.h"
 
 void imprimeMensagemErro(StatusDeRetorno s);
 
@@ -29,7 +30,7 @@ StatusDeRetorno funcionalidade2(char* caminhoBin);
 /// @return `sucess` upon sucessful execution, `registro_inexistente` if
 /// no registry with the field especified is encoutered
 /// `erro_processamento` if other errors have been found.
-StatusDeRetorno funcionalidade3 (char* caminhoBin, int n);
+StatusDeRetorno funcionalidade3(char* bin_path, int n, char** campo, char** valor);
 
 /// @brief Main function for feature 4. Opens binary file at `caminhoBin` and
 /// prints registry at relative registry number `RRN`

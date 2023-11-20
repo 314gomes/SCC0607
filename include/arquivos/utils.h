@@ -28,3 +28,5 @@ FILE *abreBinario(char *caminhobin);
 /// @param RRN Relative registry number.
 /// @return It's byte offset.
 long byteoffset_RRN(int RRN);
+
+int campoDeBuscaEString(char* nomeCampo);
