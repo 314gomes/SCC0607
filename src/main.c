@@ -5,9 +5,7 @@
 */
 #include <stdio.h>
 #include "funcionalidades.h"
-
-#define TAMANHO_VALOR_ARGUMENTO 100
-#define CONTAGEM_ARGUMENTOS 3
+#include "arquivos/defines.h"
 
 typedef enum {
 	CREATE_TABLE = 1,
@@ -18,33 +16,39 @@ typedef enum {
 
 void tratar_comando_entrada(){
 	Comandos cmd_in = 0;
-	char args[CONTAGEM_ARGUMENTOS][TAMANHO_VALOR_ARGUMENTO];
 	StatusDeRetorno status;
-	int num_busca;
-	int num_RRN;
-	int buffer;
-	scanf("%d", &buffer);
-	cmd_in = buffer;
+	char bin_path[TAM_MAXIMO_STRING];
+	scanf("%d", (int *) &cmd_in);
 
 	switch (cmd_in){
 		case CREATE_TABLE:
-			scanf("%s", args[0]);
-			scanf("%s", args[1]);
-			status = funcionalidade1(args[0], args[1]);
+			char csv_path[TAM_MAXIMO_STRING];
+			
+			scanf("%s", csv_path);
+			scanf("%s", bin_path);
+			
+			status = funcionalidade1(csv_path, bin_path);
 			break;
 		case SELECT_FROM:
-			scanf("%s", args[0]);
-			status = funcionalidade2(args[0]);
+			
+			status = funcionalidade2(bin_path);
+			
 			break;
 		case SELECT_WHERE:
-			scanf("%s", args[0]);
+			int num_busca;
+			
+			scanf("%s", bin_path);
 			scanf("%d", &num_busca);
-			status = funcionalidade3(args[0], num_busca);
+			
+			status = funcionalidade3(bin_path, num_busca);
 			break;
 		case SELECT_RRN:
-			scanf("%s", args[0]);
+			int num_RRN;
+			scanf("%s", bin_path);
 			scanf("%d", &num_RRN);
-			status = funcionalidade4(args[0], num_RRN);
+			
+			status = funcionalidade4(bin_path, num_RRN);
+			
 			break;
 		default:
 			break;
