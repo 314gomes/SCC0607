@@ -26,7 +26,9 @@ debug:
 	@echo $(DEFALUT)
 	@cat $< | ./main.o > $@
 
-	VAR = diff $@ $*.out
+	@echo $(RED)
+	@diff $@ $*.out
+	@echo $(DEFALUT)
 
 test: $(testes)
 	echo $(testes)
