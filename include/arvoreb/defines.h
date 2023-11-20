@@ -11,7 +11,6 @@
 #define ARB_DEFINES_INCLUDED
 
 #define ARB_TAM_PAGINA 205
-#define ARB_TAM_CHAVE 35
 #define ARB_ORDEM 4
 #define ARB_TAM_CHAVE 55
 

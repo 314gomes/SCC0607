@@ -50,23 +50,7 @@ void tratar_comando_entrada(){
 			break;
 	}
 
-	switch (status)
-	{
-	case sucesso:
-		break;
-	
-	case falha_processamento:
-		printf("Falha no processamento do arquivo.");
-		break;
-
-	case registro_inexistente:
-		printf("Registro inexistente.");
-		break;
-
-	default:
-		printf("Erro desconhecido!");
-		break;
-	}
+	imprimeMensagemErro(status);
 
 }
 

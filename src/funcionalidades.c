@@ -16,6 +16,28 @@
 #include "arquivos/defines.h"
 #include "arquivos/busca.h"
 
+/// @brief Imprime mensagem de erro correspondente ao status de retorno s
+/// @param s Status a ser impresso
+void imprimeMensagemErro(StatusDeRetorno s){
+    switch (s)
+	{
+	case sucesso:
+		break;
+	
+	case falha_processamento:
+		printf("Falha no processamento do arquivo.");
+		break;
+
+	case registro_inexistente:
+		printf("Registro inexistente.");
+		break;
+
+	default:
+		printf("Erro desconhecido!");
+		break;
+	}
+}
+
 StatusDeRetorno funcionalidade1 (char* caminhoCSV, char* caminhoBin){
 
     // initializes a new c_buffer
@@ -163,10 +185,6 @@ StatusDeRetorno funcionalidade3 (char* caminhoBin, int n) {
 
     fclose(BIN_out);
 
-    // if all return "registro_inexistente", st will be equal to the number of searches n
-    if (st == n) 
-        return registro_inexistente;
-    else 
         return sucesso;
 }
 

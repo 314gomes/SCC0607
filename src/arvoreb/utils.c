@@ -1,5 +1,5 @@
+#include <stdio.h>
 #include "arvoreb/utils.h"
-#include "stdio.h"
 #include "arvoreb/defines.h"
 /// @brief Abrir arquivo de indice binario da Arvore B em modo de leitura
 /// @param caminhobin caminho para o arquivo de indice da Arvore

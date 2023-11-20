@@ -5,6 +5,8 @@
 */
 #include "arquivos/tipos.h"
 
+void imprimeMensagemErro(StatusDeRetorno s);
+
 /// @brief Parses  `caminhoCSV`
 /// substituting or creating new binary file `caminhoBin`
 /// @param caminhoCSV path to CSV file
