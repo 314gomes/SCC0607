@@ -18,16 +18,16 @@ run:
 debug:
 	gdb main.o
 
-%.myout: %.in all
+casos_introdutorio/%.myout: casos_introdutorio/%.in all
 	@echo $(BLUE)
 	@echo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	@echo "%% NOW TESTING $<"
 	@echo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	@echo $(DEFALUT)
-	@cat $< | ./main.o > $@
+	@cd casos_introdutorio; cat $*.in | ../main.o > $*.myout
 
 	@echo $(RED)
-	@diff --strip-trailing-cr $@ $*.out || :
+	@diff --strip-trailing-cr $@ casos_introdutorio/$*.out || :
 	@echo $(DEFALUT)
 
 test: $(testes)
