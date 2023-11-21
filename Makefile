@@ -6,7 +6,7 @@ RED := "\033[31;49m"
 BLUE := "\033[0;34m"
 GREEN := "\033[37;42m"
 DEFALUT := "\033[39;49m"
-casos := $(wildcard casos_introdutorio/*.in)
+casos := $(wildcard casos_introdutorio/*.in) $(wildcard casos_pratico1/*.in)
 testes = $(casos:.in=.myout)
 
 all:
