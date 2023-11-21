@@ -59,7 +59,6 @@ FILE *abreBinario(char *caminhoBin){
         return NULL;
     }
 
-    fseek(bin, 0, SEEK_SET);
     fread(&status, 1, 1, bin);
     
     if(status == INCONSISTENTE){

@@ -67,6 +67,7 @@ void tratar_comando_entrada(){
 			status = funcionalidade1(csv_path, bin_path);
 			break;
 		case SELECT_FROM:
+			scanf("%s", bin_path);
 			
 			status = funcionalidade2(bin_path);
 			
