@@ -1,6 +1,14 @@
 #include <stdio.h>
 #include "arvoreb/utils.h"
 #include "arvoreb/defines.h"
+
+/// @brief Calcular byteoffset de um RRN do arquivo de indices arvore B
+/// @param RRN numero relativo de registro
+/// @return byteoffset correspondente
+long arBByteoffsetRRN(int RRN){
+    return ARB_TAM_PAGINA * RRN;
+}
+
 /// @brief Abrir arquivo de indice binario da Arvore B em modo de leitura
 /// @param caminhobin caminho para o arquivo de indice da Arvore
 /// @return NULL se status for `INCONSISTENTE` ou se arquivo não existir, FILE*

@@ -5,6 +5,7 @@
 		"stdio.h": "c",
 		"leitura.h": "c",
 		"listase.h": "c",
-		"impressao.h": "c"
+		"impressao.h": "c",
+		"defines.h": "c"
 	}
 }

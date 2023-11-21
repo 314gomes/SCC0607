@@ -1,0 +1,1 @@
+void ArBLeNo(FILE* f, ArBNo* no);

@@ -17,7 +17,7 @@ typedef struct {
 
 	int RRNFilho[ARB_ORDEM];
 	int RRNArquivoDados[ARB_ORDEM - 1];
-	char chave[ARB_TAM_CHAVE][ARB_ORDEM - 1];
+	char chave[ARB_ORDEM - 1][ARB_TAM_CHAVE + 1];
 } ArBNo;
 
 #endif
