@@ -32,3 +32,7 @@ debug:
 
 test: $(testes)
 	echo $(testes)
+
+zip:
+	rm *.zip || :
+	zip -r ediii.zip include/ src/ Makefile
