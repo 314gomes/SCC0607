@@ -13,10 +13,10 @@ long arBByteoffsetRRN(int RRN){
 /// @param caminhobin caminho para o arquivo de indice da Arvore
 /// @return NULL se status for `INCONSISTENTE` ou se arquivo não existir, FILE*
 /// do arquivo binário se tudo correto.
-FILE *arBAbre(char *caminhoBin){
+FILE *arBAbre(char *caminhoBin, char *modo){
     char status;
     
-    FILE *bin = fopen(caminhoBin, "rb");
+    FILE *bin = fopen(caminhoBin, modo);
     if(bin == NULL){
         return NULL;
     }

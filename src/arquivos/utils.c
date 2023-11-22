@@ -51,10 +51,10 @@ int calcularTamanhoRegistro(Registro *r){
     return tamanhoRegistro;
 }
 
-FILE *abreBinario(char *caminhoBin){
+FILE *abreBinario(char *caminhoBin, char *modo){
     char status;
     
-    FILE *bin = fopen(caminhoBin, "rb");
+    FILE *bin = fopen(caminhoBin, modo);
     if(bin == NULL){
         return NULL;
     }

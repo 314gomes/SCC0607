@@ -79,7 +79,7 @@ StatusDeRetorno funcionalidade2 (char* caminhoBin) {
     Registro *r = novo_registro();
     StatusDeRetorno status = registro_inexistente;
 
-    FILE *BIN_out = abreBinario(caminhoBin);
+    FILE *BIN_out = abreBinario(caminhoBin, "rb");
     if(BIN_out == NULL) return falha_processamento;
 
     fseek(BIN_out, 0, SEEK_SET);
@@ -108,7 +108,7 @@ StatusDeRetorno funcionalidade2 (char* caminhoBin) {
 }
 
 StatusDeRetorno funcionalidade3(char* bin_path, int n, char** campo, char** valor){
-    FILE *bin = abreBinario(bin_path);
+    FILE *bin = abreBinario(bin_path, "rb");
     if (bin == NULL) 
         return falha_processamento;
 
@@ -138,7 +138,7 @@ StatusDeRetorno funcionalidade3(char* bin_path, int n, char** campo, char** valo
 }
 
 StatusDeRetorno funcionalidade4 (char* caminhoBin, int RRN){
-    FILE* bin = abreBinario(caminhoBin);
+    FILE* bin = abreBinario(caminhoBin, "rb");
     
     if(bin == NULL) return falha_processamento;
 
@@ -154,12 +154,12 @@ StatusDeRetorno funcionalidade4 (char* caminhoBin, int RRN){
 }
 
 StatusDeRetorno funcionalidade6(char *bin_path, char *index_path, int n, char** campo, char** valor){
-    FILE* bin = abreBinario(bin_path);
+    FILE* bin = abreBinario(bin_path, "rb");
     if(bin == NULL){
         return falha_processamento;
     }
     
-    FILE* index = arBAbre(index_path);
+    FILE* index = arBAbre(index_path, "rb");
     if(index == NULL){
         return falha_processamento;
     }

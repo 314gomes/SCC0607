@@ -22,7 +22,7 @@ int calcularTamanhoRegistro(Registro *r);
 /// @param caminhobin path to binary file.
 /// @return NULL if status is `INCONSISTENTE` or if file does not exist, FILE*
 /// to binary file if sucessfull.
-FILE *abreBinario(char *caminhobin);
+FILE *abreBinario(char *caminhobin, char *modo);
 
 /// @brief Calculates byteoffset of a given RRN according to specification.
 /// @param RRN Relative registry number.
