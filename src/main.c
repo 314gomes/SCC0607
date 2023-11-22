@@ -15,6 +15,7 @@ typedef enum {
 	SELECT_FROM = 2,
 	SELECT_WHERE = 3,
 	SELECT_RRN = 4,
+	SELECT_WHERE_ARB = 6,
 } Comandos;
 
 void criar_termos_busca(int n, char ***campo, char ***valor){
@@ -57,6 +58,10 @@ void tratar_comando_entrada(){
 	char bin_path[TAM_MAXIMO_STRING];
 	scanf("%d", (int *) &cmd_in);
 
+
+	int num_busca;
+	char **campo;
+	char **valor;
 	switch (cmd_in){
 		case CREATE_TABLE:
 			char csv_path[TAM_MAXIMO_STRING];
@@ -73,10 +78,6 @@ void tratar_comando_entrada(){
 			
 			break;
 		case SELECT_WHERE:
-			int num_busca;
-			char** campo;
-			char** valor;
-
 			scanf("%s", bin_path);
 			scanf("%d", &num_busca);
 
@@ -95,6 +96,21 @@ void tratar_comando_entrada(){
 			
 			status = funcionalidade4(bin_path, num_RRN);
 			
+			break;
+		case SELECT_WHERE_ARB:
+			char index_path[TAM_MAXIMO_STRING];
+
+			scanf("%s", bin_path);
+			scanf("%s", index_path);
+			scanf("%d", &num_busca);
+
+			criar_termos_busca(num_busca, &campo, &valor);
+
+			ler_termos_busca(num_busca, campo, valor);
+
+			status = funcionalidade6(bin_path, index_path, num_busca, campo, valor);
+
+			destruir_termos_busca(num_busca, campo, valor);
 			break;
 		default:
 			break;

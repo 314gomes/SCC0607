@@ -15,6 +15,8 @@
 #include "arquivos/tipos.h"
 #include "arquivos/defines.h"
 #include "arquivos/busca.h"
+#include "arvoreb/utils.h"
+#include "arvoreb/busca.h"
 
 /// @brief Imprime mensagem de erro correspondente ao status de retorno s
 /// @param s Status a ser impresso
@@ -149,4 +151,55 @@ StatusDeRetorno funcionalidade4 (char* caminhoBin, int RRN){
     free_registro(r_buffer);
     fclose(bin);
     return sucesso;
+}
+
+StatusDeRetorno funcionalidade6(char *bin_path, char *index_path, int n, char** campo, char** valor){
+    FILE* bin = abreBinario(bin_path);
+    if(bin == NULL){
+        return falha_processamento;
+    }
+    
+    FILE* index = arBAbre(index_path);
+    if(index == NULL){
+        return falha_processamento;
+    }
+
+    Registro *r_buffer = novo_registro();
+    StatusDeRetorno s;
+    for (int i = 0; i < n; i++) {
+        int eBuscaArvoreB = !strcmp(campo[i], "nomeTecnologiaOrigemDestino");
+        
+        if(eBuscaArvoreB){
+            int RRN;
+            s = arBBusca(index, valor[i], &RRN);
+            if(s == sucesso){
+                StatusDeRetorno s = le_RRN(bin, RRN, r_buffer);
+                if(s == sucesso) imprimeRegistro(*r_buffer);
+            }
+        }
+        else{
+            s = buscaCampo(bin, campo[i], valor[i]);
+        }
+
+        // em casos de erro
+        switch (s)
+        {
+        case registro_inexistente:
+            imprimeMensagemErro(s);
+            break;
+        
+        case falha_processamento:
+            return s;
+            break;
+
+        default:
+            break;
+        }
+    }
+    free_registro(r_buffer);
+
+    fclose(bin);
+
+    return sucesso;
+
 }

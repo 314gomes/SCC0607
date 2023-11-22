@@ -6,7 +6,7 @@
 /// @param RRN numero relativo de registro
 /// @return byteoffset correspondente
 long arBByteoffsetRRN(int RRN){
-    return ARB_TAM_PAGINA * RRN;
+    return ARB_TAM_PAGINA * (RRN + 1);
 }
 
 /// @brief Abrir arquivo de indice binario da Arvore B em modo de leitura

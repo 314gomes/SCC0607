@@ -6,6 +6,7 @@
 		"leitura.h": "c",
 		"listase.h": "c",
 		"impressao.h": "c",
-		"defines.h": "c"
+		"defines.h": "c",
+		"busca.h": "c"
 	}
 }
