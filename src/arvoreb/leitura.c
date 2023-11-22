@@ -24,9 +24,9 @@ void ArBLeNo(FILE* f, ArBNo* no){
 	fread(&no->RRNFilho[0], sizeof(int), 1, f);
 	for(int i = 0; i < ARB_ORDEM - 1; i++){
 		// ler corretamente ate lixo
-		ArBLeChave(f, no->chave[i]);
+		ArBLeChave(f, no->chaveValor[i].chave);
 		
-		fread(&no->RRNArquivoDados[i], sizeof(int), 1, f);
+		fread(&no->chaveValor[i].RRNArquivoDados, sizeof(int), 1, f);
 		
 		fread(&no->RRNFilho[i + 1], sizeof(int), 1, f);
 	}

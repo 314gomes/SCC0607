@@ -11,13 +11,17 @@ typedef struct {
 } ArBCabecalho;
 
 typedef struct {
+	int RRNArquivoDados;
+	char chave[ARB_TAM_CHAVE];
+} ArBChaveValor;
+
+typedef struct {
 	int nroChavesNo;
 	int alturaNo;
 	int RRNdoNo;
 
 	int RRNFilho[ARB_ORDEM];
-	int RRNArquivoDados[ARB_ORDEM - 1];
-	char chave[ARB_ORDEM - 1][ARB_TAM_CHAVE + 1];
+	ArBChaveValor chaveValor[ARB_ORDEM - 1];
 } ArBNo;
 
 #endif

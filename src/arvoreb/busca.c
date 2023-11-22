@@ -14,10 +14,10 @@ StatusDeRetorno arBBuscaBinaria(ArBNo *no, char *c, int *RRN_busca, int *RRN_ret
 
 	while (ini <= fim){
 		meio = ini + (fim - ini)/2;
-		cmp = strcmp(c, no->chave[meio]);
+		cmp = strcmp(c, no->chaveValor[meio].chave);
 
 		if(cmp == 0){ // encontrada a chave, retornar
-			*RRN_retorno = no->RRNArquivoDados[meio];
+			*RRN_retorno = no->chaveValor[meio].RRNArquivoDados;
 			return sucesso;
 		}
 		else if(cmp < 0){
