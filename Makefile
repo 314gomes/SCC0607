@@ -19,19 +19,16 @@ debug:
 	gdb main.o
 
 %.myout: %.in all
-	@echo $(BLUE)
-	@echo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	@echo $(BLUE)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	@echo "%% NOW TESTING $<"
 	@echo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	@echo $(DEFALUT)
-	cd $(*D); cat $(notdir $*).in | ../main.o > $(notdir $*).myout
+	@cd $(*D); cat $(notdir $*).in | ../main.o > $(notdir $*).myout
 
 	@echo $(RED)
 	@diff --strip-trailing-cr $@ $*.out || :
 	@echo $(DEFALUT)
 
 test: $(testes)
-	echo $(testes)
 
 zip:
 	rm *.zip || :
