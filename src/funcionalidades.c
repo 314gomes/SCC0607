@@ -199,6 +199,7 @@ StatusDeRetorno funcionalidade6(char *bin_path, char *index_path, int n, char** 
     free_registro(r_buffer);
 
     fclose(bin);
+    fclose(index);
 
     return sucesso;
 
