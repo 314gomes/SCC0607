@@ -12,11 +12,14 @@ testes = $(casos:.in=.myout)
 all:
 	gcc src/*.c  src/*/*.c -I include -g -Wall -ggdb -o main.o
 
+run%:
+	cd casos_$*/; ../main.o
+
 run:
 	./main.o
 
-debug:
-	gdb main.o
+debug%:
+	cd casos_$*/; gdb ../main.o
 
 %.myout: %.in all
 	@echo $(BLUE)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
