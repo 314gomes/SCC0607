@@ -17,6 +17,8 @@
 #include "arquivos/busca.h"
 #include "arvoreb/utils.h"
 #include "arvoreb/busca.h"
+#include "arvoreb/escrita.h"
+#include "arvoreb/insercao.h"
 
 /// @brief Imprime mensagem de erro correspondente ao status de retorno s
 /// @param s Status a ser impresso
@@ -164,6 +166,15 @@ StatusDeRetorno funcionalidade5(char *bin_path, char *index_path){
     if(index == NULL){
         return falha_processamento;
     }
+
+    // buffer de cabecalho da arvore
+    ArBCabecalho arbc;
+    // escrever cabecalho inicial (que indica que a arvore esta vazia e
+    // inconsistente)
+    arbc.status = '0';
+    arbc.noRaiz = -1;
+    arbc.RRNProxNo = 0;
+    arBEscreveCabecalho(index, &arbc);
 
     // ler limite superior de RRN indicado pelo proximo RRN do arquivo de dados    
     int RRN_maximo;
