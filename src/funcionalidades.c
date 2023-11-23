@@ -153,6 +153,54 @@ StatusDeRetorno funcionalidade4 (char* caminhoBin, int RRN){
     return sucesso;
 }
 
+StatusDeRetorno funcionalidade5(char *bin_path, char *index_path){
+    // Abrir arquivos e testar se foram abertos corretamente
+    FILE* bin = abreBinario(bin_path, "rb");
+    if(bin == NULL){
+        return falha_processamento;
+    }
+    
+    FILE* index = fopen(index_path, "wb");
+    if(index == NULL){
+        return falha_processamento;
+    }
+
+    // ler limite superior de RRN indicado pelo proximo RRN do arquivo de dados    
+    int RRN_maximo;
+    fread(&RRN_maximo, sizeof(int), 1, bin);
+
+    // buffer de registro
+    Registro *r = novo_registro;
+    // status que muda a cada leitura do rrn
+    StatusDeRetorno status_leitura;
+    // Valor a ser inserido na arvore B
+    ArBChaveValor cv;
+    // Leitura e insercao de todos os RRNs
+    for(int RRN_atual = 0; RRN_atual < RRN_maximo; RRN_atual++){
+        // ler RRN atual
+        status_leitura = le_RRN(bin, RRN_atual, r);
+        
+        // caso nao tenha sucesso, foi marcado como removido. pular laco
+        if(status_leitura != sucesso){
+            break;
+        }
+
+        // certificar que a chave e uma string vazia
+        cv.chave[0] = '\0';
+        // armazenar chave e valor a serem inseridos na arvore
+        strcat(cv.chave, r->tecnologiaOrigem.string);
+        strcat(cv.chave, r->tecnologiaDestino.string);
+        cv.RRNArquivoDados = RRN_atual;
+
+        // inserir na arvore
+        arBInsere(index, cv);
+    }
+
+    free_registro(r);
+    fclose(bin);
+    fclose(index);
+}
+
 StatusDeRetorno funcionalidade6(char *bin_path, char *index_path, int n, char** campo, char** valor){
     FILE* bin = abreBinario(bin_path, "rb");
     if(bin == NULL){

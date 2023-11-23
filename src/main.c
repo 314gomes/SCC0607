@@ -15,6 +15,7 @@ typedef enum {
 	SELECT_FROM = 2,
 	SELECT_WHERE = 3,
 	SELECT_RRN = 4,
+	CREATE_INDEX = 5,
 	SELECT_WHERE_ARB = 6,
 } Comandos;
 
@@ -53,15 +54,17 @@ void destruir_termos_busca(int n, char **campo, char **valor){
 }
 
 void tratar_comando_entrada(){
+	// variaveis utilizadas na funcao
 	Comandos cmd_in = 0;
 	StatusDeRetorno status;
 	char bin_path[TAM_MAXIMO_STRING];
-	scanf("%d", (int *) &cmd_in);
-
-
+	char index_path[TAM_MAXIMO_STRING];
 	int num_busca;
 	char **campo;
 	char **valor;
+
+	scanf("%d", (int *) &cmd_in);
+
 	switch (cmd_in){
 		case CREATE_TABLE:
 			char csv_path[TAM_MAXIMO_STRING];
@@ -97,9 +100,13 @@ void tratar_comando_entrada(){
 			status = funcionalidade4(bin_path, num_RRN);
 			
 			break;
-		case SELECT_WHERE_ARB:
-			char index_path[TAM_MAXIMO_STRING];
+		case CREATE_INDEX:
+			scanf("%s", bin_path);
+			scanf("%s", index_path);
 
+			status = funcioinalidade5(bin_path, index_path);
+			break;
+		case SELECT_WHERE_ARB:
 			scanf("%s", bin_path);
 			scanf("%s", index_path);
 			scanf("%d", &num_busca);
