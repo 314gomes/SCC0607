@@ -7,7 +7,17 @@
 #include "arvoreb/leitura.h"
 
 
-StatusDeRetorno arBBuscaBinaria(ArBNo *no, char *c, int *RRN_busca, int *RRN_retorno){
+/// @brief Funcao para determinar onde uma chave c da arvore B deve ser inserida
+/// considerando determinado no.
+/// @param no No a ser considerado na busca binaria.
+/// @param c Chave de busca
+/// @param indice_retorno ponteiro para inteiro a ser sobrescrito com o indice
+/// encontrado na busca
+/// @return Resultado da ultima comparacao. Caso seja negativo,a posicao da
+/// chave e no filho esquerdo de  indice_retorno. Caso seja 0, foi encontrado um
+/// match perfeito. Caso positivo, a posicao da chave e no filho direito de
+/// indice_retorno.
+int arBBuscaBinaria(ArBNo *no, char *c, int *indice_retorno){
 	int ini = 0;
 	int fim = no->nroChavesNo - 1;
 	int meio, cmp;
@@ -16,9 +26,8 @@ StatusDeRetorno arBBuscaBinaria(ArBNo *no, char *c, int *RRN_busca, int *RRN_ret
 		meio = ini + (fim - ini)/2;
 		cmp = strcmp(c, no->chaveValor[meio].chave);
 
-		if(cmp == 0){ // encontrada a chave, retornar
-			*RRN_retorno = no->chaveValor[meio].RRNArquivoDados;
-			return sucesso;
+		if(cmp == 0){ // encontrada a chave, encerrar
+			break;
 		}
 		else if(cmp < 0){
 			fim = meio - 1;
@@ -28,16 +37,9 @@ StatusDeRetorno arBBuscaBinaria(ArBNo *no, char *c, int *RRN_busca, int *RRN_ret
 		}
 	}
 
-	// se no fim do laco nao foi encontrada resposta, e necessario determinar
-	// qual vai ser o proximo rrn de busca dentro da propria arvore b.
-	if(cmp < 0){
-		*RRN_busca = no->RRNFilho[meio];
-	}
-	else{
-		*RRN_busca = no->RRNFilho[meio + 1];
-	}
-
-	return registro_inexistente;
+	// no fim do laco, escrever o indice de retorno enocntrado
+	*indice_retorno = meio;
+	return cmp;
 
 }
 
@@ -48,17 +50,28 @@ StatusDeRetorno arBBuscaRecursiva(FILE* i, char *c, int *r, int RRN_busca, ArBNo
 	ArBLeNo(i, no);
 	
 	//busca binaria nos nos
-	int RRN_prox_busca;
-	StatusDeRetorno s;
-	s = arBBuscaBinaria(no, c, &RRN_prox_busca, r);
+	int indice_encontrado;
+	int cmp = arBBuscaBinaria(no, c, &indice_encontrado);
 	
-	if(s == sucesso){ // indica que busca achou um match perfeito
-		return s;
+	// se houve match perfeito, pode retornar sucesso
+	if(cmp == 0){ // indica que busca achou um match perfeito
+		*r = no->chaveValor[indice_encontrado].RRNArquivoDados;
+		return sucesso;
 	}
 
 	// caso contrario, busca recursiva com o RRN da proxima busca, determinado
 	// pela busca binaria. Porem, caso RRN da proxima busca seja -1, chegou ao
 	// fim da arvore sem encontrar o match.
+	int RRN_prox_busca;
+	// proxima busca no filho esquerdo
+	if(cmp < 0){
+		RRN_prox_busca = no->RRNFilho[indice_encontrado];
+	}
+	// proxima busca no filho direito
+	else{
+		RRN_prox_busca = no->RRNFilho[indice_encontrado + 1];
+	}
+
 	if(RRN_prox_busca < 0){
 		return registro_inexistente;
 	}
