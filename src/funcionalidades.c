@@ -170,7 +170,7 @@ StatusDeRetorno funcionalidade5(char *bin_path, char *index_path){
     fread(&RRN_maximo, sizeof(int), 1, bin);
 
     // buffer de registro
-    Registro *r = novo_registro;
+    Registro *r = novo_registro();
     // status que muda a cada leitura do rrn
     StatusDeRetorno status_leitura;
     // Valor a ser inserido na arvore B
@@ -199,6 +199,8 @@ StatusDeRetorno funcionalidade5(char *bin_path, char *index_path){
     free_registro(r);
     fclose(bin);
     fclose(index);
+
+    return sucesso;
 }
 
 StatusDeRetorno funcionalidade6(char *bin_path, char *index_path, int n, char** campo, char** valor){

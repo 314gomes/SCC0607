@@ -104,7 +104,7 @@ void tratar_comando_entrada(){
 			scanf("%s", bin_path);
 			scanf("%s", index_path);
 
-			status = funcioinalidade5(bin_path, index_path);
+			status = funcionalidade5(bin_path, index_path);
 			break;
 		case SELECT_WHERE_ARB:
 			scanf("%s", bin_path);

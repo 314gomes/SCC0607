@@ -7,6 +7,8 @@
 		"listase.h": "c",
 		"impressao.h": "c",
 		"defines.h": "c",
-		"busca.h": "c"
+		"busca.h": "c",
+		"escrita.h": "c",
+		"insercao.h": "c"
 	}
 }
