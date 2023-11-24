@@ -204,7 +204,7 @@ StatusDeRetorno funcionalidade5(char *bin_path, char *index_path){
         cv.RRNArquivoDados = RRN_atual;
 
         // inserir na arvore
-        arBInsere(index, cv);
+        arBInsere(index, &cv);
     }
 
     free_registro(r);
