@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdio.h>
+#include "arvoreb/busca.h"
 #include "arquivos/tipos.h"
 #include "arvoreb/tipos.h"
 #include "arvoreb/defines.h"

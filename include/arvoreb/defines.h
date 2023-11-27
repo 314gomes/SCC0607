@@ -16,4 +16,12 @@
 #define ARB_ORDEM 4
 #define ARB_TAM_CHAVE 55
 
+// posicao do inteiro que guarda proximo RRN disponivel no arquivo da arvore b
+#define ARB_POS_PROX_RRN 5
+// posicao do inteiro que guarda RRN do no raiz no arquivo da arvore b
+#define ARB_POS_NO_RAIZ 1
+
+// limite de chaves no split
+#define ARB_INDICE_SPLIT (ARB_ORDEM / 2)
+
 #endif

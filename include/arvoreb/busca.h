@@ -5,6 +5,6 @@
 #include "arvoreb/defines.h"
 
 
-StatusDeRetorno arBBuscaBinaria(ArBNo *no, char *c, int *RRN_busca, int *RRN_retorno);
+int arBBuscaBinaria(ArBNo *no, char *c, int *indice_retorno);
 StatusDeRetorno arBBuscaRecursiva(FILE* i, char *c, int *r, int RRN_busca, ArBNo *no);
 StatusDeRetorno arBBusca(FILE* indices, char *chave, int *resultado_RRN);
