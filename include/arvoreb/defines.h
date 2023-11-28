@@ -16,7 +16,7 @@
 #define ARB_ORDEM 4
 #define ARB_TAM_CHAVE 55
 
-const int ARB_RRN_NULL = -1;
+#define ARB_RRN_NULL -1
 
 // posicao do inteiro que guarda proximo RRN disponivel no arquivo da arvore b
 #define ARB_POS_PROX_RRN 5

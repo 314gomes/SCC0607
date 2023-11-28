@@ -58,13 +58,14 @@ void arBEscreveNo(FILE *f, ArBNo *n){
 		fwrite(&n->RRNFilho[i + 1], sizeof(int), 1, f);
 	}
 	// Escrever campos nulos
+	int rrn_null = ARB_RRN_NULL;
 	for(int i = 0; i < ARB_ORDEM - 1 - n->nroChavesNo; i++){
 		// chave null
 		arBEscreveChave(f, "");
 		// rrn do arquivo de dados null
-		fwrite(&ARB_RRN_NULL, sizeof(int), 1, f);
+		fwrite(&rrn_null, sizeof(int), 1, f);
 		// rrn filho null
-		fwrite(&ARB_RRN_NULL, sizeof(int), 1, f);
+		fwrite(&rrn_null, sizeof(int), 1, f);
 	}
 
 }
