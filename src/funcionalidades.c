@@ -162,7 +162,7 @@ StatusDeRetorno funcionalidade5(char *bin_path, char *index_path){
         return falha_processamento;
     }
     
-    FILE* index = fopen(index_path, "wb");
+    FILE* index = fopen(index_path, "w+b");
     if(index == NULL){
         return falha_processamento;
     }
