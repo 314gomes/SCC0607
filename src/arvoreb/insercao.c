@@ -104,7 +104,7 @@ void arBSplit(FILE* f, ArBChaveValor *novo_cv, int novo_RRN, ArBNo *no_antigo, A
 	arBEscreveNo(f, &novo_no);
 }
 
-int arBInsereRecursiva(FILE *index, int RRN_atual, ArBChaveValor *cv_novo, ArBChaveValor *cv_promo, int *RRN_promo){
+int arBInsereRecursiva(FILE *index, int RRN_atual, ArBChaveValor *cv_novo, ArBChaveValor *cv_promo, int *RRN_promo, int *altura_promo){
 	// No atual guardado em memoria primaria
 	ArBNo no_atual;
 	// proximo indice de insercao a ser determinado usando busca binaria
@@ -120,6 +120,7 @@ int arBInsereRecursiva(FILE *index, int RRN_atual, ArBChaveValor *cv_novo, ArBCh
 	if(RRN_atual == ARB_RRN_NULL){
 		*cv_promo = *cv_novo;
 		*RRN_promo = ARB_RRN_NULL;
+		*altura_promo = 1;
 		return PROMOCAO;
 	}
 	// senao...
@@ -144,7 +145,8 @@ int arBInsereRecursiva(FILE *index, int RRN_atual, ArBChaveValor *cv_novo, ArBCh
 		rrn_prox_insercao,
 		cv_novo,
 		&cv_promo_recebido,
-		&rrn_promo_recebido
+		&rrn_promo_recebido,
+		NULL
 	);
 
 	// encerrar em caso de nao ter promocao
@@ -170,6 +172,7 @@ int arBInsereRecursiva(FILE *index, int RRN_atual, ArBChaveValor *cv_novo, ArBCh
 			cv_promo,
 			RRN_promo
 		);
+		*altura_promo = no_atual.alturaNo + 1;
 		return PROMOCAO;
 	}
 
@@ -179,23 +182,57 @@ int arBInsereRecursiva(FILE *index, int RRN_atual, ArBChaveValor *cv_novo, ArBCh
 /// @param index arquivo de indices arvore B de acordo com especificacao
 /// @param cv tipo ArBChaveValor a ser inserido
 void arBInsere(FILE *index, ArBChaveValor *cv){
-	int RRNProxNo;
-	int noRaiz;
+	// Variavel para guardar proximo RRN disponivel para insercao de novo no
+	int prox_RRN;
+	// Variavel para guardar o RRN do no raiz
+	int raiz_RRN;
+	// Variavel do status de retorno da insercao, caso haja overflow ate a raiz
+	int resultado_insercao;
+	// Variavel para o RRN que pode ser promovido pela insercao
+	int RRN_promo;
+	// Variavel para a chave que pode ser promovida pela insercao
+	ArBChaveValor cv_promo;
+	// Altura da nova raiz, determinada pela funcao de isnercao recursiva
+	int altura_promo;
+	// Variavel para possivel novo no a ser criado em caso de overflow na raiz
+	ArBNo nova_raiz;
+
 	// certificar que a posicao esta correta para leitura dos parametros
 	fseek(index, ARB_POS_NO_RAIZ, SEEK_SET);
-	// toda insercao comeca lendo o cabecalho
-	fread(&noRaiz, sizeof(int), 1, index);
-	fread(&RRNProxNo, sizeof(int), 1, index);
+	// Ler rrn da raiz e proximo rrn disponivel para escrita
+	fread(&raiz_RRN, sizeof(int), 1, index);
+	fread(&prox_RRN, sizeof(int), 1, index);
 
 	// toda insercao comeca pelo no raiz
-	int resultado_insercao;
-	ArBChaveValor cv_promo;
-	int RRN_promo;
-	resultado_insercao = arBInsereRecursiva(index, noRaiz, cv, &cv_promo, &RRN_promo);
+	resultado_insercao = arBInsereRecursiva(index, raiz_RRN, cv, &cv_promo, &RRN_promo, &altura_promo);
 	
+	// em caso de promocao, preencher nova raiz e escreve-la
 	if(resultado_insercao == PROMOCAO){
-		// create a new root page with key := PROMO_KEY, left child := ROOT and
-		// right child := PROMO_R_CHILD
-		// set ROOT to RRN of new root page
+		// nova raiz, incialmente com apenas 1 no
+		nova_raiz.nroChavesNo = 1;
+		// rrn da nova raiz e o proximo rrn disponivel
+		nova_raiz.RRNdoNo = prox_RRN;
+		// altura conseguida na funcao de insercao recursiva
+		nova_raiz.alturaNo = altura_promo;
+		// inserir chave promovida para nova raiz
+		nova_raiz.chaveValor[0] = cv_promo;
+		// raiz antiga como filho esquerdo da nova chave 
+		nova_raiz.RRNFilho[0] = raiz_RRN;
+		// rrn promovido como filho direito da nova chave
+		nova_raiz.RRNFilho[1] = RRN_promo;
+		
+		// escrever nova raiz
+		arBEscreveNo(index, &nova_raiz);
+		
+		// atualizar valor rrn da raiz
+		raiz_RRN = prox_RRN;
+		// atualizar valor proximo rrn
+		prox_RRN++;
+	
+		// certificar que a posicao esta correta para escrita dos valores
+		fseek(index, ARB_POS_NO_RAIZ, SEEK_SET);
+		// escrever
+		fwrite(&raiz_RRN, sizeof(int), 1, index);
+		fwrite(&prox_RRN, sizeof(int), 1, index);
 	}
 }
