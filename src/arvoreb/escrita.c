@@ -47,8 +47,9 @@ void arBEscreveNo(FILE *f, ArBNo *n){
 	fwrite(&n->alturaNo, sizeof(int), 1, f);
 	fwrite(&n->RRNdoNo, sizeof(int), 1, f);
 	
+	// Escrever campos nao nulos
 	fwrite(&n->RRNFilho[0], sizeof(int), 1, f);
-	for(int i = 0; i < ARB_ORDEM - 1; i++){
+	for(int i = 0; i < n->nroChavesNo; i++){
 		// ler corretamente ate lixo
 		arBEscreveChave(f, n->chaveValor[i].chave);
 		
@@ -56,4 +57,14 @@ void arBEscreveNo(FILE *f, ArBNo *n){
 		
 		fwrite(&n->RRNFilho[i + 1], sizeof(int), 1, f);
 	}
+	// Escrever campos nulos
+	for(int i = 0; i < ARB_ORDEM - 1 - n->nroChavesNo; i++){
+		// chave null
+		arBEscreveChave(f, "");
+		// rrn do arquivo de dados null
+		fwrite(&ARB_RRN_NULL, sizeof(int), 1, f);
+		// rrn filho null
+		fwrite(&ARB_RRN_NULL, sizeof(int), 1, f);
+	}
+
 }
