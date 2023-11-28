@@ -8,8 +8,8 @@
 /// @param c Cabecalho a ser escrito
 void arBEscreveCabecalho(FILE *f, ArBCabecalho *c){
 	fwrite(&c->status, sizeof(char), 1, f);
-	fwrite(&c->noRaiz, sizeof(char), 1, f);
-	fwrite(&c->RRNProxNo, sizeof(char), 1, f);
+	fwrite(&c->noRaiz, sizeof(int), 1, f);
+	fwrite(&c->RRNProxNo, sizeof(int), 1, f);
 
 	char lixo = LIXO;
 	for(int i = 0; i < ARB_TAM_LIXO_CABECALHO; i++){
