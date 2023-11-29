@@ -193,7 +193,7 @@ StatusDeRetorno funcionalidade5(char *bin_path, char *index_path){
         
         // caso nao tenha sucesso, foi marcado como removido. pular laco
         if(status_leitura != sucesso){
-            break;
+            continue;
         }
 
         // certificar que a chave e uma string vazia
