@@ -120,7 +120,9 @@ int arBInsereRecursiva(FILE *index, int RRN_atual, ArBChaveValor *cv_novo, ArBCh
 	if(RRN_atual == ARB_RRN_NULL){
 		*cv_promo = *cv_novo;
 		*RRN_promo = ARB_RRN_NULL;
-		*altura_promo = 1;
+		if(altura_promo != NULL){
+			*altura_promo = 1;
+		}
 		return PROMOCAO;
 	}
 	// senao...
@@ -172,7 +174,6 @@ int arBInsereRecursiva(FILE *index, int RRN_atual, ArBChaveValor *cv_novo, ArBCh
 			cv_promo,
 			RRN_promo
 		);
-		*altura_promo = no_atual.alturaNo + 1;
 		return PROMOCAO;
 	}
 
