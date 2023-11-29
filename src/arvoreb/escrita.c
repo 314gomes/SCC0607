@@ -27,7 +27,7 @@ void arBEscreveChave(FILE *f, char *c){
 	fwrite(c, sizeof(char), tamChave, f);
 	
 	char lixo = LIXO;
-	for(int i; i < ARB_TAM_CHAVE - tamChave; i++){
+	for(int i = 0; i < ARB_TAM_CHAVE - tamChave; i++){
 		fwrite(&lixo, sizeof(char), 1, f);
 	}
 }

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "arvoreb/tipos.h"
 #include "arvoreb/defines.h"
 
@@ -14,6 +15,8 @@ void ArBLeChave(FILE *f, char* c){
 			c[i] = in;
 		}
 	}
+	int tam_chave_local = strlen(c);
+	fseek(f, ARB_TAM_CHAVE - tam_chave_local, SEEK_CUR);
 }
 
 void ArBLeNo(FILE* f, ArBNo* no){
