@@ -196,6 +196,13 @@ StatusDeRetorno funcionalidade5(char *bin_path, char *index_path){
             continue;
         }
 
+        // caso nao tenha origem ou destino, pular laco
+        if(r->tecnologiaOrigem.tamanho == 0){
+            continue;
+        }
+        if(r->tecnologiaDestino.tamanho == 0){
+            continue;
+        }
         // certificar que a chave e uma string vazia
         cv.chave[0] = '\0';
         // armazenar chave e valor a serem inseridos na arvore
