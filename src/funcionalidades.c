@@ -207,9 +207,18 @@ StatusDeRetorno funcionalidade5(char *bin_path, char *index_path){
         arBInsere(index, &cv);
     }
 
+    // atualizar valor do status para condizente
+    arbc.status = '1';
+    // posicionar stream para atualizar o status
+    fseek(index, 0, SEEK_SET);
+    // sobrescrever status
+    fwrite(&arbc.status, sizeof(char), 1, index);
+
     free_registro(r);
     fclose(bin);
     fclose(index);
+
+    binarioNaTela(index_path);
 
     return sucesso;
 }
