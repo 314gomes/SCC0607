@@ -177,6 +177,9 @@ int arBInsereRecursiva(FILE *index, int RRN_atual, ArBChaveValor *cv_novo, ArBCh
 			cv_promo,
 			RRN_promo
 		);
+		if(altura_promo != NULL){
+			*altura_promo = no_atual.alturaNo + 1;
+		}
 		return PROMOCAO;
 	}
 
@@ -212,6 +215,9 @@ void arBInsere(FILE *index, ArBChaveValor *cv){
 	
 	// em caso de promocao, preencher nova raiz e escreve-la
 	if(resultado_insercao == PROMOCAO){
+		// Ler proximo rrn disponivel para escrita novamente
+		fseek(index, ARB_POS_PROX_RRN, SEEK_SET);
+		fread(&prox_RRN, sizeof(int), 1, index);
 		// nova raiz, incialmente com apenas 1 no
 		nova_raiz.nroChavesNo = 1;
 		// rrn da nova raiz e o proximo rrn disponivel
