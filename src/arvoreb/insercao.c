@@ -28,6 +28,9 @@ void arBInsereEmNoOrdenado(ArBChaveValor *novo_cv, int novo_RRN, ArBNo *no){
 	// inserir nova chave e novo filho na posicao correta
 	no->chaveValor[indice_novo_cv] = *novo_cv;
 	no->RRNFilho[indice_novo_cv + 1] = novo_RRN;
+	
+	// atualizar nro chaves
+	no->nroChavesNo++;
 }
 
 void arBSplit(FILE* f, ArBChaveValor *novo_cv, int novo_RRN, ArBNo *no_antigo, ArBChaveValor *cv_promo, int *RRN_promo){
