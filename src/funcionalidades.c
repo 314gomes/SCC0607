@@ -50,9 +50,11 @@ StatusDeRetorno funcionalidade1 (char* caminhoCSV, char* caminhoBin){
     // opens binary files for reading and writing
     // checking if they were opened correctly
     FILE *CSV_in = fopen(caminhoCSV, "r");
-    if (CSV_in == NULL) return falha_processamento;
+    if (CSV_in == NULL) 
+        return falha_processamento;
     FILE *BIN_out = fopen(caminhoBin, "wb");
-    if (BIN_out == NULL) return falha_processamento;
+    if (BIN_out == NULL) 
+        return falha_processamento;
     
 
     escreverCabecalho(BIN_out, c_buffer);
@@ -280,4 +282,56 @@ StatusDeRetorno funcionalidade6(char *bin_path, char *index_path, int n, char** 
 
     return sucesso;
 
+}
+
+StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char** linhas) {
+    FILE* bin = abreBinario(bin_path, "w+b");
+    if(bin == NULL){
+        return falha_processamento;
+    }
+    
+    FILE* index = arBAbre(index_path, "w+b");
+    if(index == NULL){
+        return falha_processamento;
+    }
+
+    Registro *r_buffer = novo_registro(); 
+    Cabecalho *c_buffer = novo_cabecalho();   
+
+    //c_buffer->status = INCONSISTENTE;
+    //escreverCabecalho(bin, c_buffer);
+
+    fseek(bin, 0, SEEK_SET);
+    fseek(bin, 1, SEEK_CUR);
+    int aux_RRN;
+    fread(&(aux_RRN), sizeof(int), 1, bin); 
+
+    printf("proxRRN = %d\n\n", aux_RRN);
+
+
+    fseek(bin, byteoffset_RRN(aux_RRN) - 5, SEEK_CUR);
+    for (int i = 0; i < n; i++) {
+
+        parseLinhaCSV(linhas[i], r_buffer);
+        r_buffer->removido = NAO_REMOVIDO;
+        escreverRegistro(bin, r_buffer);
+        aux_RRN++;
+    }
+
+    //c_buffer->status = CONSISTENTE;
+    //c_buffer->proxRRN = aux_RRN;
+    //escreverCabecalho(bin, c_buffer);
+
+
+    fclose(bin);
+    fclose(index);
+
+    binarioNaTela(bin_path);
+    binarioNaTela(index_path);
+
+    // frees memory
+    free(r_buffer);
+    free(c_buffer);
+
+    return sucesso;
 }

@@ -42,3 +42,4 @@ StatusDeRetorno funcionalidade3(char* bin_path, int n, char** campo, char** valo
 StatusDeRetorno funcionalidade4(char* caminhoBin, int RRN);
 StatusDeRetorno funcionalidade5(char *bin_path, char *index_path);
 StatusDeRetorno funcionalidade6(char *bin_path, char *index_path, int n, char** campo, char** valor);
+StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char** linhas);

@@ -17,6 +17,7 @@ typedef enum {
 	SELECT_RRN = 4,
 	CREATE_INDEX = 5,
 	SELECT_WHERE_ARB = 6,
+	INSERT_ARB = 7,
 } Comandos;
 
 void criar_termos_busca(int n, char ***campo, char ***valor){
@@ -53,6 +54,31 @@ void destruir_termos_busca(int n, char **campo, char **valor){
 	free(valor);
 }
 
+
+void criar_linhas_insercao (int n,  char*** linhas) {
+	*linhas = calloc(n, sizeof(char*));
+	for (int i = 0; i < n; i++)
+	{
+		(*linhas)[i] = calloc(TAM_MAXIMO_STRING, sizeof(char));
+	}
+}
+
+void ler_linhas_insercao (int n, char** linhas) {
+	 for (int i = 0; i < n; i++) {
+		getchar();
+        scanf("%[^\n]s", linhas[i]);
+    }
+}
+
+void destruir_linhas_insercao (int n, char **linhas){
+	for (int i = 0; i < n; i++)
+	{
+		free(linhas[i]);
+	}
+	free(linhas);
+}
+
+
 void tratar_comando_entrada(){
 	// variaveis utilizadas na funcao
 	Comandos cmd_in = 0;
@@ -60,14 +86,19 @@ void tratar_comando_entrada(){
 	char bin_path[TAM_MAXIMO_STRING];
 	char index_path[TAM_MAXIMO_STRING];
 	int num_busca;
+	int num_insert_arb;
 	char **campo;
 	char **valor;
+	char **linhas;
+
+	char csv_path[TAM_MAXIMO_STRING];
+	int num_RRN;
 
 	scanf("%d", (int *) &cmd_in);
 
 	switch (cmd_in){
 		case CREATE_TABLE:
-			char csv_path[TAM_MAXIMO_STRING];
+			
 			
 			scanf("%s", csv_path);
 			scanf("%s", bin_path);
@@ -93,7 +124,7 @@ void tratar_comando_entrada(){
 			destruir_termos_busca(num_busca, campo, valor);
 			break;
 		case SELECT_RRN:
-			int num_RRN;
+			
 			scanf("%s", bin_path);
 			scanf("%d", &num_RRN);
 			
@@ -118,6 +149,20 @@ void tratar_comando_entrada(){
 			status = funcionalidade6(bin_path, index_path, num_busca, campo, valor);
 
 			destruir_termos_busca(num_busca, campo, valor);
+			break;
+		case INSERT_ARB:
+			scanf("%s", bin_path);
+			scanf("%s", index_path);
+			scanf("%d", &num_insert_arb);
+
+			criar_linhas_insercao(num_insert_arb, &linhas);
+
+			ler_linhas_insercao(num_insert_arb, linhas);
+
+			status = funcionalidade7(bin_path, index_path, num_insert_arb, linhas);
+			
+			destruir_linhas_insercao(num_insert_arb, linhas);
+
 			break;
 		default:
 			break;
