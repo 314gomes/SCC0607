@@ -15,8 +15,6 @@ void ArBLeChave(FILE *f, char* c){
 			c[i] = in;
 		}
 	}
-	int tam_chave_local = strlen(c);
-	fseek(f, ARB_TAM_CHAVE - tam_chave_local, SEEK_CUR);
 }
 
 void ArBLeNo(FILE* f, ArBNo* no){
@@ -25,7 +23,7 @@ void ArBLeNo(FILE* f, ArBNo* no){
 	fread(&no->RRNdoNo, sizeof(int), 1, f);
 	
 	fread(&no->RRNFilho[0], sizeof(int), 1, f);
-	for(int i = 0; i < ARB_ORDEM - 1; i++){
+	for(int i = 0; i < no->nroChavesNo; i++){
 		// ler corretamente ate lixo
 		ArBLeChave(f, no->chaveValor[i].chave);
 		
