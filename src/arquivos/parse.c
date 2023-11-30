@@ -35,7 +35,7 @@ void parseTokenInt(char* tkn, int *n){
 
 void parseTokenStringVariavel(char* tkn, StringVariavel *str){
     // empty strings remain empty and have size 0
-    if (isempty(tkn)){
+    if (isempty(tkn) == 1 || strcmp(tkn, "NULO") == 0){
         *(str->string) = '\0';
         str->tamanho = 0;
     } else {

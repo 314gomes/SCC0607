@@ -37,6 +37,12 @@ void leConteudoRegistro(FILE *bin, Registro *r){
     leCampoStringVariavel(bin, &r->tecnologiaDestino);
 }
 
+void leCabecalho (FILE *bin, Cabecalho *c) {
+    leCampoChar(bin, &c->status);
+    leCampoInt(bin, &c->proxRRN);  
+    leCampoInt(bin, &c->nroTecnologias);  
+    leCampoInt(bin, &c->nroParesTecnologias);  
+}
 StatusDeRetorno le_RRN(FILE *bin, int RRN, Registro *r){
     // fseek field start's byte offset 
     long byte_offset = byteoffset_RRN(RRN);

@@ -27,6 +27,8 @@ void leStatusRegistro(FILE *bin, Registro *r);
 /// @param r registry buffer to write to
 void leConteudoRegistro(FILE *bin, Registro *r);
 
+void leCabecalho (FILE *bin, Cabecalho *c);
+
 /// @brief Reads registry at relative registry number RRN from binary FILE* bin
 /// according to specification, writing it to r
 /// @param bin Open binary FILE* to write to

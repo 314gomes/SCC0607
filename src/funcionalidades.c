@@ -285,7 +285,7 @@ StatusDeRetorno funcionalidade6(char *bin_path, char *index_path, int n, char** 
 }
 
 StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char** linhas) {
-    FILE* bin = abreBinario(bin_path, "w+b");
+    FILE* bin = abreBinario(bin_path, "r+");
     if(bin == NULL){
         return falha_processamento;
     }
@@ -298,31 +298,33 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
     Registro *r_buffer = novo_registro(); 
     Cabecalho *c_buffer = novo_cabecalho();   
 
-    //c_buffer->status = INCONSISTENTE;
-    //escreverCabecalho(bin, c_buffer);
+    fseek(bin, 0, SEEK_SET);
+
+    leCabecalho (bin, c_buffer);
+    int aux_proxRRN = c_buffer->proxRRN;
+    c_buffer->status = INCONSISTENTE;
+    escreverCabecalho(bin, c_buffer);
+
+    //printf("proxRRN = %d\n\n", c_buffer->proxRRN);
 
     fseek(bin, 0, SEEK_SET);
-    fseek(bin, 1, SEEK_CUR);
-    int aux_RRN;
-    fread(&(aux_RRN), sizeof(int), 1, bin); 
+    fseek(bin, byteoffset_RRN(c_buffer->proxRRN), SEEK_CUR);
 
-    printf("proxRRN = %d\n\n", aux_RRN);
-
-
-    fseek(bin, byteoffset_RRN(aux_RRN) - 5, SEEK_CUR);
     for (int i = 0; i < n; i++) {
 
         parseLinhaCSV(linhas[i], r_buffer);
+
         r_buffer->removido = NAO_REMOVIDO;
         escreverRegistro(bin, r_buffer);
-        aux_RRN++;
+        aux_proxRRN++;
     }
 
-    //c_buffer->status = CONSISTENTE;
-    //c_buffer->proxRRN = aux_RRN;
-    //escreverCabecalho(bin, c_buffer);
+    fseek(bin, 0, SEEK_SET);
+    c_buffer->status = CONSISTENTE;
+    c_buffer->proxRRN = aux_proxRRN;
+    escreverCabecalho(bin, c_buffer);
 
-
+    //printf("proxRRNFIM = %d\n\n", c_buffer->proxRRN);
     fclose(bin);
     fclose(index);
 
