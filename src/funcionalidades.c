@@ -19,6 +19,7 @@
 #include "arvoreb/busca.h"
 #include "arvoreb/escrita.h"
 #include "arvoreb/insercao.h"
+//#include "listaSE.h"
 
 /// @brief Imprime mensagem de erro correspondente ao status de retorno s
 /// @param s Status a ser impresso
@@ -296,7 +297,8 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
     }
 
     Registro *r_buffer = novo_registro(); 
-    Cabecalho *c_buffer = novo_cabecalho();   
+    Cabecalho *c_buffer = novo_cabecalho();  
+    listaSE tec = novaLista(); 
 
     fseek(bin, 0, SEEK_SET);
 
@@ -319,9 +321,24 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
         aux_proxRRN++;
     }
 
+    fseek(bin, TAM_CABECALHO, SEEK_SET);
+    c_buffer->nroTecnologias = 0;
+    c_buffer->nroParesTecnologias = 0;
+
+    while(fread(&(r_buffer->removido), sizeof(char), 1, bin) != 0) {
+
+        leConteudoRegistro(bin, r_buffer);
+        adicionaLista (&tec, c_buffer, r_buffer);
+
+        int tam_lixo = TAM_REGISTRO - calcularTamanhoRegistro(r_buffer);
+        fseek(bin, tam_lixo, SEEK_CUR);
+ 
+    }
+
     fseek(bin, 0, SEEK_SET);
     c_buffer->status = CONSISTENTE;
     c_buffer->proxRRN = aux_proxRRN;
+    c_buffer->nroTecnologias = tec.tam;
     escreverCabecalho(bin, c_buffer);
 
     //printf("proxRRNFIM = %d\n\n", c_buffer->proxRRN);

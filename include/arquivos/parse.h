@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "listaSE.h"
 #include "arquivos/tipos.h"
 
 /// @brief Determine whether `s` is whitespace (or empty) only.
@@ -22,6 +23,7 @@ void parseTokenStringVariavel(char* tkn, StringVariavel *str);
 /// May contain NULL field.
 /// @param r_buffer Registry buffer.
 void parseLinhaCSV(char *CSV_line, Registro *r_buffer);
+void adicionaLista (listaSE* tec, Cabecalho *c_buffer, Registro *r_buffer);
 
 /// @brief Parse entire CSV file and write its data to BIN_out file, while
 /// updating a buffer for Cabecalho `c_buffer` according to specification.

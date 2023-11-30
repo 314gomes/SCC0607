@@ -5,7 +5,7 @@
 #include "arquivos/tipos.h"
 #include "arquivos/utils.h"
 #include "arquivos/escrita.h"
-#include "listaSE.h"
+//#include "listaSE.h"
 
 int isempty(const char *s)
 {
@@ -73,6 +73,30 @@ void parseLinhaCSV(char *CSV_line, Registro *r_buffer){
     }
 }
 
+void adicionaLista (listaSE* tec, Cabecalho *c_buffer, Registro *r_buffer) {
+
+    // some temporary variables for readability
+    char *strOrigem = r_buffer->tecnologiaOrigem.string;
+    char *strDestino = r_buffer->tecnologiaDestino.string;
+
+    int origemIsNull = isempty(strOrigem);
+    int destinoIsNull = isempty(strDestino);
+
+    // pair exists if both tec origem and tec destino are not null
+    int parExists = !(origemIsNull) && !(destinoIsNull);
+
+    // add non-null technologies to list of technologies without repetitions
+    if(!origemIsNull)
+        insereOrdenadoSemRepeticao(strOrigem, tec);
+    if(!destinoIsNull)
+        insereOrdenadoSemRepeticao(strDestino, tec);
+
+    // increase technology pairs accordingly
+    if(parExists)
+        c_buffer->nroParesTecnologias++;
+
+}
+
 void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer){
     // initialize buffer variables and list of technologies
     Registro *r_buffer = novo_registro();
@@ -89,26 +113,7 @@ void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer){
         // parse line to buffer
         parseLinhaCSV(CSV_line_buffer, r_buffer);
 
-        // some temporary variables for readability
-        char *strOrigem = r_buffer->tecnologiaOrigem.string;
-        char *strDestino = r_buffer->tecnologiaDestino.string;
-
-        int origemIsNull = isempty(strOrigem);
-        int destinoIsNull = isempty(strDestino);
-
-        // pair exists if both tec origem and tec destino are not null
-        int parExists = !(origemIsNull) && !(destinoIsNull);
-
-
-        // add non-null technologies to list of technologies without repetitions
-        if(!origemIsNull)
-            insereOrdenadoSemRepeticao(strOrigem, &tec);
-        if(!destinoIsNull)
-            insereOrdenadoSemRepeticao(strDestino, &tec);
-
-        // increase technology pairs accordingly
-        if(parExists)
-            c_buffer->nroParesTecnologias++;
+        adicionaLista (&tec, c_buffer, r_buffer);
 
         // write buffer to file
         escreverRegistro(BIN_out, r_buffer);
