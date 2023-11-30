@@ -298,7 +298,10 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
 
     Registro *r_buffer = novo_registro(); 
     Cabecalho *c_buffer = novo_cabecalho();  
-    listaSE tec = novaLista(); 
+    //listaSE tec = novaLista(); 
+
+    // Valor a ser inserido na arvore B
+    ArBChaveValor cv;
 
     fseek(bin, 0, SEEK_SET);
 
@@ -318,9 +321,31 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
 
         r_buffer->removido = NAO_REMOVIDO;
         escreverRegistro(bin, r_buffer);
+
+        // caso nao tenha origem ou destino, pular laco
+        if(r_buffer->tecnologiaOrigem.tamanho == 0){
+            aux_proxRRN++;
+            continue;
+        }
+        if(r_buffer->tecnologiaDestino.tamanho == 0){
+            aux_proxRRN++;
+            continue;
+        }
+
+        // certificar que a chave e uma string vazia
+        cv.chave[0] = '\0';
+        // armazenar chave e valor a serem inseridos na arvore
+        strcat(cv.chave, r_buffer->tecnologiaOrigem.string);
+        strcat(cv.chave, r_buffer->tecnologiaDestino.string);
+        cv.RRNArquivoDados = aux_proxRRN;
+
+        // inserir na arvore
+        arBInsere(index, &cv);
+
         aux_proxRRN++;
     }
 
+/*
     fseek(bin, TAM_CABECALHO, SEEK_SET);
     c_buffer->nroTecnologias = 0;
     c_buffer->nroParesTecnologias = 0;
@@ -334,11 +359,13 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
         fseek(bin, tam_lixo, SEEK_CUR);
  
     }
+*/
+
 
     fseek(bin, 0, SEEK_SET);
     c_buffer->status = CONSISTENTE;
-    c_buffer->proxRRN = aux_proxRRN;
-    c_buffer->nroTecnologias = tec.tam;
+    //c_buffer->proxRRN = aux_proxRRN;
+    //c_buffer->nroTecnologias = tec.tam;
     escreverCabecalho(bin, c_buffer);
 
     //printf("proxRRNFIM = %d\n\n", c_buffer->proxRRN);
