@@ -291,7 +291,7 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
         return falha_processamento;
     }
     
-    FILE* index = arBAbre(index_path, "w+b");
+    FILE* index = arBAbre(index_path, "r+");
     if(index == NULL){
         return falha_processamento;
     }
