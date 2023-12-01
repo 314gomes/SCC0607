@@ -487,8 +487,9 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
     binarioNaTela(index_path);
 
     // frees memory
-    free(r_buffer);
+    free_registro(r_buffer);
     free(c_buffer);
+    destroiLista(&tec);
 
     return sucesso;
 }
