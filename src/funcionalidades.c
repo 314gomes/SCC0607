@@ -298,7 +298,7 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
 
     Registro *r_buffer = novo_registro(); 
     Cabecalho *c_buffer = novo_cabecalho();  
-    //listaSE tec = novaLista(); 
+    listaSE tec = novaLista(); 
 
     // Valor a ser inserido na arvore B
     ArBChaveValor cv;
@@ -312,6 +312,26 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
 
     //printf("proxRRN = %d\n\n", c_buffer->proxRRN);
 
+
+    // percorrer arquivo de dados para armazenar todas as tecnologias ja contidas nele
+    for(int RRN_atual = 0; RRN_atual < c_buffer->proxRRN; RRN_atual++){
+        // ler RRN atual
+        StatusDeRetorno status_leitura = le_RRN(bin, RRN_atual, r_buffer);
+        
+        // caso nao tenha sucesso, foi marcado como removido. pular laco
+        if(status_leitura != sucesso){
+            continue;
+        }
+
+        // caso tenha tecnologia, inserir na lista
+        if(r_buffer->tecnologiaOrigem.tamanho != 0){
+            insereOrdenadoSemRepeticao(r_buffer->tecnologiaOrigem.string, &tec);
+        }
+        if(r_buffer->tecnologiaDestino.tamanho != 0){
+            insereOrdenadoSemRepeticao(r_buffer->tecnologiaDestino.string, &tec);
+        }
+    }
+
     fseek(bin, 0, SEEK_END);
 
     r_buffer->removido = NAO_REMOVIDO;
@@ -322,6 +342,14 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
         escreverRegistro(bin, r_buffer);
         c_buffer->proxRRN++;
 
+
+        // caso tenha tecnologia, inserir na lista
+        if(r_buffer->tecnologiaOrigem.tamanho != 0){
+            insereOrdenadoSemRepeticao(r_buffer->tecnologiaOrigem.string, &tec);
+        }
+        if(r_buffer->tecnologiaDestino.tamanho != 0){
+            insereOrdenadoSemRepeticao(r_buffer->tecnologiaDestino.string, &tec);
+        }
 
         // caso nao tenha origem ou destino, pular laco
         if(r_buffer->tecnologiaOrigem.tamanho == 0){
@@ -345,29 +373,12 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
         arBInsere(index, &cv);
     }
 
-/*
-    fseek(bin, TAM_CABECALHO, SEEK_SET);
-    c_buffer->nroTecnologias = 0;
-    c_buffer->nroParesTecnologias = 0;
-
-    while(fread(&(r_buffer->removido), sizeof(char), 1, bin) != 0) {
-
-        leConteudoRegistro(bin, r_buffer);
-        adicionaLista (&tec, c_buffer, r_buffer);
-
-        int tam_lixo = TAM_REGISTRO - calcularTamanhoRegistro(r_buffer);
-        fseek(bin, tam_lixo, SEEK_CUR);
- 
-    }
-*/
-
-
     c_buffer->status = CONSISTENTE;
-    //c_buffer->proxRRN = aux_proxRRN;
-    //c_buffer->nroTecnologias = tec.tam;
+    // atualizar nro de tecnologias com o tamanho da lista de tecnologias sem
+    // repeticao
+    c_buffer->nroTecnologias = tec.tam;
     escreverCabecalho(bin, c_buffer);
 
-    //printf("proxRRNFIM = %d\n\n", c_buffer->proxRRN);
     fclose(bin);
     fclose(index);
 
