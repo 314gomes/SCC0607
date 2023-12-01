@@ -231,6 +231,7 @@ StatusDeRetorno funcionalidade5(char *bin_path, char *index_path){
     
     FILE* index = fopen(index_path, "w+b");
     if(index == NULL){
+        fclose(bin);
         return falha_processamento;
     }
 
@@ -319,6 +320,7 @@ StatusDeRetorno funcionalidade6(char *bin_path, char *index_path, int n, char** 
     
     FILE* index = arBAbre(index_path, "rb");
     if(index == NULL){
+        fclose(bin);
         return falha_processamento;
     }
 
@@ -394,6 +396,7 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
     
     FILE* index = arBAbre(index_path, "r+");
     if(index == NULL){
+        fclose(bin);
         return falha_processamento;
     }
 
