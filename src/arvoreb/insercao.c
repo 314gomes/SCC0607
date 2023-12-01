@@ -10,11 +10,17 @@
 #define PROMOCAO 1
 #define SEM_PROMOCAO 0
 
+/// @brief Inserir nova chave de forma ordenada em um no de arvore b
+/// @param novo_cv Nova chave a ser inserida
+/// @param novo_RRN Filho direito da nova chave
+/// @param no No no qual realizar a insercao
 void arBInsereEmNoOrdenado(ArBChaveValor *novo_cv, int novo_RRN, ArBNo *no){
-	// variaveis locais para determinar o indice de insercao
+	// variaveis locais de comparacao da busca binaria e indice no qual inserir
 	int cmp, indice_novo_cv;
 	
+	// Determinar posicao de insercao.
 	cmp = arBBuscaBinaria(no, novo_cv->chave, &indice_novo_cv);
+	// caso filho direito
 	if(cmp > 0){
 		indice_novo_cv++;
 	}
@@ -33,6 +39,14 @@ void arBInsereEmNoOrdenado(ArBChaveValor *novo_cv, int novo_RRN, ArBNo *no){
 	no->nroChavesNo++;
 }
 
+/// @brief Subrotina de split 1 para 2. Divide o mais igualmente possivel os
+/// valores do no antigo e nova chave inserida entre dois nos.
+/// @param f Arquivo de arvore B sobre o qual realizar o split.
+/// @param novo_cv Nova chave a ser inserida.
+/// @param novo_RRN RRN do filho direito dessa chave.
+/// @param no_antigo No ja existente na arvoreb.
+/// @param cv_promo ponteiro de chave que sera promovida na rotina de split.
+/// @param RRN_promo ponteiro para inteiro do filho direito da chave promovida. 
 void arBSplit(FILE* f, ArBChaveValor *novo_cv, int novo_RRN, ArBNo *no_antigo, ArBChaveValor *cv_promo, int *RRN_promo){
 	// "pagina" de trabalho que comporta uma chave e um rrn filho a mais
 	ArBChaveValor cv_trabalho[ARB_ORDEM];
@@ -49,7 +63,7 @@ void arBSplit(FILE* f, ArBChaveValor *novo_cv, int novo_RRN, ArBNo *no_antigo, A
 	// RRN do no e o proximo disponivel na arvore, recuperado pelo cabecalho
 	fread(&novo_no.RRNdoNo, sizeof(int), 1, f);
 	
-	// determinar indice no qual deve ser inserido a nova chave
+	// determinar indice no qual deve ser inserida a nova chave
 	int indice_nova_chave, cmp;
 	cmp = arBBuscaBinaria(no_antigo, novo_cv->chave, &indice_nova_chave);
 	if(cmp > 0){
@@ -107,6 +121,15 @@ void arBSplit(FILE* f, ArBChaveValor *novo_cv, int novo_RRN, ArBNo *no_antigo, A
 	arBEscreveNo(f, &novo_no);
 }
 
+/// @brief Funcao recursiva de insercao na arvore B.
+/// @param index FILE* do arquivo arvore B.
+/// @param RRN_atual RRN atual no qual tentar a insercao.
+/// @param cv_novo Nova chave a ser inserida.
+/// @param cv_promo ponteiro para a chave que pode ser promovida pela insercao.
+/// @param RRN_promo ponteiro de int para o filho direito da chave promovida.
+/// @param altura_promo ponteiro para int da altura que pode ser promovida.
+/// @return retorna PROMOCAO se precisou promover chave, SEM_PROMOCAO caso
+/// contrario.
 int arBInsereRecursiva(FILE *index, int RRN_atual, ArBChaveValor *cv_novo, ArBChaveValor *cv_promo, int *RRN_promo, int *altura_promo){
 	// No atual guardado em memoria primaria
 	ArBNo no_atual;
@@ -169,6 +192,7 @@ int arBInsereRecursiva(FILE *index, int RRN_atual, ArBChaveValor *cv_novo, ArBCh
 		return SEM_PROMOCAO;
 	}
 	else{
+		// utilizar subrotina de split e promover nova chave.
 		arBSplit(
 			index,
 			&cv_promo_recebido,
@@ -241,7 +265,7 @@ void arBInsere(FILE *index, ArBChaveValor *cv){
 	
 		// certificar que a posicao esta correta para escrita dos valores
 		fseek(index, ARB_POS_NO_RAIZ, SEEK_SET);
-		// escrever
+		// sobrescrever RRN da raiz e do proximo disponivel.
 		fwrite(&raiz_RRN, sizeof(int), 1, index);
 		fwrite(&prox_RRN, sizeof(int), 1, index);
 	}
