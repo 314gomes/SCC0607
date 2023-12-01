@@ -19,20 +19,29 @@
 /// match perfeito. Caso positivo, a posicao da chave e no filho direito de
 /// indice_retorno.
 int arBBuscaBinaria(ArBNo *no, char *c, int *indice_retorno){
+	// indice de inicio da busca binaria
 	int ini = 0;
+	// indice de fim da busca binaria
 	int fim = no->nroChavesNo - 1;
+	// variaveis para indice de meio e comparacao das strings
 	int meio, cmp;
 
+	// enquanto houver busca consistente
 	while (ini <= fim){
+		// atualizar meio
 		meio = ini + (fim - ini)/2;
+		// atualizar comparacao
 		cmp = strcmp(c, no->chaveValor[meio].chave);
 
-		if(cmp == 0){ // encontrada a chave, encerrar
+		// encontrada a chave, encerrar
+		if(cmp == 0){
 			break;
 		}
+		// se e menor, buscar na metade inferior
 		else if(cmp < 0){
 			fim = meio - 1;
 		}
+		// se e maior, buscar na metade superior
 		else if(cmp > 0){
 			ini = meio + 1;
 		}
@@ -44,6 +53,14 @@ int arBBuscaBinaria(ArBNo *no, char *c, int *indice_retorno){
 
 }
 
+/// @brief Funcao recursiva da busca em arvore B.
+/// @param i FILE* da arvore B
+/// @param c chave de busca
+/// @param r RRN de retorno 
+/// @param RRN_busca RRN no qual realizar a busca
+/// @param no No para o qual escrever os dados lidos
+/// @return `sucesso` caso tenha sido encontrado, `registro_inexistente` caso
+/// contrario.
 StatusDeRetorno arBBuscaRecursiva(FILE* i, char *c, int *r, int RRN_busca, ArBNo *no){
 	//carregar pagina para memoria primaria
 	long byteoffset = arBByteoffsetRRN(RRN_busca);
@@ -60,9 +77,7 @@ StatusDeRetorno arBBuscaRecursiva(FILE* i, char *c, int *r, int RRN_busca, ArBNo
 		return sucesso;
 	}
 
-	// caso contrario, busca recursiva com o RRN da proxima busca, determinado
-	// pela busca binaria. Porem, caso RRN da proxima busca seja -1, chegou ao
-	// fim da arvore sem encontrar o match.
+	// Caso contrario, determinar em qual RRN deve ser feita a proxima busca
 	int RRN_prox_busca;
 	// proxima busca no filho esquerdo
 	if(cmp < 0){
@@ -73,34 +88,41 @@ StatusDeRetorno arBBuscaRecursiva(FILE* i, char *c, int *r, int RRN_busca, ArBNo
 		RRN_prox_busca = no->RRNFilho[indice_encontrado + 1];
 	}
 
-	if(RRN_prox_busca < 0){
+	// caso RRN seja nulo, chegou ao fim da arvore sem encontrar. Retornar
+	// registro_inexistente
+	if(RRN_prox_busca == ARB_RRN_NULL){
 		return registro_inexistente;
 	}
+	// Se for RRN valido, busca recursiva no proximo RRN
 	else{
 		return arBBuscaRecursiva(i, c, r, RRN_prox_busca, no);
 	}
 
 }
 
-/// @brief ler rrn raiz, iniciar busca recursiva na raiz
-/// @param indices 
-/// @param chave 
-/// @param resultado_RRN 
-/// @return 
+/// @brief Executa busca em arquivo de arvore b.
+/// @param indices FILE* para o arquio de indices arvore B.
+/// @param chave chave de busca.
+/// @param resultado_RRN Resultado da busca.
+/// @return `sucesso` caso tenha sido encontrado, `registro_inexistente` caso
+/// contrario.
 StatusDeRetorno arBBusca(FILE* indices, char *chave, int *resultado_RRN){
 	// deixar apenas um no em memoria primaria e passa-lo por referencia para
 	// a funcao recursiva
 	ArBNo noDeBusca;
 
+	// variavel para guardar o RRN do no raiz, pelo qual inciar a busca
 	int RRN_no_raiz;
+	// variavel local para guardar o status de retorno da busca
 	StatusDeRetorno s;	
 
-	// Ler RRN do no raiz, que esta sempre no byte 1 do arquivo de indices
-	// segundo especificacao
-	fseek(indices, 1, SEEK_SET);
+	// Posicionar stream para leitura do RRN do no raiz
+	fseek(indices, ARB_POS_NO_RAIZ, SEEK_SET);
+	// Ler RRN do no raiz
 	fread(&RRN_no_raiz, sizeof(int), 1, indices);
 	
 	// Iniciar busca recursiva pela raiz
 	s = arBBuscaRecursiva(indices, chave, resultado_RRN, RRN_no_raiz, &noDeBusca);
+	// Retornar status da busca
 	return s;
 }

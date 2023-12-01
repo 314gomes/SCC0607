@@ -9,6 +9,7 @@
 		"defines.h": "c",
 		"busca.h": "c",
 		"escrita.h": "c",
-		"insercao.h": "c"
+		"insercao.h": "c",
+		"funcionalidades.h": "c"
 	}
 }
