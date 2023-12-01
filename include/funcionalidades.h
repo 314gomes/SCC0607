@@ -42,4 +42,15 @@ StatusDeRetorno funcionalidade3(char* bin_path, int n, char** campo, char** valo
 StatusDeRetorno funcionalidade4(char* caminhoBin, int RRN);
 StatusDeRetorno funcionalidade5(char *bin_path, char *index_path);
 StatusDeRetorno funcionalidade6(char *bin_path, char *index_path, int n, char** campo, char** valor);
+
+/// @brief Funcao principal para a funcionalidade 7. Abre os arquivos binarios em 'bin_path' e
+/// 'index_path' e insere novos registros tanto no arquivo de registros quanto no arquivo de indices da 
+/// arvore B.
+/// @param bin_path Caminho para o arquivo binario de registros.
+/// @param index_path Caminho para o arquivo binario de indices.
+/// @param n Numero de registros que serao inseridos.
+/// @param linhas Armazena em cada linha um dos registros novos que serao inseridos.
+/// @return Retorna 'sucesso' quando a insercao foi executada sem erros, 'registro inexistente' caso
+/// nenhum registro com o campo especificado e encontrado e 'erro_processamento' se algum outro erro
+/// foi encontrado.
 StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char** linhas);
