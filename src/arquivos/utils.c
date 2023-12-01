@@ -5,10 +5,12 @@
 #include "arquivos/tipos.h"
 #include "arquivos/defines.h"
 
+/// @brief Alocar memoria e atribuir valores padrao a um buffer Registro.
+/// @return Ponteiro para novo Registro
 Registro *novo_registro() {
 
     Registro* r_buffer;
-    r_buffer = (Registro*)malloc(sizeof(Registro));
+    r_buffer = (Registro*) malloc(sizeof(Registro));
 
     r_buffer->removido = '0';
     r_buffer->tecnologiaOrigem.string = NULL;
@@ -19,18 +21,22 @@ Registro *novo_registro() {
     r_buffer->popularidade = -1;
     r_buffer->peso = -1;
 
-    r_buffer->tecnologiaOrigem.string = (char *)malloc(TAM_MAXIMO_STRING);
-    r_buffer->tecnologiaDestino.string =(char *)malloc(TAM_MAXIMO_STRING);
+    r_buffer->tecnologiaOrigem.string = (char *) malloc(TAM_MAXIMO_STRING);
+    r_buffer->tecnologiaDestino.string = (char *) malloc(TAM_MAXIMO_STRING);
 
     return r_buffer;
 }
 
+/// @brief Libera memoria de Registro *
+/// @param r Ponteiro de registro a ter sua memoria liberada
 void free_registro(Registro *r){
     free(r->tecnologiaOrigem.string);
     free(r->tecnologiaDestino.string);
     free(r);
 }
 
+/// @brief Alocar memoria e atribuir valores padrao a um buffer Cabecalho.
+/// @return Ponteiro para novo cabecalho Cabecalho.
 Cabecalho *novo_cabecalho() {
 
     Cabecalho* cabecalho;
@@ -44,6 +50,9 @@ Cabecalho *novo_cabecalho() {
     return cabecalho;
 }
 
+/// @brief Calcula tamanho de Registro.
+/// @param r Ponteiro para um Registro.
+/// @return Tamanho dos dados do registro quando escritos no arquivo.
 int calcularTamanhoRegistro(Registro *r){
     int tamanhoRegistro = TAM_REGISTRO_FIXO;
     tamanhoRegistro += r->tecnologiaOrigem.tamanho;
@@ -51,29 +60,44 @@ int calcularTamanhoRegistro(Registro *r){
     return tamanhoRegistro;
 }
 
+/// @brief Abre arquivo binario e detecta seu status.
+/// @param caminhobin Caminho para arquivo binario.
+/// @param modo String de modo de abertura de acordo com a especificacao fopen.
+/// @return NULL se status for `INCONSISTENTE` ou se arquivo nao existe, FILE*
+/// para arquivo binario se teve sucesso.
 FILE *abreBinario(char *caminhoBin, char *modo){
+    // variavel temporaria para guardar status do arquivo
     char status;
     
     FILE *bin = fopen(caminhoBin, modo);
+    // se houve falha na abertura, retornar
     if(bin == NULL){
         return NULL;
     }
 
+    // le status do arquivo
     fread(&status, 1, 1, bin);
     
-    if(status == INCONSISTENTE){
+    // Se status nao for consistente, fechar arquivo e retornar NULL
+    if(status != CONSISTENTE){
         fclose(bin);
         return NULL;
     }
     
+    // Caso nenhum erro tenha sido encontrado, retornar FILE* do arquivo aberto
     return bin;
 }
 
+/// @brief Calcula byte offset de um dado RRN de acordo com a especificacao.
+/// @param RRN Numero relativo de registro.
+/// @return Seu byte offset.
 long byteoffset_RRN(int RRN){
-    // quite straightforward formula
     return TAM_CABECALHO + TAM_REGISTRO*RRN;
 }
 
+/// @brief Determinar se um campo buscado e ou nao string
+/// @param nomeCampo nome do campo a determinar
+/// @return 1 se for string, 0 caso contrario
 int campoDeBuscaEString(char* nomeCampo){
     if (strcmp(nomeCampo, "grupo") == 0) {
         return 0;

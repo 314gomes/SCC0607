@@ -7,48 +7,66 @@
 #include "arquivos/escrita.h"
 //#include "listaSE.h"
 
+/// @brief Determinar se string `s` e apenas espaco em branco (ou vazia).
+/// @param s String para testar.
+/// @return `1` se `s` e apenas espaco em branco ou vazia, `0` caso contrario
 int isempty(const char *s)
 {
-    // string only contains \0
-	if ((*s) == '\0') return 1;
+    // Se string contem apenas finalizador
+	if ((*s) == '\0'){
+        return 1;
+    }
 
-    // iterate over string
+    // Iterar pela string
 	while (*s) {
-        // if a single nonempty character was found, return false
+        // Retornar falso no primeiro caractere nao nulo encontrado
         if (!isspace(*s))
             return 0;
         s++;
 	}
 
-    // otherwiser return true
+    // caso contrario retorna 1
 	return 1;
 }
 
+/// @brief Extrai inteiro do token `tkn` e a escreve em `n`
+/// @param tkn token string a ser analisado
+/// @param n buffer de string no qual escrever
 void parseTokenInt(char* tkn, int *n){
-    // specification says empty integers must receive value -1
+    // Especificacao diz que campos string nulos devem receber -1
     if (isempty(tkn) == 1 || strcmp(tkn, "NULO") == 0 || strcmp(tkn, " NULO") == 0){
         *n = -1;
     } else {
+        // converte string para inteiro
         sscanf(tkn, "%d", n);
     }
 }
 
+/// @brief Extrai tipo StringVariavel de token `tkn` e escreve para `str`.
+/// @param tkn Token string a ser analisada.
+/// @param n Buffer de string variavel no qual escrever.
 void parseTokenStringVariavel(char* tkn, StringVariavel *str){
-    // empty strings remain empty and have size 0
+    // Strings vazias permanecem vazias e tem tamanho 0
     if (isempty(tkn) == 1 || strcmp(tkn, "NULO") == 0 || strcmp(tkn, " NULO") == 0){
         *(str->string) = '\0';
         str->tamanho = 0;
     } else {
+        // copiar string e determinar tamanho
         sscanf(tkn, "%s", str->string);
         str->tamanho = strlen(str->string);
     }
 }
 
+/// @brief Extrai dados de linha de arquivo CSV e as escreve para um buffer de
+/// acordo com a especificacao
+/// @param CSV_line String contendo linha de arquivo CSV de acoro com a
+/// espcificacao
+/// @param r_buffer Buffer de registro.
 void parseLinhaCSV(char *CSV_line, Registro *r_buffer){
     int field = 0;
     char *tkn = NULL;
 
-    // iterate over each token from csv line, each separated by ','
+    // Iterar sobre cada token da linha CSV, cada um separado por ","
     while ((tkn = strsep(&CSV_line, ",")) != NULL) {
         switch (field) {
             case 0:
@@ -73,57 +91,54 @@ void parseLinhaCSV(char *CSV_line, Registro *r_buffer){
     }
 }
 
-void adicionaLista (listaSE* tec, Cabecalho *c_buffer, Registro *r_buffer) {
-
-    // some temporary variables for readability
-    char *strOrigem = r_buffer->tecnologiaOrigem.string;
-    char *strDestino = r_buffer->tecnologiaDestino.string;
-
-    int origemIsNull = isempty(strOrigem);
-    int destinoIsNull = isempty(strDestino);
-
-    // pair exists if both tec origem and tec destino are not null
-    int parExists = !(origemIsNull) && !(destinoIsNull);
-
-    // add non-null technologies to list of technologies without repetitions
-    if(!origemIsNull)
-        insereOrdenadoSemRepeticao(strOrigem, tec);
-    if(!destinoIsNull)
-        insereOrdenadoSemRepeticao(strDestino, tec);
-
-    // increase technology pairs accordingly
-    if(parExists)
-        c_buffer->nroParesTecnologias++;
-
-}
-
 void parseCSV(FILE *CSV_in, FILE *BIN_out, Cabecalho *c_buffer){
-    // initialize buffer variables and list of technologies
-    Registro *r_buffer = novo_registro();
+    // buffer da linha lida
     char CSV_line_buffer[100];
+    // buffer de registro contendo dados extraidos de cada linha
+    Registro *r_buffer = novo_registro();
+    // lista encadeada ordenada para contagem de tecnologias distintas
     listaSE tec = novaLista();
 
-    // skips first line
+    // Pula primeira linha (que contem apenas nomes dos campos)
     fgets(CSV_line_buffer, sizeof(CSV_line_buffer), CSV_in);
 
-    // iterate over each line of the CSV file    
+    // Iterar sobre cada linha do arquivo CSV
     while (fgets(CSV_line_buffer, sizeof(CSV_line_buffer), CSV_in)) {
         c_buffer->proxRRN++;
 
-        // parse line to buffer
+        // extrair da linha
         parseLinhaCSV(CSV_line_buffer, r_buffer);
 
-        adicionaLista (&tec, c_buffer, r_buffer);
+        // Algumas variaveis temporarias para legibilidade do codigo
+        char *strOrigem = r_buffer->tecnologiaOrigem.string;
+        char *strDestino = r_buffer->tecnologiaDestino.string;
 
-        // write buffer to file
+        int origemIsNull = isempty(strOrigem);
+        int destinoIsNull = isempty(strDestino);
+
+        // Determinar se par existe 
+        int parExists = !(origemIsNull) && !(destinoIsNull);
+
+        // Adicionar tecnologias nao nulas na lista de tecnologias
+        if(!origemIsNull)
+            insereOrdenadoSemRepeticao(strOrigem, &tec);
+        if(!destinoIsNull)
+            insereOrdenadoSemRepeticao(strDestino, &tec);
+
+        // Incrementar numero de pares de tecnologia de acordo
+        if(parExists)
+            c_buffer->nroParesTecnologias++;
+
+        // Escrever buffer para arquivo
         escreverRegistro(BIN_out, r_buffer);
     }
 
-    // number of different technologies is then just the size of our list
+    // Numero de tecnologias diferentes e apenas o tamanho da lista
     c_buffer->nroTecnologias = tec.tam;
 
-    // free memory from linked list
+    // Liberar memoria da lista encadeada
     destroiLista(&tec);
 
+    // liberar memoria do buffer de registro
     free_registro(r_buffer);
 }
