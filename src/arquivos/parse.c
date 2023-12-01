@@ -40,7 +40,7 @@ void parseTokenStringVariavel(char* tkn, StringVariavel *str){
         str->tamanho = 0;
     } else {
         sscanf(tkn, "%s", str->string);
-        str->tamanho = strlen(tkn);
+        str->tamanho = strlen(str->string);
     }
 }
 
