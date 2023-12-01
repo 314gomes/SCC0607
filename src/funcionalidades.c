@@ -331,6 +331,9 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
             continue;
         }
 
+        // nem origem nem destino e nulo, incrementar numero de pares
+        c_buffer->nroParesTecnologias++;
+
         // certificar que a chave e uma string vazia
         cv.chave[0] = '\0';
         // armazenar chave e valor a serem inseridos na arvore
