@@ -21,6 +21,9 @@ run:
 debug%:
 	cd casos_$*/; gdb ../main.o
 
+valgrind%:
+	cd casos_$*/; valgrind --leak-check=full --show-leak-kinds=all ../main.o
+
 %.myout: %.in all
 	@echo $(BLUE)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	@echo "%% NOW TESTING $<"
