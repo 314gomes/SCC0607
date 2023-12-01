@@ -26,20 +26,20 @@ int isempty(const char *s)
 
 void parseTokenInt(char* tkn, int *n){
     // specification says empty integers must receive value -1
-    if (isempty(tkn)){
+    if (isempty(tkn) == 1 || strcmp(tkn, "NULO") == 0 || strcmp(tkn, " NULO") == 0){
         *n = -1;
     } else {
-        *n = atoi(tkn);
+        sscanf(tkn, "%d", n);
     }
 }
 
 void parseTokenStringVariavel(char* tkn, StringVariavel *str){
     // empty strings remain empty and have size 0
-    if (isempty(tkn) == 1 || strcmp(tkn, "NULO") == 0){
+    if (isempty(tkn) == 1 || strcmp(tkn, "NULO") == 0 || strcmp(tkn, " NULO") == 0){
         *(str->string) = '\0';
         str->tamanho = 0;
     } else {
-        strcpy(str->string, tkn);
+        sscanf(tkn, "%s", str->string);
         str->tamanho = strlen(tkn);
     }
 }
