@@ -303,32 +303,31 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
     // Valor a ser inserido na arvore B
     ArBChaveValor cv;
 
+    // fseek necessario ja que a funcao de abertura le o status do cabecalho
     fseek(bin, 0, SEEK_SET);
 
     leCabecalho (bin, c_buffer);
-    int aux_proxRRN = c_buffer->proxRRN;
     c_buffer->status = INCONSISTENTE;
     escreverCabecalho(bin, c_buffer);
 
     //printf("proxRRN = %d\n\n", c_buffer->proxRRN);
 
-    fseek(bin, 0, SEEK_SET);
-    fseek(bin, byteoffset_RRN(c_buffer->proxRRN), SEEK_CUR);
+    fseek(bin, 0, SEEK_END);
 
+    r_buffer->removido = NAO_REMOVIDO;
     for (int i = 0; i < n; i++) {
 
         parseLinhaCSV(linhas[i], r_buffer);
 
-        r_buffer->removido = NAO_REMOVIDO;
         escreverRegistro(bin, r_buffer);
+        c_buffer->proxRRN++;
+
 
         // caso nao tenha origem ou destino, pular laco
         if(r_buffer->tecnologiaOrigem.tamanho == 0){
-            aux_proxRRN++;
             continue;
         }
         if(r_buffer->tecnologiaDestino.tamanho == 0){
-            aux_proxRRN++;
             continue;
         }
 
@@ -337,12 +336,10 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
         // armazenar chave e valor a serem inseridos na arvore
         strcat(cv.chave, r_buffer->tecnologiaOrigem.string);
         strcat(cv.chave, r_buffer->tecnologiaDestino.string);
-        cv.RRNArquivoDados = aux_proxRRN;
+        cv.RRNArquivoDados = c_buffer->proxRRN - 1;
 
         // inserir na arvore
         arBInsere(index, &cv);
-
-        aux_proxRRN++;
     }
 
 /*
@@ -362,7 +359,6 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
 */
 
 
-    fseek(bin, 0, SEEK_SET);
     c_buffer->status = CONSISTENTE;
     //c_buffer->proxRRN = aux_proxRRN;
     //c_buffer->nroTecnologias = tec.tam;
