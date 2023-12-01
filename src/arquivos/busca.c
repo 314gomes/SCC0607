@@ -12,9 +12,9 @@
 #include "arquivos/defines.h"
 #include "arquivos/impressao.h"
 
-void buscaAuxiliar (FILE* BIN_out, Registro* r) {
-    leConteudoRegistro(BIN_out, r); 
-    imprimeRegistro(*r);
+void buscaAuxiliar (FILE* BIN_out, Registro* r_buffer) {
+    leConteudoRegistro(BIN_out, r_buffer); 
+    imprimeRegistro(*r_buffer);
 }
 
 /// @brief Funcao auxiliar utilizada na busca de campos fixos de inteiros
@@ -25,141 +25,177 @@ void buscaAuxiliar (FILE* BIN_out, Registro* r) {
 /// o registro esta marcado como deletado ou caso nao esteja no arquivo
 StatusDeRetorno buscaCampoInt (FILE* BIN_out, int campo, int buscado) {
 
-    Registro *r = novo_registro();
+    // r_buffer para auxiliar na leitura e impressao dos registros
+    // status pre definido como 'registro_inexistente', sera alterado caso
+    // a busca seja bem sucedida
+    Registro *r_buffer = novo_registro();
     StatusDeRetorno status = registro_inexistente;
     
-    // lixo calcula bytes para o proximo registro
-    // RRN encaminhado para a funcao auxiliar
-    // aux_int armazena temporariamente o valor do campo lido
-    int lixo = 0, RRN = 0, aux_int;
+    // lixo calcula o número de bytes necessários para o próximo registro.
+    // auxiliarInt armazena temporariamente o valor do campo lido.
+    int lixo = 0, auxiliarInt;
 
-    // aux_char armazena temporariamente o valor do campo removido
-    char aux_char;
+    // auxiliarChar armazena temporariamente o valor do campo "removido".
+    char auxiliarChar;
 
     fseek(BIN_out, 0, SEEK_SET);
     fseek(BIN_out, TAM_CABECALHO, SEEK_CUR);
 
-    while(fread(&(aux_char), sizeof(char), 1, BIN_out) != 0) {
+    while(fread(&(auxiliarChar), sizeof(char), 1, BIN_out) != 0) {
 
-       if (aux_char == NAO_REMOVIDO) {
+       if (auxiliarChar == NAO_REMOVIDO) {
 
+            // Caso o registro nao esteja removido, o campo procurado e lido 
+            // e armazenado em auxiliarInt. Em seguida,
+            // o ponteiro retorna ao comeco do registro
             fseek(BIN_out, campo, SEEK_CUR);
-            fread(&(aux_int), sizeof(int), 1, BIN_out); 
+            fread(&(auxiliarInt), sizeof(int), 1, BIN_out); 
             fseek(BIN_out, -(campo+sizeof(int)), SEEK_CUR);
 
-            if (aux_int == buscado) {
-                // nao retorna registro inexistente quando encontra o buscado
+            // Caso o auxiliarInt seja igual ao buscado, status recebe 'sucesso'
+            // e chama-se buscaAuxiliar para ler e imprimir o registro por completo.
+            // lixo calcula a quantidade de bytes para o proximo registro
+            // considerando que todo o registro atual foi lido.
+            if (auxiliarInt == buscado) {              
                 status = sucesso;
 
-                buscaAuxiliar (BIN_out, r);
-                lixo = TAM_REGISTRO - (TAM_REGISTRO_FIXO + r->tecnologiaOrigem.tamanho + r->tecnologiaDestino.tamanho);
+                buscaAuxiliar (BIN_out, r_buffer);
+                lixo = TAM_REGISTRO - (TAM_REGISTRO_FIXO + r_buffer->tecnologiaOrigem.tamanho + r_buffer->tecnologiaDestino.tamanho);
                 
             }
+            // lixo calcula a quantidade de bytes para o proximo registro
+            // desconsiderando apenas o campo "removido"
             else 
                 lixo = TAM_REGISTRO - 1;
        }
        else 
             lixo = TAM_REGISTRO - 1;
 
-        RRN++;
+        // proximo registro
         fseek(BIN_out, lixo, SEEK_CUR);
     }
 
-    free_registro(r);
+    // libera r_buffer
+    free_registro(r_buffer);
 
     return status;
 }
 
-/// @brief Funcao auxiliar utilizada na busca de campos variaveis de char
-/// @param caminhoBin Caminho para arquivo binario
-/// @param buscado String que sera buscada
-/// @param tamanho Tamanho da string a ser buscada
+/// @brief Funcao auxiliar utilizada na busca de campos variaveis de char.
+/// @param caminhoBin Caminho para arquivo binario.
+/// @param buscado String que sera buscada.
+/// @param tamanho Tamanho da string a ser buscada.
 /// @param flag Flag para informar qual string sera buscada. Seu valor e `0` para a primeira
-/// string e `1` para a segunda
+/// string e `1` para a segunda.
 /// @return Retorna `sucesso` quando a busca e bem sucedida, `registro_inexistente` se
-/// o registro esta marcado como deletado ou caso nao esteja no arquivo
+/// o registro esta marcado como deletado ou caso nao esteja no arquivo.
 StatusDeRetorno buscaCampoStringVariavel (FILE *BIN_out, char* buscado, int tamanho, int flag) {
-    Registro *r = novo_registro();
+    
+    // r_buffer para auxiliar na leitura e impressao dos registros
+    // status pre definido como 'registro_inexistente', sera alterado caso
+    // a busca seja bem sucedida
+    Registro *r_buffer = novo_registro();
     StatusDeRetorno status = registro_inexistente;
 
-    // constant field = 3*int
-    // grupo + popularidade + peso
-    int campo = 12;
-    int RRN = 0;
+    // campo constante pois necessariamente devera
+    // ler o tamanho da primeira string todas as vezes
+    // lixo calcula o número de bytes necessários para o próximo registro.
+    int campo = 12, lixo = 0;;
 
-    // aux_size temporarily stores the size of the 
-    // two strings that will be compared.
-    int aux_tamanho[2], lixo = 0;
+    // auxiliarTamanho armazena temporariamente o tamanho de 
+    // duas strings que serao comparadas.
+    int auxiliarTamanho[2];
 
-    // aux_char temporarily stores the value of the removed field
-    // aux_string temporarily stores the read field
-    char aux_char, aux_string[TAM_MAXIMO_STRING];
+    // auxiliarChar armazena temporariamente o valor do campo "removido".
+    // auxiliarString armazena temporariamente a string lida.
+    char auxiliarChar, auxiliarString[TAM_MAXIMO_STRING];
     
     fseek(BIN_out, 0, SEEK_SET);
     fseek(BIN_out, TAM_CABECALHO, SEEK_CUR);
 
-    while(fread(&(aux_char), sizeof(char), 1, BIN_out) != 0) {
+    while(fread(&(auxiliarChar), sizeof(char), 1, BIN_out) != 0) {
         
-        if (aux_char == NAO_REMOVIDO) {
+        if (auxiliarChar == NAO_REMOVIDO) {
             
+            // Caso o registro nao esteja removido, o tamanho da primeira
+            // string e lido e armazenado em auxiliarTamanho[0]. Em seguida,
+            // o ponteiro retorna ao comeco do registro
             fseek(BIN_out, campo, SEEK_CUR);
-
-            // size of the first string stored
-            // case 0: string read
-            // case 1: fseek with the string's size
-            fread(&(aux_tamanho[0]), sizeof(int), 1, BIN_out);
-
+            fread(&(auxiliarTamanho[0]), sizeof(int), 1, BIN_out);
+   
             switch(flag) {
-                // first variable-length string
+                // caso 0: primeira string e a buscada
                 case 0:
-                    if (aux_tamanho[0] == tamanho) {
-                        fread(&(aux_string), sizeof(char), aux_tamanho[0], BIN_out);
-                        fseek(BIN_out, -(campo+sizeof(int)+aux_tamanho[0]), SEEK_CUR);
+                    // Caso a string do registro atual tenha o mesmo tamanho da string
+                    // buscada, ela e lida. Caso contrario, e passado para o proximo registro.
+                    // Apos a leitura o ponteiro retorna ao inicio do registro.
+                    if (auxiliarTamanho[0] == tamanho) {
 
-                        // assigns \0 at the end of strings for comparison purposes
-                        aux_string[tamanho] = '\0';
+                        fread(&(auxiliarString), sizeof(char), auxiliarTamanho[0], BIN_out);
+                        fseek(BIN_out, -(campo+sizeof(int)+auxiliarTamanho[0]), SEEK_CUR);
+
+                        // adiciona '\0' no final das strings que serao comparadas
+                        // visando o comportamento correto de strcmp
+                        auxiliarString[tamanho] = '\0';
                         buscado[tamanho] = '\0';
 
-                        if (strcmp(aux_string, buscado) == 0) {
+                        // Caso o auxiliarString seja igual ao buscado, status recebe 'sucesso'
+                        // e chama-se buscaAuxiliar para ler e imprimir o registro por completo.
+                        // lixo calcula a quantidade de bytes para o proximo registro
+                        // considerando que todo o registro atual foi lido.
+                        if (strcmp(auxiliarString, buscado) == 0) {
                             status = sucesso; 
-
-                            buscaAuxiliar (BIN_out, r);
-                            lixo = TAM_REGISTRO - (TAM_REGISTRO_FIXO + r->tecnologiaOrigem.tamanho + r->tecnologiaDestino.tamanho);
+                            buscaAuxiliar (BIN_out, r_buffer);
+                            lixo = TAM_REGISTRO - (TAM_REGISTRO_FIXO + r_buffer->tecnologiaOrigem.tamanho + r_buffer->tecnologiaDestino.tamanho);
                         }
                         else {
                             lixo = TAM_REGISTRO-1;
                         }
                     }
+                    // lixo calcula a quantidade de bytes para o proximo registro
+                    // desconsiderando todos os campos ate o tamanho da primeira string
                     else {
                         fseek(BIN_out, -(campo+sizeof(int)), SEEK_CUR);
                         lixo = TAM_REGISTRO-1;
                     }
                 break;
 
-                // second variable-length string
+                // caso 1: segunda string e a buscada
                 case 1:
-                    fseek(BIN_out, aux_tamanho[0], SEEK_CUR);
-                    fread(&(aux_tamanho[1]), sizeof(int), 1, BIN_out);
-                    
-                    if (aux_tamanho[1] == tamanho) {
-                        fread(&(aux_string), sizeof(char), aux_tamanho[1], BIN_out);
-                        fseek(BIN_out, -(campo+(2*sizeof(int))+aux_tamanho[0]+aux_tamanho[1]), SEEK_CUR);
 
-                        aux_string[tamanho] = '\0';
+                    // Utiliza-se o auxiiarTamanho[0] para pular os bytes necessarios
+                    // e ler o tamanho da segunda string.
+                    fseek(BIN_out, auxiliarTamanho[0], SEEK_CUR);
+                    fread(&(auxiliarTamanho[1]), sizeof(int), 1, BIN_out);
+                    
+                    // Caso a string do registro atual tenha o mesmo tamanho da string
+                    // buscada, ela e lida. Caso contrario, e passado para o proximo registro.
+                    // Apos a leitura o ponteiro retorna ao inicio do registro.
+                    if (auxiliarTamanho[1] == tamanho) {
+
+                        fread(&(auxiliarString), sizeof(char), auxiliarTamanho[1], BIN_out);
+                        fseek(BIN_out, -(campo+(2*sizeof(int))+auxiliarTamanho[0]+auxiliarTamanho[1]), SEEK_CUR);
+
+                        // adiciona '\0' no final das strings que serao comparadas
+                        // visando o comportamento correto de strcmp
+                        auxiliarString[tamanho] = '\0';
                         buscado[tamanho] = '\0';
 
-                        if (strcmp(aux_string, buscado) == 0) {
+                        // Caso o auxiliarString seja igual ao buscado, status recebe 'sucesso'
+                        // e chama-se buscaAuxiliar para ler e imprimir o registro por completo.
+                        // lixo calcula a quantidade de bytes para o proximo registro
+                        // considerando que todo o registro atual foi lido.
+                        if (strcmp(auxiliarString, buscado) == 0) {
                             status = sucesso;   
-
-                            buscaAuxiliar (BIN_out, r);
-                            lixo = TAM_REGISTRO - (TAM_REGISTRO_FIXO + r->tecnologiaOrigem.tamanho + r->tecnologiaDestino.tamanho);
+                            buscaAuxiliar (BIN_out, r_buffer);
+                            lixo = TAM_REGISTRO - (TAM_REGISTRO_FIXO + r_buffer->tecnologiaOrigem.tamanho + r_buffer->tecnologiaDestino.tamanho);
                         }
                         else {
                             lixo = TAM_REGISTRO-1;
                         }
                     }
                     else {
-                        fseek(BIN_out, -(campo+(2*sizeof(int))+aux_tamanho[0]), SEEK_CUR);
+                        fseek(BIN_out, -(campo+(2*sizeof(int))+auxiliarTamanho[0]), SEEK_CUR);
                         lixo = TAM_REGISTRO-1;
                     }
                 break;
@@ -167,14 +203,15 @@ StatusDeRetorno buscaCampoStringVariavel (FILE *BIN_out, char* buscado, int tama
         }
         else
             lixo = TAM_REGISTRO - 1;
-            
-        RRN++;
+
+        // proximo registro
         fseek(BIN_out, lixo, SEEK_CUR);
     }
 
-    return status;
+    // libera r_buffer
+    free_registro(r_buffer);
 
-    free_registro(r);
+    return status;
 }
 
 /// @brief Funcao auxiliar de busca de campo qualquer
