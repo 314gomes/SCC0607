@@ -19,6 +19,10 @@
 #include "arvoreb/busca.h"
 #include "arvoreb/escrita.h"
 #include "arvoreb/insercao.h"
+#include "grafos/utils.h"
+#include "grafos/insercao.h"
+#include "grafos/impressao.h"
+#include "grafos/busca.h"
 //#include "listaSE.h"
 
 /// @brief Imprime mensagem de erro correspondente ao status de retorno s
@@ -493,6 +497,121 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
     free_registro(r_buffer);
     free(c_buffer);
     destroiLista(&tec);
+
+    return sucesso;
+}
+
+/// @brief Funcao principal para a funcionalidade 8. Abre o arquivo binario em 'bin_path' e insere os registros em 
+/// um grafo direcionado e ponderado.
+/// @param bin_path Caminho para o arquivo binario de registros.
+/// @return Retorna 'sucesso' quando a insercao foi executada sem erros, `erro_processamento` se algum outro erro
+/// foi encontrado
+StatusDeRetorno funcionalidade8 (char *bin_path) {
+
+    FILE* bin = abreBinario(bin_path, "rb");
+    if(bin == NULL){
+        return falha_processamento;
+    }
+
+    Cabecalho *c_buffer = novo_cabecalho();  
+
+    // le o cabecalho para armazenar em 'nroVertices' o numero de tecnologias 
+    // existentes no arquivo binario para usar tanto na criacao do grafo
+    // como em insercao e busca
+    fseek(bin, 0, SEEK_SET);
+    leCabecalho (bin, c_buffer);
+    int nroVertices = c_buffer->nroTecnologias;
+    
+    Vertice *vertices = novo_vetorVertice(nroVertices);
+    vertices = criaGrafo(bin, vertices, nroVertices, TRUE);   
+
+    imprimeGrafo(vertices, nroVertices);
+    
+    free(c_buffer);
+    //free_vertice(vertices);
+
+    return sucesso;
+}
+
+StatusDeRetorno funcionalidade9 (char *bin_path) {
+
+    FILE* bin = abreBinario(bin_path, "rb");
+    if(bin == NULL){
+        return falha_processamento;
+    }
+
+    Cabecalho *c_buffer = novo_cabecalho();  
+
+    fseek(bin, 0, SEEK_SET);
+    leCabecalho (bin, c_buffer);
+    int nroVertices = c_buffer->nroTecnologias;
+    
+    Vertice *vertices = novo_vetorVertice(nroVertices);
+    vertices = criaGrafo(bin, vertices, nroVertices, FALSE); 
+
+    imprimeGrafo(vertices, nroVertices);
+    
+    free(c_buffer);
+    //free_vertice(vertices);
+
+    return sucesso;
+}
+
+StatusDeRetorno funcionalidade10 (char *bin_path, int n, char** campo) {
+
+    FILE* bin = abreBinario(bin_path, "rb");
+    if(bin == NULL){
+        return falha_processamento;
+    }
+
+    Cabecalho *c_buffer = novo_cabecalho();  
+
+    fseek(bin, 0, SEEK_SET);
+    leCabecalho (bin, c_buffer);
+    int nroVertices = c_buffer->nroTecnologias;
+    
+    Vertice *vertices = novo_vetorVertice(nroVertices);
+    vertices = criaGrafo(bin, vertices, nroVertices, TRUE);  
+
+    int index = 0;
+
+    for (int i = 0; i < n; i++) {
+        index = verificaVertices(vertices, campo[i], nroVertices);
+        
+        if (index != -1) {
+            imprimeVertice(vertices[index]);
+        }
+        else {
+            printf("Registro inexistente.");
+        }
+    } 
+
+    free(c_buffer);
+    //free_vertice(vertices);
+
+    return sucesso;
+}
+
+StatusDeRetorno funcionalidade11 (char *bin_path) {
+
+    FILE* bin = abreBinario(bin_path, "rb");
+    if(bin == NULL){
+        return falha_processamento;
+    }
+
+    Cabecalho *c_buffer = novo_cabecalho();  
+
+    fseek(bin, 0, SEEK_SET);
+    leCabecalho (bin, c_buffer);
+    int nroVertices = c_buffer->nroTecnologias;
+    
+    Vertice *vertices = novo_vetorVertice(nroVertices);
+
+    // Chame a função kosaraju para obter o número de componentes conexos
+    kosaraju(vertices, nroVertices, bin);
+
+    // Imprima o número de componentes conexos
+    //printf("O grafo tem %d componentes fortemente conexos.\n", numComponentes);
 
     return sucesso;
 }

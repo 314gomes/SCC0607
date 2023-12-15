@@ -21,3 +21,11 @@ StatusDeRetorno funcionalidade5(char *bin_path, char *index_path);
 StatusDeRetorno funcionalidade6(char *bin_path, char *index_path, int n, char** campo, char** valor);
 
 StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char** linhas);
+
+StatusDeRetorno funcionalidade8 (char *bin_path);
+
+StatusDeRetorno funcionalidade9 (char *bin_path);
+
+StatusDeRetorno funcionalidade10 (char *bin_path, int n, char** campo);
+
+StatusDeRetorno funcionalidade11 (char *bin_path);

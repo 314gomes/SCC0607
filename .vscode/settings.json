@@ -10,6 +10,8 @@
 		"busca.h": "c",
 		"escrita.h": "c",
 		"insercao.h": "c",
-		"funcionalidades.h": "c"
+		"funcionalidades.h": "c",
+		"stdlib.h": "c",
+		"string.h": "c"
 	}
 }

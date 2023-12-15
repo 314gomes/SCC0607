@@ -18,6 +18,11 @@ typedef enum {
 	CREATE_INDEX = 5,
 	SELECT_WHERE_ARB = 6,
 	INSERT_ARB = 7,
+	GRAFO_DIRPON = 8,
+	GRAFO_TRANS = 9,
+	GRAFO_WHERE = 10,
+	GRAFO_CONEX = 11,
+	GRAFO_CAMIN = 12,
 } Comandos;
 
 void criar_termos_busca(int n, char ***campo, char ***valor){
@@ -79,6 +84,30 @@ void destruir_linhas_insercao (int n, char **linhas){
 }
 
 
+void criar_busca_grafo(int n, char ***campo){
+	*campo = calloc(n, sizeof(char*));
+	for (int i = 0; i < n; i++)
+	{
+		(*campo)[i] = calloc(TAM_MAXIMO_STRING, sizeof(char));
+	}
+	
+}
+
+void ler_busca_grafo(int n, char** campo){
+	for (int i = 0; i < n; i++){
+		scan_quote_string(campo[i]);
+	}
+}
+
+void destruir_busca_grafo(int n, char **campo){
+	for (int i = 0; i < n; i++)
+	{
+		free(campo[i]);
+	}
+	free(campo);
+
+}
+ 
 void tratar_comando_entrada(){
 	// variaveis utilizadas na funcao
 	Comandos cmd_in = 0;
@@ -98,8 +127,7 @@ void tratar_comando_entrada(){
 
 	switch (cmd_in){
 		case CREATE_TABLE:
-			
-			
+				
 			scanf("%s", csv_path);
 			scanf("%s", bin_path);
 			
@@ -162,6 +190,37 @@ void tratar_comando_entrada(){
 			status = funcionalidade7(bin_path, index_path, num_insert_arb, linhas);
 			
 			destruir_linhas_insercao(num_insert_arb, linhas);
+
+			break;
+		case GRAFO_DIRPON: // func8
+			scanf("%s", bin_path);
+
+			status = funcionalidade8(bin_path);
+
+			break;
+		case GRAFO_TRANS: // func9
+			scanf("%s", bin_path);
+
+			status = funcionalidade9(bin_path);
+
+			break;
+		case GRAFO_WHERE:
+			scanf("%s", bin_path);
+			scanf("%d", &num_busca);
+
+			criar_busca_grafo(num_busca, &campo);
+
+			ler_busca_grafo (num_busca, campo);
+
+			status = funcionalidade10(bin_path, num_busca, campo);
+
+			destruir_busca_grafo (num_busca, campo);
+
+			break;
+		case GRAFO_CONEX: // func11
+			scanf("%s", bin_path);
+
+			status = funcionalidade11(bin_path);
 
 			break;
 		default:
