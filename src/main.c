@@ -220,8 +220,8 @@ void tratar_comando_entrada(){
 			break;
 		case GRAFO_CONEX: // func11
 			scanf("%s", bin_path);
-			puts("func11");
-			//status = funcionalidade11(bin_path);
+
+			status = funcionalidade11(bin_path);
 
 			break;
 		case GRAFO_CAMIN: //func12

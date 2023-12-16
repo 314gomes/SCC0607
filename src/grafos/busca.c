@@ -5,6 +5,7 @@
 #include "grafos/busca.h"
 #include "grafos/insercao.h"
 #include "grafos/impressao.h"
+#include "grafos/pilha.h"
 
 /// @brief 
 /// @param vertices 
@@ -107,32 +108,78 @@ void menorCaminho(Vertice *vertices, char *inicio, int* verticeAnterior, int* va
     free(verificado);
 }
 
-/*
-void DFS(Vertice* vertices, int vertice, int* visitados, Pilha* pilha, int n) {
-    if (vertice < 0 || vertice >= n) {
-        printf("Erro: Índice inválido em DFS\n");
+void dfsPilha(Pilha *pilha, Vertice *vertices, int ini, int *visitado, int n) {
+    if (visitado[ini] == 1)
         return;
+
+    // marca o vértice como verificado e empilha
+    visitado[ini] = 1;
+    empilha(pilha, ini);
+
+    // verifica os não verificados
+    for (int i = 0; i < vertices[ini].grau_saida; i++) {
+        int index = indiceVertice(vertices, vertices[ini].arestas[i].destino, n);
+        if (visitado[index] == 0)
+            dfsPilha(pilha, vertices, index, visitado, n);
     }
+}
 
-    visitados[vertice] = 1;
+void dfsComponentes(Vertice *vT, int indice, int *verificados, int n) {
+    if (verificados[indice] == 1)
+        return;
 
-    for (int i = 0; i < vertices[vertice].num_arestas; i++) {
-        int adjacente = vertices[vertice].arestas[i].peso;
-        if (adjacente < 0 || adjacente >= n) {
-            printf("Erro: Índice adjacente inválido em DFS\n");
-            continue;
-        }
-        if (!visitados[adjacente]) {
-            DFS(vertices, adjacente, visitados, pilha, n);
-        }
-    }
+    // marca o vértice como verificado e atribui o componente atual
+    verificados[indice] = 1;
 
-    if (pilha != NULL) {
-        empilha(pilha, vertice);  // Empilhar na ordem de finalização
+    // verifica os não verificados
+    for (int i = 0; i < vT[indice].grau_saida; i++) {
+        int index = indiceVertice(vT, vT[indice].arestas[i].destino, n);
+        if (verificados[index] == 0)
+            dfsComponentes(vT, index, verificados, n);
     }
 }
 
 
+int kosaraju (Vertice *v, Vertice *vT, int n) {
+ 
+    Pilha *pilha = (Pilha*) malloc (sizeof(Pilha));
+    inicializaPilha(pilha);
+    
+    int verificados[n];
+    // inicializa vetor de vertices verificados
+    // 0 nao verificado e 1 verificado
+    for(int i = 0; i < n; i++) {
+        verificados[i] = 0;
+    }
+    
+
+    // primeira parte: criar uma pilha de indices
+    // com a busca em profundidade com o grafo direcionado e ponderado
+    for (int i = 0; i < n; i++) {
+        if (verificados[i] == 0)
+            dfsPilha(pilha, v, i, verificados, n);
+    }
+
+
+    // segunda parte: desempilhar a pilha de indicies
+    // com a busca em profundidade com o grafo transposto
+    int nroComponentes = 0;
+
+    for(int i = 0; i < n; i++) {
+        verificados[i] = 0;
+    }
+
+    while (!estaVazia(pilha)) {
+        int indice = desempilha(pilha);
+        if (verificados[indice] == 0) {
+            dfsComponentes(vT, indice, verificados, n);
+            nroComponentes++;
+        }
+    }
+
+    return nroComponentes;
+}
+/*
 void kosaraju(Vertice *vertices, int n, FILE *bin) {
     int *visitados = (int *)malloc(n * sizeof(int));
     memset(visitados, 0, n * sizeof(int));  // Inicializar com 0 (não visitado)

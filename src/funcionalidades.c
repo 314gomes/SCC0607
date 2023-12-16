@@ -593,7 +593,7 @@ StatusDeRetorno funcionalidade10 (char *bin_path, int n, char** campo) {
     return sucesso;
 }
 
-/*
+
 StatusDeRetorno funcionalidade11 (char *bin_path) {
 
     FILE* bin = abreBinario(bin_path, "rb");
@@ -608,16 +608,21 @@ StatusDeRetorno funcionalidade11 (char *bin_path) {
     int nroVertices = c_buffer->nroTecnologias;
     
     Vertice *vertices = novo_vetorVertice(nroVertices);
+    Vertice *verticesT = novo_vetorVertice(nroVertices);
 
-    // Chame a função kosaraju para obter o número de componentes conexos
-    kosaraju(vertices, nroVertices, bin);
+    vertices = criaGrafo(bin, vertices, nroVertices, TRUE);
+    verticesT = criaGrafo(bin, vertices, nroVertices, FALSE);
 
-    // Imprima o número de componentes conexos
-    //printf("O grafo tem %d componentes fortemente conexos.\n", numComponentes);
+    int nroComponentes = kosaraju (vertices, verticesT, nroVertices);
+
+    if (nroComponentes == 1)
+        printf("Sim, o grafo é fortemente conexo e possui 1 componente.");
+    else
+        printf("Não, o grafo não é fortemente conexo e possui %d componentes.", nroComponentes);
 
     return sucesso;
 }
-*/
+
 
 StatusDeRetorno funcionalidade12 (char *bin_path, int n, char** campoOrigem, char** campoDestino) {
     

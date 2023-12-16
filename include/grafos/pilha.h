@@ -1,7 +1,7 @@
 #ifndef PILHA_H
 #define PILHA_H
 
-#define MAX_SIZE 1000
+#define MAX_SIZE 120
 
 typedef struct {
     int itens[MAX_SIZE];

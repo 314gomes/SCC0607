@@ -28,6 +28,6 @@ StatusDeRetorno funcionalidade9 (char *bin_path);
 
 StatusDeRetorno funcionalidade10 (char *bin_path, int n, char** campo);
 
-//StatusDeRetorno funcionalidade11 (char *bin_path);
+StatusDeRetorno funcionalidade11 (char *bin_path);
 
 StatusDeRetorno funcionalidade12 (char *bin_path, int n, char** campoOrigem, char** campoDestino);
