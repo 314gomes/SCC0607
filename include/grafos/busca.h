@@ -6,7 +6,7 @@ void menorCaminho(Vertice *vertices, char *inicio, int* ant, int* dist, int n);
 
 void dfsPilha (Pilha *pilha, Vertice *vertices, int ini, int *visitado, int n);
 
-void dfsComponentes(Vertice *vT, int indice, int *verificados, int n);
+void dfsComponentes(Vertice *vT, int indice, int *verificados, int n, int* num);
 
 int kosaraju (Vertice *v, Vertice *vT, int n);
 /*

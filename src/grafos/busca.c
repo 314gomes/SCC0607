@@ -114,17 +114,19 @@ void dfsPilha(Pilha *pilha, Vertice *vertices, int ini, int *visitado, int n) {
 
     // marca o vértice como verificado e empilha
     visitado[ini] = 1;
-    empilha(pilha, ini);
+    int index;
 
     // verifica os não verificados
     for (int i = 0; i < vertices[ini].grau_saida; i++) {
-        int index = indiceVertice(vertices, vertices[ini].arestas[i].destino, n);
+        index = indiceVertice(vertices, vertices[ini].arestas[i].destino, n);
         if (visitado[index] == 0)
             dfsPilha(pilha, vertices, index, visitado, n);
     }
+
+    empilha(pilha, index);
 }
 
-void dfsComponentes(Vertice *vT, int indice, int *verificados, int n) {
+void dfsComponentes(Vertice *vT, int indice, int *verificados, int n, int* num) {
     if (verificados[indice] == 1)
         return;
 
@@ -133,9 +135,18 @@ void dfsComponentes(Vertice *vT, int indice, int *verificados, int n) {
 
     // verifica os não verificados
     for (int i = 0; i < vT[indice].grau_saida; i++) {
+        //printf("for\n");
         int index = indiceVertice(vT, vT[indice].arestas[i].destino, n);
-        if (verificados[index] == 0)
-            dfsComponentes(vT, index, verificados, n);
+        printf("tecnologia %s\n", vT[indice].arestas[i].destino);
+        if (verificados[index] == 0) {
+            printf("index nao visitado %d\n", index);
+            (*num)++;
+            printf("num %d\n", (*num));
+            dfsComponentes(vT, index, verificados, n, num);
+            
+            
+        }
+            
     }
 }
 
@@ -172,7 +183,8 @@ int kosaraju (Vertice *v, Vertice *vT, int n) {
     while (!estaVazia(pilha)) {
         int indice = desempilha(pilha);
         if (verificados[indice] == 0) {
-            dfsComponentes(vT, indice, verificados, n);
+            printf("entrando dfs %d\n", indice);
+            dfsPilha(pilha, vT, indice, verificados, n);
             nroComponentes++;
         }
     }

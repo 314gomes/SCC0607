@@ -621,6 +621,10 @@ StatusDeRetorno funcionalidade11 (char *bin_path) {
         printf("Não, o grafo não é fortemente conexo e possui %d componentes.", nroComponentes);
 
     return sucesso;
+
+    free(c_buffer);
+    free_vertice(vertices, nroVertices);
+    free_vertice(verticesT, nroVertices);
 }
 
 
