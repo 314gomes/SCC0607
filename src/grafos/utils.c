@@ -16,7 +16,7 @@ Vertice *novo_vertice () {
     Vertice* v_buffer;
     v_buffer = (Vertice*) malloc(sizeof(Vertice));
 
-    v_buffer->destino = NULL;
+    v_buffer->origem = NULL;
     v_buffer->grupo = 0;
     v_buffer->grau_entrada = 0;
     v_buffer->grau_saida = 0;
@@ -33,7 +33,7 @@ Vertice *novo_vetorVertice (int n) {
     Vertice *vertices = (Vertice*) malloc(n*sizeof(Vertice));
 
     for (int i = 0; i < n; ++i) {
-        vertices[i].destino = NULL;  // Substitua pelos valores desejados
+        vertices[i].origem = NULL;  // Substitua pelos valores desejados
         vertices[i].grupo = 0;
         vertices[i].grau_entrada = 0;
         vertices[i].grau_saida = 0;
@@ -47,10 +47,20 @@ Vertice *novo_vetorVertice (int n) {
     return vertices;
 }
 
+/*
 /// @brief Libera memoria de Vertice *
 /// @param v Ponteiro de Vertice a ter sua memoria liberada
-void free_vertice (Vertice *v) {
-    free(v->arestas->origem);
-    free(v->arestas);
-    free(v);
+void free_vertice (Vertice *vertices, int n) {
+
+    if (vertices == NULL) {
+        return;
+    }
+
+    for (int i = 0; i < n; ++i) 
+        free(vertices[i].arestas);
+        free(vertices[i].origem);
+    }
+
+    free(vertices);
 }
+*/

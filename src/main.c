@@ -38,7 +38,8 @@ void criar_termos_busca(int n, char ***campo, char ***valor){
 
 void ler_termos_busca(int n, char** campo, char** valor){
 	for (int i = 0; i < n; i++){
-		scanf("%s", campo[i]);
+		//scanf("%s", campo[i]);
+		scan_quote_string(campo[i]);
 		if(campoDeBuscaEString(campo[i])){
 			scan_quote_string(valor[i]);
 		}
@@ -219,9 +220,21 @@ void tratar_comando_entrada(){
 			break;
 		case GRAFO_CONEX: // func11
 			scanf("%s", bin_path);
+			puts("func11");
+			//status = funcionalidade11(bin_path);
 
-			status = funcionalidade11(bin_path);
+			break;
+		case GRAFO_CAMIN: //func12
+			scanf("%s", bin_path);
+			scanf("%d", &num_busca);
 
+			criar_termos_busca(num_busca, &campo, &valor);
+
+			ler_termos_busca(num_busca, campo, valor);
+
+			status = funcionalidade12(bin_path, num_busca, campo, valor);
+
+			destruir_termos_busca(num_busca, campo, valor);
 			break;
 		default:
 			break;

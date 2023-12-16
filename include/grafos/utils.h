@@ -11,3 +11,5 @@
 Vertice *novo_vertice ();
 
 Vertice *novo_vetorVertice (int n);
+
+void free_vertice (Vertice *v, int n);

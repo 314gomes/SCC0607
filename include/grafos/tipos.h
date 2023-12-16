@@ -6,13 +6,13 @@
 #include <stdio.h>
 
 typedef struct {
-    char *origem;
+    char *destino;
     int peso;
 } Aresta;
 
 // Estrutura para representar uma tecnologia
 typedef struct {
-    char *destino;
+    char *origem;
     int grupo;
     int grau_entrada;
     int grau_saida;

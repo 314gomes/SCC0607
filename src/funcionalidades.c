@@ -528,7 +528,7 @@ StatusDeRetorno funcionalidade8 (char *bin_path) {
     imprimeGrafo(vertices, nroVertices);
     
     free(c_buffer);
-    //free_vertice(vertices);
+    //free_vertice(vertices, nroVertices);
 
     return sucesso;
 }
@@ -552,7 +552,7 @@ StatusDeRetorno funcionalidade9 (char *bin_path) {
     imprimeGrafo(vertices, nroVertices);
     
     free(c_buffer);
-    //free_vertice(vertices);
+    //free_vertice(vertices, nroVertices);
 
     return sucesso;
 }
@@ -576,8 +576,8 @@ StatusDeRetorno funcionalidade10 (char *bin_path, int n, char** campo) {
     int index = 0;
 
     for (int i = 0; i < n; i++) {
-        
-        index = verificaVertices(vertices, campo[i], nroVertices);
+
+        index = indiceVertice (vertices, campo[i], nroVertices);
         
         if (index != -1) {
             imprimeVertice(vertices[index]);
@@ -588,11 +588,12 @@ StatusDeRetorno funcionalidade10 (char *bin_path, int n, char** campo) {
     } 
 
     free(c_buffer);
-    //free_vertice(vertices);
+    //free_vertice(vertices, nroVertices);
 
     return sucesso;
 }
 
+/*
 StatusDeRetorno funcionalidade11 (char *bin_path) {
 
     FILE* bin = abreBinario(bin_path, "rb");
@@ -613,6 +614,47 @@ StatusDeRetorno funcionalidade11 (char *bin_path) {
 
     // Imprima o número de componentes conexos
     //printf("O grafo tem %d componentes fortemente conexos.\n", numComponentes);
+
+    return sucesso;
+}
+*/
+
+StatusDeRetorno funcionalidade12 (char *bin_path, int n, char** campoOrigem, char** campoDestino) {
+    
+    FILE* bin = abreBinario(bin_path, "rb");
+    if(bin == NULL){
+        return falha_processamento;
+    }
+
+    Cabecalho *c_buffer = novo_cabecalho();  
+    
+    fseek(bin, 0, SEEK_SET);
+    leCabecalho (bin, c_buffer);
+    int nroVertices = c_buffer->nroTecnologias;
+    
+    Vertice *vertices = novo_vetorVertice(nroVertices);
+    vertices = criaGrafo(bin, vertices, nroVertices, TRUE);
+    
+    int verticeAnterior[nroVertices];
+    int menorDistancia[nroVertices];
+
+    for (int i = 0; i < n; i++) {
+
+        menorCaminho(vertices, campoOrigem[i], verticeAnterior, menorDistancia, nroVertices);
+
+        int iOrigem = indiceVertice (vertices, campoOrigem[i], nroVertices);
+        int iDestino = indiceVertice (vertices, campoDestino[i], nroVertices);
+
+        printf("%s %s: ", vertices[iOrigem].origem, vertices[iDestino].origem);
+
+        if (menorDistancia[iDestino] != -1)
+            printf("%d\n", menorDistancia[iDestino]);
+        else    
+            printf("CAMINHO INEXISTENTE.\n");
+    } 
+
+    free(c_buffer);
+    //free_vertice(vertices, nroVertices);
 
     return sucesso;
 }
