@@ -47,7 +47,7 @@ Vertice *novo_vetorVertice (int n) {
     return vertices;
 }
 
-/*
+
 /// @brief Libera memoria de Vertice *
 /// @param v Ponteiro de Vertice a ter sua memoria liberada
 void free_vertice (Vertice *vertices, int n) {
@@ -56,11 +56,10 @@ void free_vertice (Vertice *vertices, int n) {
         return;
     }
 
-    for (int i = 0; i < n; ++i) 
+    for (int i = 0; i < n; ++i) {
         free(vertices[i].arestas);
         free(vertices[i].origem);
     }
 
     free(vertices);
 }
-*/

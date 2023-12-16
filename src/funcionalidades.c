@@ -528,7 +528,7 @@ StatusDeRetorno funcionalidade8 (char *bin_path) {
     imprimeGrafo(vertices, nroVertices);
     
     free(c_buffer);
-    //free_vertice(vertices, nroVertices);
+    free_vertice(vertices, nroVertices);
 
     return sucesso;
 }
@@ -552,7 +552,7 @@ StatusDeRetorno funcionalidade9 (char *bin_path) {
     imprimeGrafo(vertices, nroVertices);
     
     free(c_buffer);
-    //free_vertice(vertices, nroVertices);
+    free_vertice(vertices, nroVertices);
 
     return sucesso;
 }
@@ -588,7 +588,7 @@ StatusDeRetorno funcionalidade10 (char *bin_path, int n, char** campo) {
     } 
 
     free(c_buffer);
-    //free_vertice(vertices, nroVertices);
+    free_vertice(vertices, nroVertices);
 
     return sucesso;
 }
@@ -654,7 +654,7 @@ StatusDeRetorno funcionalidade12 (char *bin_path, int n, char** campoOrigem, cha
     } 
 
     free(c_buffer);
-    //free_vertice(vertices, nroVertices);
+    free_vertice(vertices, nroVertices);
 
     return sucesso;
 }
