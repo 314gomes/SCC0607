@@ -40,19 +40,19 @@ void atualizaVertice (int index, Vertice *vertices, Registro* r_buffer, char* or
 
     if (index != -1) {
         if (flag == 0) {
-            vertices[index].grau_entrada++;
+            vertices[index].grau_saida++;
             int num_arestas = vertices[index].num_arestas;
-            vertices[index].arestas[num_arestas].origem = strdup(origem);
+            vertices[index].arestas[num_arestas].origem = strdup(destino);
             vertices[index].arestas[num_arestas].peso = r_buffer->peso;
             vertices[index].num_arestas++;
 
-            if (bool == FALSE)
+            if (bool == TRUE)
                 vertices[index].grupo = r_buffer->grupo;
  
         }      
         else {
-            vertices[index].grau_saida++;
-            if (bool == TRUE)
+            vertices[index].grau_entrada++;
+            if (bool == FALSE)
                 vertices[index].grupo = r_buffer->grupo;
         }
             
@@ -72,19 +72,19 @@ void atualizaVertice (int index, Vertice *vertices, Registro* r_buffer, char* or
         if (free_index != -1) {
             // Utilize o vértice livre
             if (flag == 0) {
-                vertices[free_index].destino = strdup(destino);                 
-                vertices[free_index].grau_entrada = 1;
+                vertices[free_index].destino = strdup(origem);                 
+                vertices[free_index].grau_saida = 1;
                 vertices[free_index].num_arestas = 1;
-                vertices[free_index].arestas[0].origem = strdup(origem);
+                vertices[free_index].arestas[0].origem = strdup(destino);
                 vertices[free_index].arestas[0].peso = r_buffer->peso;
 
-                if (bool == FALSE)
+                if (bool == TRUE)
                     vertices[free_index].grupo = r_buffer->grupo;
             }
             else {     
-                vertices[free_index].destino = strdup(origem);
-                vertices[free_index].grau_saida = 1;
-                if (bool == TRUE)
+                vertices[free_index].destino = strdup(destino);
+                vertices[free_index].grau_entrada = 1;
+                if (bool == FALSE)
                     vertices[free_index].grupo = r_buffer->grupo;
             }
             
@@ -104,8 +104,8 @@ void insereGrafo (Vertice *vertices, Registro *r_buffer, int n) {
     int iDestino = verificaVertices(vertices, charDestino, n);
     int iOrigem = verificaVertices(vertices, charOrigem, n);
 
-    atualizaVertice (iDestino, vertices, r_buffer, charOrigem, charDestino, n, 0, TRUE);
-    atualizaVertice (iOrigem, vertices, r_buffer, charOrigem, charDestino, n, 1, TRUE);
+    atualizaVertice (iDestino, vertices, r_buffer, charOrigem, charDestino, n, 1, TRUE);
+    atualizaVertice (iOrigem, vertices, r_buffer, charOrigem, charDestino, n, 0, TRUE);
 }
 
 void insereGrafoTransposto (Vertice *vertices, Registro *r_buffer, int n) {
@@ -115,8 +115,8 @@ void insereGrafoTransposto (Vertice *vertices, Registro *r_buffer, int n) {
     int iDestino = verificaVertices(vertices, charDestino, n);
     int iOrigem = verificaVertices(vertices, charOrigem, n);
 
-    atualizaVertice (iOrigem, vertices, r_buffer, charDestino, charOrigem, n, 0, FALSE);
-    atualizaVertice (iDestino, vertices, r_buffer, charDestino, charOrigem, n, 1, FALSE);
+    atualizaVertice (iOrigem, vertices, r_buffer, charDestino, charOrigem, n, 1, FALSE);
+    atualizaVertice (iDestino, vertices, r_buffer, charDestino, charOrigem, n, 0, FALSE);
 }
 
 /// @brief Funcao principal para a criacao de um grafo. Le o arquivo binario, armazena temporariamente o 

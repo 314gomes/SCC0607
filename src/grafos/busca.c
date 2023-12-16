@@ -4,6 +4,7 @@
 #include "grafos/utils.h"
 #include "grafos/busca.h"
 #include "grafos/insercao.h"
+#include "grafos/impressao.h"
 
 
 int verificaVertices (Vertice *vertices, char *string, int n) {
@@ -15,6 +16,16 @@ int verificaVertices (Vertice *vertices, char *string, int n) {
     }
     
     return -1;
+}
+
+void verificaOrigem (Vertice vertice, char *string) {
+    //printf("==> %s\n", vertice.destino);
+    for (int i = 0; i < vertice.num_arestas; i++) {
+        printf("\t%s,\n", vertice.arestas[i].origem);
+        //if (strcmp(string, vertice.arestas[i].origem) == 0)
+            //printf ("\t(procuro: %s destino: %s origem: %s)\n",string, vertice.arestas[i].origem, vertice.destino);
+
+    }
 }
 
 void DFS(Vertice* vertices, int vertice, int* visitados, Pilha* pilha, int n) {

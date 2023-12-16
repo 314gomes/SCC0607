@@ -571,11 +571,12 @@ StatusDeRetorno funcionalidade10 (char *bin_path, int n, char** campo) {
     int nroVertices = c_buffer->nroTecnologias;
     
     Vertice *vertices = novo_vetorVertice(nroVertices);
-    vertices = criaGrafo(bin, vertices, nroVertices, TRUE);  
+    vertices = criaGrafo(bin, vertices, nroVertices, FALSE);  
 
     int index = 0;
 
     for (int i = 0; i < n; i++) {
+        
         index = verificaVertices(vertices, campo[i], nroVertices);
         
         if (index != -1) {
