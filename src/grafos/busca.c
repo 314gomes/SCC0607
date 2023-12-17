@@ -213,6 +213,7 @@ int kosaraju (Vertice *vertices, Vertice *verticesT, int n) {
         }
     }
 
+    free(pilha);
     free(verificados);
 
     return nroComponentes;
