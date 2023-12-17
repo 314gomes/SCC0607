@@ -9,26 +9,9 @@
 #include "grafos/utils.h"
 #include "grafos/defines.h"
 
-/// @brief  Alocar memoria e atribuir valores padrao a um buffer Vertice
-/// @return Ponteiro para novo Vertice
-Vertice *novo_vertice () {
-
-    Vertice* v_buffer;
-    v_buffer = (Vertice*) malloc(sizeof(Vertice));
-
-    v_buffer->origem = NULL;
-    v_buffer->grupo = 0;
-    v_buffer->grau_entrada = 0;
-    v_buffer->grau_saida = 0;
-    v_buffer->grau_total = 0;
-    v_buffer->num_arestas = 0;
-
-    v_buffer->arestas = (Aresta*) malloc(NUM_ARESTAS*sizeof(Aresta));
-
-    return v_buffer;
-
-}
-
+/// @brief Funcao utilizada para inicializar um vetor de vertices.
+/// @param n Numero de vertices.
+/// @return Retorna um vetor de vertices.
 Vertice *novo_vetorVertice (int n) {
     Vertice *vertices = (Vertice*) malloc(n*sizeof(Vertice));
 
@@ -48,8 +31,9 @@ Vertice *novo_vetorVertice (int n) {
 }
 
 
-/// @brief Libera memoria de Vertice *
-/// @param v Ponteiro de Vertice a ter sua memoria liberada
+/// @brief Libera memoria de um vetor de vertices.
+/// @param v Ponteiro de Vertice a ter sua memoria liberada.
+/// @param n Numero de vertices.
 void free_vertice (Vertice *vertices, int n) {
 
     if (vertices == NULL) {

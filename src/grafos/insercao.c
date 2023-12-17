@@ -14,6 +14,7 @@
 #include "arquivos/defines.h"
 #include "grafos/defines.h"
 
+// funcoes elaboras para comparar e ordenas as arestas de um vertice.
 int compararArestas(const void *a, const void *b) {
     const Aresta *aresta1 = (const Aresta *)a;
     const Aresta *aresta2 = (const Aresta *)b;
@@ -26,6 +27,7 @@ void ordenarArestas(Vertice *vertice) {
     }
 }
 
+// funcoes elaboras para comparar e ordenas os vertices de um vetor.
 int compararDestinos(const void *a, const void *b) {
     const Vertice *vertice1 = (const Vertice *)a;
     const Vertice *vertice2 = (const Vertice *)b;
@@ -35,6 +37,7 @@ int compararDestinos(const void *a, const void *b) {
 void ordenarDestinos(Vertice *vertices, int n) {
     qsort(vertices, n, sizeof(Vertice), compararDestinos);
 }
+
 
 /// @brief Funcao que atualiza os vertices e as arestas do grafo ponderado e direcionado
 /// @param index Indice do vertice no vetor de vertices.

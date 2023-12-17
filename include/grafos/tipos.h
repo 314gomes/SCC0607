@@ -5,12 +5,13 @@
 */
 #include <stdio.h>
 
+// Estrutura para representar uma aresta de um vertice
 typedef struct {
     char *destino;
     int peso;
 } Aresta;
 
-// Estrutura para representar uma tecnologia
+// Estrutura para representar um vertice
 typedef struct {
     char *origem;
     int grupo;

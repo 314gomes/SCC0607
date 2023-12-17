@@ -502,10 +502,10 @@ StatusDeRetorno funcionalidade7 (char *bin_path, char *index_path, int n, char**
 }
 
 /// @brief Funcao principal para a funcionalidade 8. Abre o arquivo binario em 'bin_path' e insere os registros em 
-/// um grafo direcionado e ponderado.
+/// um grafo direcionado e ponderado. Em seguida, imprime o grafo de acordo com as especificacoes da documentacao.
 /// @param bin_path Caminho para o arquivo binario de registros.
 /// @return Retorna 'sucesso' quando a insercao foi executada sem erros, `erro_processamento` se algum outro erro
-/// foi encontrado
+/// foi encontrado.
 StatusDeRetorno funcionalidade8 (char *bin_path) {
 
     FILE* bin = abreBinario(bin_path, "rb");
@@ -513,11 +513,10 @@ StatusDeRetorno funcionalidade8 (char *bin_path) {
         return falha_processamento;
     }
 
-    Cabecalho *c_buffer = novo_cabecalho();  
-
     // le o cabecalho para armazenar em 'nroVertices' o numero de tecnologias 
     // existentes no arquivo binario para usar tanto na criacao do grafo
     // como em insercao e busca
+    Cabecalho *c_buffer = novo_cabecalho(); 
     fseek(bin, 0, SEEK_SET);
     leCabecalho (bin, c_buffer);
     int nroVertices = c_buffer->nroTecnologias;
@@ -533,6 +532,12 @@ StatusDeRetorno funcionalidade8 (char *bin_path) {
     return sucesso;
 }
 
+/// @brief Funcao principal para a funcionalidade 9. Abre o arquivo binario em 'bin_path' e insere os registros em 
+/// um grafo direcionado e ponderado transposto. Em seguida, imprime o grafo transposto de acordo com as especificacoes 
+/// da documentacao.
+/// @param bin_path Caminho para o arquivo binario de registros.
+/// @return Retorna 'sucesso' quando a insercao foi executada sem erros, `erro_processamento` se algum outro erro
+/// foi encontrado.
 StatusDeRetorno funcionalidade9 (char *bin_path) {
 
     FILE* bin = abreBinario(bin_path, "rb");
@@ -540,8 +545,10 @@ StatusDeRetorno funcionalidade9 (char *bin_path) {
         return falha_processamento;
     }
 
+    // le o cabecalho para armazenar em 'nroVertices' o numero de tecnologias 
+    // existentes no arquivo binario para usar tanto na criacao do grafo
+    // como em insercao e busca
     Cabecalho *c_buffer = novo_cabecalho();  
-
     fseek(bin, 0, SEEK_SET);
     leCabecalho (bin, c_buffer);
     int nroVertices = c_buffer->nroTecnologias;
@@ -557,6 +564,14 @@ StatusDeRetorno funcionalidade9 (char *bin_path) {
     return sucesso;
 }
 
+/// @brief Funcao principal da funcionalidade 10. Abre o arquivo binario em 'bin_path' e insere os registros em 
+/// um grafo direcionado e ponderado transposto. Em seguida, realiza busca pelas tecnologias recebidas e as imprime
+/// junto de suas origens de acordo com as especificacoes da documentacao.
+/// @param bin_path Caminho para o arquivo binario de registros.
+/// @param n Numero de tecnologias que serao buscadas.
+/// @param campo Vetor de strings que armazena as tecnologias que serao buscadas.
+/// @return Retorna 'sucesso' quando a insercao e a busca foram executadas sem erros, `erro_processamento` se 
+/// algum outro erro foi encontrado.
 StatusDeRetorno funcionalidade10 (char *bin_path, int n, char** campo) {
 
     FILE* bin = abreBinario(bin_path, "rb");
@@ -570,6 +585,8 @@ StatusDeRetorno funcionalidade10 (char *bin_path, int n, char** campo) {
     leCabecalho (bin, c_buffer);
     int nroVertices = c_buffer->nroTecnologias;
     
+    // grafo transposto e utilizado para otimizar a busca pelo destino
+    // e suas origens
     Vertice *vertices = novo_vetorVertice(nroVertices);
     vertices = criaGrafo(bin, vertices, nroVertices, FALSE);  
 
@@ -577,14 +594,16 @@ StatusDeRetorno funcionalidade10 (char *bin_path, int n, char** campo) {
 
     for (int i = 0; i < n; i++) {
 
+        // index i quando vertice encontrado e -1 quando vertice nao existe
         index = indiceVertice (vertices, campo[i], nroVertices);
         
         if (index != -1) {
             imprimeVertice(vertices[index]);
         }
         else {
-            printf("Registro inexistente.");
+            printf("Registro inexistente.\n\n");
         }
+
     } 
 
     free(c_buffer);
@@ -593,7 +612,12 @@ StatusDeRetorno funcionalidade10 (char *bin_path, int n, char** campo) {
     return sucesso;
 }
 
-
+/// @brief Funcao principal da funcionalidade 11. Abre o arquivo binario em 'bin_path' e insere os registros em 
+/// um grafo e em um transposto. Em seguida, encaminha para o algoritmo kosaraju para fazer uma busca em profundidade
+/// e achar o numero de componentes conexos. Imprime o numero de componentes e se o grafo é fortemente conexo.
+/// @param bin_path Caminho para o arquivo binario de registros.
+/// @return Retorna 'sucesso' quando a insercao e o kosaraju foram executados sem erros, `erro_processamento` se 
+/// algum outro erro foi encontrado.
 StatusDeRetorno funcionalidade11 (char *bin_path) {
 
     FILE* bin = abreBinario(bin_path, "rb");
@@ -607,12 +631,20 @@ StatusDeRetorno funcionalidade11 (char *bin_path) {
     leCabecalho (bin, c_buffer);
     int nroVertices = c_buffer->nroTecnologias;
     
+    // sao criados dois vetores de vertices, 'vertices' para armazenar normalmente
+    //o grafo e 'verticesT' para armazenar o transposto desse mesmo grafo.
     Vertice *vertices = novo_vetorVertice(nroVertices);
     Vertice *verticesT = novo_vetorVertice(nroVertices);
 
     vertices = criaGrafo(bin, vertices, nroVertices, TRUE);
-    verticesT = criaGrafo(bin, vertices, nroVertices, FALSE);
+  
+    // retorno ao inicio do arquivo binario
+    fseek(bin, 0, SEEK_SET);
+    leCabecalho (bin, c_buffer);
 
+    verticesT = criaGrafo(bin, verticesT, nroVertices, FALSE);
+
+    // 'nroComponentes' recebe o numero de componentes conexos calculado pelo kosaraju
     int nroComponentes = kosaraju (vertices, verticesT, nroVertices);
 
     if (nroComponentes == 1)
@@ -620,14 +652,23 @@ StatusDeRetorno funcionalidade11 (char *bin_path) {
     else
         printf("Não, o grafo não é fortemente conexo e possui %d componentes.", nroComponentes);
 
-    return sucesso;
-
     free(c_buffer);
     free_vertice(vertices, nroVertices);
     free_vertice(verticesT, nroVertices);
+
+    return sucesso;
 }
 
-
+/// @brief Funcao principal da funcionalidade 12. Abre o arquivo binario em 'bin_path' e insere os registros em 
+/// um grafo direcionado e ponderado. Em seguida, inicializa vetores de inteiros que serao utilizados no calculo do
+/// menor caminho entre os dois vertices recebidos por meio do algoritmo dijkstra e os imprime de acordo com as 
+/// especificacoes da documentacao.
+/// @param bin_path Caminho para o arquivo binario de registros.
+/// @param n Numero de caminhos que serao buscados.
+/// @param campoOrigem Vetor de strings que armazena as origens dos caminhos que serao calculados.
+/// @param campoDestino Vetor de strings que armazena os destinos dos caminhos que serao calculados.
+/// @return Retorna 'sucesso' quando a insercao e a busca foram executadas sem erros, `erro_processamento` se 
+/// algum outro erro foi encontrado.
 StatusDeRetorno funcionalidade12 (char *bin_path, int n, char** campoOrigem, char** campoDestino) {
     
     FILE* bin = abreBinario(bin_path, "rb");
@@ -644,22 +685,40 @@ StatusDeRetorno funcionalidade12 (char *bin_path, int n, char** campoOrigem, cha
     Vertice *vertices = novo_vetorVertice(nroVertices);
     vertices = criaGrafo(bin, vertices, nroVertices, TRUE);
     
+    // armazena qual sera o vertice anterior no menor caminho.
     int verticeAnterior[nroVertices];
+    // armazena a menor distancia entre o vertice definido como origem e os demais.
     int menorDistancia[nroVertices];
 
     for (int i = 0; i < n; i++) {
 
-        menorCaminho(vertices, campoOrigem[i], verticeAnterior, menorDistancia, nroVertices);
-
+        // busca pelos indices da origem e do destino no vetor de vertices.
+        // retorna -1 quando a tecnologia nao existe no vetor de vertices.
         int iOrigem = indiceVertice (vertices, campoOrigem[i], nroVertices);
         int iDestino = indiceVertice (vertices, campoDestino[i], nroVertices);
-
-        printf("%s %s: ", vertices[iOrigem].origem, vertices[iDestino].origem);
-
-        if (menorDistancia[iDestino] != -1)
-            printf("%d\n", menorDistancia[iDestino]);
-        else    
+        
+        printf("%s %s: ", campoOrigem[i], campoDestino[i]);
+        
+        // caso a origem ou o destino encaminhados nao existam no
+        // vetor de vertices.
+        if (iOrigem == -1 || iDestino == -1) {
             printf("CAMINHO INEXISTENTE.\n");
+        }
+        // caso a origem ou o destino encaminhados existam no
+        // vetor de vertices.
+        else {
+            // atribui o menor caminho da origem para os demais vertices
+            // no vetor 'menorDistancia'
+            menorCaminho(vertices, campoOrigem[i], verticeAnterior, menorDistancia, nroVertices);
+            
+            // verifica a distancia para o destino solicitado
+            if (menorDistancia[iDestino] != -1)
+                printf("%d\n", menorDistancia[iDestino]);
+            // caso o caminho nao exista
+            else    
+                printf("CAMINHO INEXISTENTE.\n");
+        }
+        
     } 
 
     free(c_buffer);
